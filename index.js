@@ -7,10 +7,10 @@ const morgan = require('morgan')
 const { connect } = require('mongoose')
 const log = require('npmlog')
 const rateLimit = require('express-rate-limit')
-
+const { USER_ROUTE } = require('./routes/user_route')
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 1, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+    max: 100, // Limit each IP to 1000 requests per `window` (here, per 15 minutes)
     standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
     legacyHeaders: false, // Disable the `X-RateLimit-*` headers
     message: { msg: 'Too many requests from this IP, please try again later', status: 429, success: false },
@@ -19,12 +19,14 @@ const limiter = rateLimit({
     }
 })
 
-
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('combined'))
 app.use(limiter)
+
+// Routes
+app.use('/user', USER_ROUTE);
 
 // Starting the server
 http.listen(PORT, async () => {

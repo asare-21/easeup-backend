@@ -9,6 +9,11 @@ const userSchema = new Schema({
         required: true,
         unique: true
     },
+    token: {
+        type: String,
+        required: true
+    },
+
     name: {
         type: String,
         required: true
@@ -39,4 +44,4 @@ const userSchema = new Schema({
     },
 })
 
-module.exports = model('User', userSchema);
+module.exports.userModel = model('User', userSchema);

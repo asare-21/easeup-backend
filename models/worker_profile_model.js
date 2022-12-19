@@ -36,3 +36,5 @@ const workerProfileSchema = new Schema({
         default: []
     },
 });
+
+module.exports.workerProfileModel = model('WorkerProfile', workerProfileSchema);
