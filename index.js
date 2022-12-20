@@ -29,6 +29,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.enable('trust proxy');
 app.set('view engine', 'ejs');
 app.set('views', 'views');
+frontEndApp.use(express.static(path.join(__dirname, 'public')));
+frontEndApp.enable('trust proxy');
+frontEndApp.set('view engine', 'ejs');
+frontEndApp.set('views', 'views');
 
 
 // Middleware
@@ -53,7 +57,7 @@ if (process.env.NODE_ENV === 'production') {
     frontEndApp.use('/', HOME)
 }
 else {
-    // Routes
+    // Development Routes
     app.use('/user', USER_ROUTE);
     app.use('/', HOME)
 }
