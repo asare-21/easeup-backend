@@ -69,7 +69,7 @@ api.use((req, res, next) => {
 
 frontEndApp.use((req, res, next) => {
     res.status(404).json({
-        msg: 'Undefined route', status: 404, success: false,
+        msg: 'Not found, status: 404, success: false',
         path: req.path
     })
     next()
