@@ -28,7 +28,7 @@ router.get('/profile', async (req, res) => {
             // User Not Found
             log.warn(e.message)
 
-            return res.status(404).json({ msg: e.errorInfo.message, status: 404, success: false })
+            return returnUnAuthUserError(res, e.message)
         }
         return commonError(res, e.message)
     }
@@ -62,7 +62,7 @@ router.post('/update', async (req, res) => {
             // User Not Found
             log.warn(e.message)
 
-            return res.status(404).json({ msg: e.errorInfo.message, status: 404, success: false })
+            return returnUnAuthUserError(res, e.message)
         }
         return commonError(res, e.message)
     }
@@ -70,12 +70,12 @@ router.post('/update', async (req, res) => {
 
 router.post('/create', async (req, res) => {
     try {   // required field : user_id
-        const { user_id } = req.body;
+        const { user_id, email, name, last_login } = req.body;
         if (!user_id) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID is required
         // required field : email, name, last_login
         await admin.auth().getUser(user_id)
 
-        const { email, name, last_login } = req.body;
+        const { } = req.body;
         if (!email || !name || !last_login) return res.status(400).json({ msg: 'Bad Request. Missing fields', status: 400, success: false }) // Email, Name and Last Login are required
         // Create the user
         const user = new userModel({
@@ -97,7 +97,7 @@ router.post('/create', async (req, res) => {
             // User Not Found
             log.warn(e.message)
 
-            return res.status(404).json({ msg: e.errorInfo.message, status: 404, success: false })
+            return returnUnAuthUserError(res, e.message)
         }
         return commonError(res, e.message)
     }
@@ -125,7 +125,7 @@ router.get('/nofications', async (req, res) => {
             // User Not Found
             log.warn(e.message)
 
-            return res.status(404).json({ msg: e.errorInfo.message, status: 404, success: false })
+            return returnUnAuthUserError(res, e.message)
         }
         return commonError(res, e.message)
     }
@@ -154,7 +154,7 @@ router.get('/bookmarks', async (req, res) => {
             // User Not Found
             log.warn(e.message)
 
-            return res.status(404).json({ msg: e.errorInfo.message, status: 404, success: false })
+            return returnUnAuthUserError(res, e.message)
         }
         return commonError(res, e.message)
     }
@@ -186,7 +186,7 @@ router.delete('/bookmarks/delete', async (req, res) => {
             // User Not Found
             log.warn(e.message)
 
-            return res.status(404).json({ msg: e.errorInfo.message, status: 404, success: false })
+            return returnUnAuthUserError(res, e.message)
         }
         return commonError(res, e.message)
     }
