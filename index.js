@@ -40,19 +40,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('combined'))
 app.use(limiter)
-// enforce https
-api.use(function (req, res, next) {
-    if (process.env.NODE_ENV != 'development' && !req.secure) {
-        return res.redirect('https://' + req.headers.host + req.url);
-    }
-    next();
-})
-frontEndApp.use(function (req, res, next) {
-    if (process.env.NODE_ENV != 'development' && !req.secure) {
-        return res.redirect('https://' + req.headers.host + req.url);
-    }
-    next();
-})
+
 // vhost (subdomain and domain)
 if (process.env.NODE_ENV === 'production') {
     app.use(vhost('api.easeupgh.tech', api));
@@ -71,6 +59,19 @@ if (process.env.NODE_ENV === 'production') {
 
     frontEndApp.use((req, res, next) => {
         return res.render('404',)
+    })
+    // enforce https
+    api.use(function (req, res, next) {
+        if (process.env.NODE_ENV != 'development' && !req.secure) {
+            return res.redirect('https://' + req.headers.host + req.url);
+        }
+        next();
+    })
+    frontEndApp.use(function (req, res, next) {
+        if (process.env.NODE_ENV != 'development' && !req.secure) {
+            return res.redirect('https://' + req.headers.host + req.url);
+        }
+        next();
     })
 }
 else {
