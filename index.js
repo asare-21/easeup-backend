@@ -63,16 +63,14 @@ if (process.env.NODE_ENV === 'production') {
     frontEndApp.use('/', HOME)
     // handle 404
     api.use((req, res, next) => {
-        res.status(404).json({
+        return res.status(404).json({
             msg: 'Undefined route', status: 404, success: false,
             path: req.path
         })
-        next()
     })
 
     frontEndApp.use((req, res, next) => {
-        res.render('404',)
-        next()
+        return res.render('404',)
     })
 }
 else {
