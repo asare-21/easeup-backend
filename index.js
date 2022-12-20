@@ -44,16 +44,30 @@ app.use(function (req, res, next) {
     next();
 })
 // vhost (subdomain and domain)
-if (process.env.NODE_ENV !== 'development') {
+if (process.env.NODE_ENV === 'production') {
     app.use(vhost('api.easeupgh.tech', api));
     app.use(vhost('www.easeupgh.tech', frontEndApp));
+    // Production Routes
+    api.use('/user', USER_ROUTE);
+    frontEndApp.use('/', HOME)
 }
-// Routes
-api.use('/user', USER_ROUTE);
-frontEndApp.use('/', HOME)
+else {
+    // Routes
+    app.use('/user', USER_ROUTE);
+    app.use('/', HOME)
+}
+
 
 // handle 404
 api.use((req, res, next) => {
+    res.status(404).json({
+        msg: 'Undefined route', status: 404, success: false,
+        path: req.path
+    })
+    next()
+})
+
+frontEndApp.use((req, res, next) => {
     res.status(404).json({
         msg: 'Undefined route', status: 404, success: false,
         path: req.path
