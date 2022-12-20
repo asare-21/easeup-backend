@@ -1,13 +1,14 @@
 require('dotenv').config();
 const express = require('express');
 const app = express();
-const http = require('http').createServer(app);
+var path = require('path');
 const PORT = process.env.PORT || 3000;
 const morgan = require('morgan')
 const { connect } = require('mongoose')
 const log = require('npmlog')
 const rateLimit = require('express-rate-limit')
 const { USER_ROUTE } = require('./routes/user_route')
+const { HOME } = require('./routes/index')
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
     max: 100, // Limit each IP to 1000 requests per `window` (here, per 15 minutes)
@@ -20,8 +21,10 @@ const limiter = rateLimit({
 })
 
 // Static files
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'public')));
 app.enable('trust proxy');
+app.set('view engine', 'ejs');
+app.set('views', 'views');
 
 
 // Middleware
@@ -31,6 +34,7 @@ app.use(morgan('combined'))
 app.use(limiter)
 // enforce https
 app.use(function (req, res, next) {
+    log.info(process.env.NODE_ENV, "NODE_ENV")
     if (process.env.NODE_ENV != 'development' && !req.secure) {
         return res.redirect('https://' + req.headers.host + req.url);
     }
@@ -39,9 +43,20 @@ app.use(function (req, res, next) {
 
 // Routes
 app.use('/user', USER_ROUTE);
+app.use('/', HOME)
+
+// handle 404
+app.use((req, res, next) => {
+    res.status(404).json({
+        msg: 'Not found', status: 404, success: false,
+        path: req.path
+    })
+    next()
+})
+
 
 // Starting the server
-http.listen(PORT, async () => {
+app.listen(PORT, async () => {
     try {
         log.info(`Listening on port ${PORT}`);
         await connect(`mongodb+srv://${process.env.easeup_admin_founder_email}:${process.env.easeup_admin_founder_pass}@easeup-cluster.pfxvast.mongodb.net/?retryWrites=true&w=majority`, {
