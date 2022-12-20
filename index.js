@@ -1,5 +1,7 @@
 require('dotenv').config();
 const express = require('express');
+const api = express();
+const frontEndApp = express();
 const app = express();
 var path = require('path');
 const PORT = process.env.PORT || 3000;
@@ -11,6 +13,7 @@ const { USER_ROUTE } = require('./routes/user_route')
 const { HOME } = require('./routes/index')
 var serviceAccount = require("./easeup.json");
 var admin = require("firebase-admin");
+const vhost = require('vhost');
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
     max: 100, // Limit each IP to 1000 requests per `window` (here, per 15 minutes)
@@ -40,13 +43,17 @@ app.use(function (req, res, next) {
     }
     next();
 })
-
+// vhost (subdomain and domain)
+if (process.env.NODE_ENV !== 'development') {
+    app.use(vhost('api.easeupgh.tech', api));
+    app.use(vhost('www.easeupgh.tech', frontEndApp));
+}
 // Routes
-app.use('/user', USER_ROUTE);
-app.use('/', HOME)
+api.use('/user', USER_ROUTE);
+frontEndApp.use('/', HOME)
 
 // handle 404
-app.use((req, res, next) => {
+api.use((req, res, next) => {
     res.status(404).json({
         msg: 'Undefined route', status: 404, success: false,
         path: req.path
