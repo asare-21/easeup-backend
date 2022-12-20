@@ -21,7 +21,7 @@ const limiter = rateLimit({
 
 // Static files
 app.use(express.static('public'));
-
+app.enable('trust proxy');
 
 
 // Middleware
@@ -29,6 +29,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('combined'))
 app.use(limiter)
+// enforce https
+app.use(function (req, res, next) {
+    if (process.env.NODE_ENV != 'development' && !req.secure) {
+        return res.redirect('https://' + req.headers.host + req.url);
+    }
+})
 
 // Routes
 app.use('/user', USER_ROUTE);
