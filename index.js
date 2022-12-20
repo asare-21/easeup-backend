@@ -25,11 +25,10 @@ const limiter = rateLimit({
     }
 })
 // Static files
-frontEndApp.use(express.static(path.join(__dirname, 'public')));
-frontEndApp.enable('trust proxy');
-api.enable('trust proxy');
-frontEndApp.set('view engine', 'ejs');
-frontEndApp.set('views', 'views');
+app.use(express.static(path.join(__dirname, 'public')));
+app.enable('trust proxy');
+app.set('view engine', 'ejs');
+app.set('views', 'views');
 
 
 // Middleware
@@ -47,7 +46,6 @@ app.use(function (req, res, next) {
 // vhost (subdomain and domain)
 if (process.env.NODE_ENV === 'production') {
     app.use(vhost('api.easeupgh.tech', api));
-    app.use(vhost('www.easeupgh.tech', frontEndApp));
     app.use(vhost('easeupgh.tech', frontEndApp));
     // Production Routes
     api.use('/user', USER_ROUTE);
