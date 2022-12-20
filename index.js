@@ -48,6 +48,7 @@ app.use(function (req, res, next) {
 if (process.env.NODE_ENV === 'production') {
     app.use(vhost('api.easeupgh.tech', api));
     app.use(vhost('www.easeupgh.tech', frontEndApp));
+    app.use(vhost('easeupgh.tech', frontEndApp));
     // Production Routes
     api.use('/user', USER_ROUTE);
     frontEndApp.use('/', HOME)
