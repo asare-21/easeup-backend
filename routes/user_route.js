@@ -1,108 +1,195 @@
 const router = require('express').Router();
 const { userModel } = require('../models/user_model');
+const admin = require("firebase-admin");
+const log = require('npmlog')
 
+function returnUnAuthUserError(res, msg) {
+    return res.status(401).json({ msg: 'Unauthorized User', status: 401, success: false })
+}
+function commonError(res, msg) {
+    return res.status(500).json({ msg: 'Internal Server Error', status: 500, success: false })
+}
+router.get('/profile', async (req, res) => {
+    try {    // required field : user_id
+        const { user_id } = req.body;
+        if (!user_id) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID is required
+        //check firebase if uid exists
+        await admin.auth().getUser(user_id)
 
-router.get('/profile', (req, res) => {
-    // required field : user_id
-    const { user_id } = req.body;
-    if (!user_id) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID is required
-    // Find the user
-    userModel.findById(user_id, (err, user) => {
-        if (err) return res.status(500).json({ msg: 'Internal Server Error', status: 500, success: false }) // Internal Server Error
-        if (!user) return res.status(404).json({ msg: 'User Not Found', status: 404, success: false }) // User Not Found
-        return res.status(200).json({ msg: 'User Found', status: 200, success: true, user }) // User Found and returned
-    })
+        // Find the user
+        userModel.findById(user_id, (err, user) => {
+            if (err) return res.status(500).json({ msg: 'Internal Server Error', status: 500, success: false }) // Internal Server Error
+            if (!user) return res.status(404).json({ msg: 'User Not Found', status: 404, success: false }) // User Not Found
+            return res.status(200).json({ msg: 'User Found', status: 200, success: true, user }) // User Found and returned
+        })
+    }
+    catch (e) {
+        if (e.errorInfo) {
+            // User Not Found
+            log.warn(e.message)
+
+            return res.status(404).json({ msg: e.errorInfo.message, status: 404, success: false })
+        }
+        return commonError(res, e.message)
+    }
 })
 
-router.post('/update', (req, res) => {
-    // required field : user_id
-    const { user_id } = req.body;
-    if (!user_id) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID is required
-    // Find the user
-    userModel.findById(user_id, (err, user) => {
-        if (err) return res.status(500).json({ msg: 'Internal Server Error', status: 500, success: false }) // Internal Server Error
-        if (!user) return res.status(404).json({ msg: 'User Not Found', status: 404, success: false }) // User Not Found
-        // Update the user
-        user.name = req.body.name || user.name
-        user.phone = req.body.phone || user.phone
-        user.address = req.body.address || user.address
-        user.profile_picture = req.body.profile_picture || user.profile_picture
+router.post('/update', async (req, res) => {
+    try {  // required field : user_id
+        const { user_id } = req.body;
+        if (!user_id) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID is required
+        //check firebase if uid exists
+        await admin.auth().getUser(user_id)
+        // check for required fields
+        if (!req.body.name && !req.body.phone && !req.body.address && !req.body.profile_picture) return res.status(400).json({ msg: 'Bad Request. Missing fields', status: 400, success: false }) // At least one field is required
+        // Find the user
+        userModel.findById(user_id, (err, user) => {
+            if (err) return res.status(500).json({ msg: 'Internal Server Error', status: 500, success: false }) // Internal Server Error
+            if (!user) return res.status(404).json({ msg: 'User Not Found', status: 404, success: false }) // User Not Found
+            // Update the user
+            user.name = req.body.name || user.name
+            user.phone = req.body.phone || user.phone
+            user.address = req.body.address || user.address
+            user.profile_picture = req.body.profile_picture || user.profile_picture
+            user.save((err) => {
+                if (err) return res.status(500).json({ msg: 'Internal Server Error', status: 500, success: false }) // Internal Server Error
+                return res.status(200).json({ msg: 'User Updated', status: 200, success: true }) // User Updated
+            })
+        })
+    }
+    catch (e) {
+        if (e.errorInfo) {
+            // User Not Found
+            log.warn(e.message)
+
+            return res.status(404).json({ msg: e.errorInfo.message, status: 404, success: false })
+        }
+        return commonError(res, e.message)
+    }
+})
+
+router.post('/create', async (req, res) => {
+    try {   // required field : user_id
+        const { user_id } = req.body;
+        if (!user_id) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID is required
+        // required field : email, name, last_login
+        await admin.auth().getUser(user_id)
+
+        const { email, name, last_login } = req.body;
+        if (!email || !name || !last_login) return res.status(400).json({ msg: 'Bad Request. Missing fields', status: 400, success: false }) // Email, Name and Last Login are required
+        // Create the user
+        const user = new userModel({
+            email,
+            name,
+            last_login,
+            phone: req.body.phone || '',
+            address: req.body.address || '',
+            email_verified: req.body.email_verified || false,
+            profile_picture: req.body.profile_picture || ''
+        })
         user.save((err) => {
             if (err) return res.status(500).json({ msg: 'Internal Server Error', status: 500, success: false }) // Internal Server Error
-            return res.status(200).json({ msg: 'User Updated', status: 200, success: true }) // User Updated
+            return res.status(200).json({ msg: 'User Created', status: 200, success: true }) // User Created
         })
-    })
+    }
+    catch (e) {
+        if (e.errorInfo) {
+            // User Not Found
+            log.warn(e.message)
+
+            return res.status(404).json({ msg: e.errorInfo.message, status: 404, success: false })
+        }
+        return commonError(res, e.message)
+    }
 })
 
-router.post('/create', (req, res) => {
-    // required field : email, name, last_login
-    const { email, name, last_login } = req.body;
-    if (!email || !name || !last_login) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // Email, Name and Last Login are required
-    // Create the user
-    const user = new userModel({
-        email,
-        name,
-        last_login,
-        phone: req.body.phone || '',
-        address: req.body.address || '',
-        email_verified: req.body.email_verified || false,
-        profile_picture: req.body.profile_picture || ''
-    })
-    user.save((err) => {
-        if (err) return res.status(500).json({ msg: 'Internal Server Error', status: 500, success: false }) // Internal Server Error
-        return res.status(200).json({ msg: 'User Created', status: 200, success: true }) // User Created
-    })
-})
-
-router.get('/nofications', (req, res) => {
-    // required field : user_id
-    const { user_id } = req.body;
-    if (!user_id) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID is required
-    // Find the user
-    userModel.findById(user_id, (err, user) => {
-        if (err) return res.status(500).json({ msg: 'Internal Server Error', status: 500, success: false }) // Internal Server Error
-        if (!user) return res.status(404).json({ msg: 'User Not Found', status: 404, success: false }) // User Not Found
-        // Find the notifications
-        notificationModel.find({ user: user_id }, (err, notifications) => {
+router.get('/nofications', async (req, res) => {
+    try {   // required field : user_id
+        const { user_id } = req.body;
+        if (!user_id) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID is required
+        //check firebase if uid exists
+        await admin.auth().getUser(user_id)
+        // Find the user
+        userModel.findById(user_id, (err, user) => {
             if (err) return res.status(500).json({ msg: 'Internal Server Error', status: 500, success: false }) // Internal Server Error
-            return res.status(200).json({ msg: 'Notifications Found', status: 200, success: true, notifications }) // Notifications Found and returned
-        })
-    })
-})
-
-router.get('/bookmarks', (req, res) => {
-    // required field : user_id
-    const { user_id } = req.body;
-    if (!user_id) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID is required
-    // Find the user
-    userModel.findById(user_id, (err, user) => {
-        if (err) return res.status(500).json({ msg: 'Internal Server Error', status: 500, success: false }) // Internal Server Error
-        if (!user) return res.status(404).json({ msg: 'User Not Found', status: 404, success: false }) // User Not Found
-        // Find the bookmarks
-        bookmarkModel.find({ user: user_id }, (err, bookmarks) => {
-            if (err) return res.status(500).json({ msg: 'Internal Server Error', status: 500, success: false }) // Internal Server Error
-            return res.status(200).json({ msg: 'Bookmarks Found', status: 200, success: true, bookmarks }) // Bookmarks Found and returned
-        })
-    })
-})
-
-router.delete('/bookmarks/delete', (req, res) => {
-    // required field : user_id, bookmark_id
-    const { user_id, bookmark_id } = req.body;
-    if (!user_id || !bookmark_id) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID and Bookmark ID are required
-    // Find the user
-    userModel.findById(user_id, (err, user) => {
-        if (err) return res.status(500).json({ msg: 'Internal Server Error', status: 500, success: false }) // Internal Server Error
-        if (!user) return res.status(404).json({ msg: 'User Not Found', status: 404, success: false }) // User Not Found
-        // Find the bookmark and delete it
-        bookmarkModel.findByIdAndDelete(
-            bookmark_id,
-            (err) => {
+            if (!user) return res.status(404).json({ msg: 'User Not Found', status: 404, success: false }) // User Not Found
+            // Find the notifications
+            notificationModel.find({ user: user_id }, (err, notifications) => {
                 if (err) return res.status(500).json({ msg: 'Internal Server Error', status: 500, success: false }) // Internal Server Error
-                return res.status(200).json({ msg: 'Bookmark Deleted', status: 200, success: true }) // Bookmark Deleted
-            }
-        )
-    })
+                return res.status(200).json({ msg: 'Notifications Found', status: 200, success: true, notifications }) // Notifications Found and returned
+            })
+        })
+    }
+    catch (e) {
+        if (e.errorInfo) {
+            // User Not Found
+            log.warn(e.message)
+
+            return res.status(404).json({ msg: e.errorInfo.message, status: 404, success: false })
+        }
+        return commonError(res, e.message)
+    }
+})
+
+router.get('/bookmarks', async (req, res) => {
+    try { // required field : user_id
+        const { user_id } = req.body;
+        if (!user_id) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID is required
+        //check firebase if uid exists
+        await admin.auth().getUser(user_id)
+        // Find the user
+        userModel.findById(user_id, (err, user) => {
+            if (err) return res.status(500).json({ msg: 'Internal Server Error', status: 500, success: false }) // Internal Server Error
+            if (!user) return res.status(404).json({ msg: 'User Not Found', status: 404, success: false }) // User Not Found
+            // Find the bookmarks
+            bookmarkModel.find({ user: user_id }, (err, bookmarks) => {
+                if (err) return res.status(500).json({ msg: 'Internal Server Error', status: 500, success: false }) // Internal Server Error
+                return res.status(200).json({ msg: 'Bookmarks Found', status: 200, success: true, bookmarks }) // Bookmarks Found and returned
+            })
+        })
+    }
+
+    catch (e) {
+        if (e.errorInfo) {
+            // User Not Found
+            log.warn(e.message)
+
+            return res.status(404).json({ msg: e.errorInfo.message, status: 404, success: false })
+        }
+        return commonError(res, e.message)
+    }
+
+})
+
+router.delete('/bookmarks/delete', async (req, res) => {
+    try {// required field : user_id, bookmark_id
+        const { user_id, bookmark_id } = req.body;
+        if (!user_id || !bookmark_id) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID and Bookmark ID are required
+        //check firebase if uid exists
+        await admin.auth().getUser(user_id)
+        // Find the user
+        userModel.findById(user_id, (err, user) => {
+            if (err) return res.status(500).json({ msg: 'Internal Server Error', status: 500, success: false }) // Internal Server Error
+            if (!user) return res.status(404).json({ msg: 'User Not Found', status: 404, success: false }) // User Not Found
+            // Find the bookmark and delete it
+            bookmarkModel.findByIdAndDelete(
+                bookmark_id,
+                (err) => {
+                    if (err) return res.status(500).json({ msg: 'Internal Server Error', status: 500, success: false }) // Internal Server Error
+                    return res.status(200).json({ msg: 'Bookmark Deleted', status: 200, success: true }) // Bookmark Deleted
+                }
+            )
+        })
+    }
+    catch (e) {
+        if (e.errorInfo) {
+            // User Not Found
+            log.warn(e.message)
+
+            return res.status(404).json({ msg: e.errorInfo.message, status: 404, success: false })
+        }
+        return commonError(res, e.message)
+    }
 
 })
 // exports all the routes

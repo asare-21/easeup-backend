@@ -9,6 +9,8 @@ const log = require('npmlog')
 const rateLimit = require('express-rate-limit')
 const { USER_ROUTE } = require('./routes/user_route')
 const { HOME } = require('./routes/index')
+var serviceAccount = require("./easeup.json");
+var admin = require("firebase-admin");
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
     max: 100, // Limit each IP to 1000 requests per `window` (here, per 15 minutes)
@@ -19,7 +21,6 @@ const limiter = rateLimit({
         log.warn(`Rate limit reached for IP: ${req.ip}`)
     }
 })
-
 // Static files
 app.use(express.static(path.join(__dirname, 'public')));
 app.enable('trust proxy');
@@ -34,7 +35,6 @@ app.use(morgan('combined'))
 app.use(limiter)
 // enforce https
 app.use(function (req, res, next) {
-    log.info(process.env.NODE_ENV, "NODE_ENV")
     if (process.env.NODE_ENV != 'development' && !req.secure) {
         return res.redirect('https://' + req.headers.host + req.url);
     }
@@ -48,7 +48,7 @@ app.use('/', HOME)
 // handle 404
 app.use((req, res, next) => {
     res.status(404).json({
-        msg: 'Not found', status: 404, success: false,
+        msg: 'Undefined route', status: 404, success: false,
         path: req.path
     })
     next()
@@ -63,6 +63,9 @@ app.listen(PORT, async () => {
             useNewUrlParser: true,
             useUnifiedTopology: true,
         })
+        await admin.initializeApp({
+            credential: admin.credential.cert(serviceAccount)
+        });
         log.info('Connected to MongoDB')
     } catch (err) {
         log.error(err)
