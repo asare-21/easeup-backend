@@ -25,10 +25,11 @@ const limiter = rateLimit({
     }
 })
 // Static files
-app.use(express.static(path.join(__dirname, 'public')));
-app.enable('trust proxy');
-app.set('view engine', 'ejs');
-app.set('views', 'views');
+frontEndApp.use(express.static(path.join(__dirname, 'public')));
+frontEndApp.enable('trust proxy');
+api.enable('trust proxy');
+frontEndApp.set('view engine', 'ejs');
+frontEndApp.set('views', 'views');
 
 
 // Middleware
