@@ -41,7 +41,13 @@ app.use(express.urlencoded({ extended: true }));
 app.use(morgan('combined'))
 app.use(limiter)
 // enforce https
-app.use(function (req, res, next) {
+api.use(function (req, res, next) {
+    if (process.env.NODE_ENV != 'development' && !req.secure) {
+        return res.redirect('https://' + req.headers.host + req.url);
+    }
+    next();
+})
+frontEndApp.use(function (req, res, next) {
     if (process.env.NODE_ENV != 'development' && !req.secure) {
         return res.redirect('https://' + req.headers.host + req.url);
     }
@@ -55,6 +61,19 @@ if (process.env.NODE_ENV === 'production') {
     // Production Routes
     api.use('/user', USER_ROUTE);
     frontEndApp.use('/', HOME)
+    // handle 404
+    api.use((req, res, next) => {
+        res.status(404).json({
+            msg: 'Undefined route', status: 404, success: false,
+            path: req.path
+        })
+        next()
+    })
+
+    frontEndApp.use((req, res, next) => {
+        res.render('404',)
+        next()
+    })
 }
 else {
     // Development Routes
@@ -63,19 +82,7 @@ else {
 }
 
 
-// handle 404
-api.use((req, res, next) => {
-    res.status(404).json({
-        msg: 'Undefined route', status: 404, success: false,
-        path: req.path
-    })
-    next()
-})
 
-frontEndApp.use((req, res, next) => {
-    res.render('404',)
-    next()
-})
 
 
 // Starting the server
