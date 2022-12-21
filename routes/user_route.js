@@ -18,7 +18,7 @@ router.get('/profile/:user_id', async (req, res) => {
 
         // Find the user
         userModel.findById(user_id, (err, user) => {
-            if (err) return res.status(500).json({ msg: 'Internal Server Error', status: 500, success: false }) // Internal Server Error
+            if (err) return res.status(500).json({ msg: err.message, status: 500, success: false }) // Internal Server Error
             if (!user) return res.status(404).json({ msg: 'User Not Found', status: 404, success: false }) // User Not Found
             return res.status(200).json({
                 msg: 'User Found', status: 200, success: true, user: {
