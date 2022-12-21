@@ -19,7 +19,7 @@ const userSchema = new Schema({
         required: true
     },
 
-    name: {
+    profile_name: {
         type: String,
         required: true
     },
