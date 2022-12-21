@@ -11,14 +11,17 @@ function commonError(res, msg) {
 }
 router.get('/profile/:user_id', async (req, res) => {
     try {    // required field : user_id
-        const { user_id } = req.params;
+        const user_id = req.params.user_id;
         if (!user_id) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID is required
         //check firebase if uid exists
         await admin.auth().getUser(user_id)
 
         // Find the user
         userModel.findById(user_id, (err, user) => {
-            if (err) return res.status(500).json({ msg: err.message, status: 500, success: false }) // Internal Server Error
+            if (err) {
+                log.warn(err.message)
+                return res.status(500).json({ msg: err.message, status: 500, success: false }) // Internal Server Error
+            }
             if (!user) return res.status(404).json({ msg: 'User Not Found', status: 404, success: false }) // User Not Found
             return res.status(200).json({
                 msg: 'User Found', status: 200, success: true, user: {

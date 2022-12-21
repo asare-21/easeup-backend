@@ -4,7 +4,7 @@ const {
 } = require('mongoose');
 
 const userSchema = new Schema({
-    uid: {
+    _id: {
         type: String,
         required: true,
         unique: true
