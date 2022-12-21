@@ -88,7 +88,7 @@ router.post('/create', async (req, res) => {
             profile_picture: req.body.profile_picture || ''
         })
         user.save((err) => {
-            if (err) return res.status(500).json({ msg: 'Internal Server Error', status: 500, success: false }) // Internal Server Error
+            if (err) return res.status(500).json({ msg: err.message, status: 500, success: false }) // Internal Server Error
             return res.status(200).json({ msg: 'User Created', status: 200, success: true }) // User Created
         })
     }
