@@ -89,7 +89,7 @@ router.post('/create', async (req, res) => {
             email,
             name,
             last_login,
-            uid: user_id,
+            uid: user_id, // firebase uid. Required
             phone: req.body.phone || '',
             address: req.body.address || '',
             email_verified: req.body.email_verified || false,
