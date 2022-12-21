@@ -75,13 +75,13 @@ router.post('/create', async (req, res) => {
         // required field : email, name, last_login
         await admin.auth().getUser(user_id)
 
-        const { } = req.body;
         if (!email || !name || !last_login) return res.status(400).json({ msg: 'Bad Request. Missing fields', status: 400, success: false }) // Email, Name and Last Login are required
         // Create the user
         const user = new userModel({
             email,
             name,
             last_login,
+            uid: user_id,
             phone: req.body.phone || '',
             address: req.body.address || '',
             email_verified: req.body.email_verified || false,
