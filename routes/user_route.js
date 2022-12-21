@@ -4,10 +4,10 @@ const admin = require("firebase-admin");
 const log = require('npmlog')
 
 function returnUnAuthUserError(res, msg) {
-    return res.status(401).json({ msg: 'Unauthorized User', status: 401, success: false })
+    return res.status(401).json({ msg: msg, status: 401, success: false })
 }
 function commonError(res, msg) {
-    return res.status(500).json({ msg: 'Internal Server Error', status: 500, success: false })
+    return res.status(500).json({ msg, status: 500, success: false })
 }
 router.get('/profile', async (req, res) => {
     try {    // required field : user_id
