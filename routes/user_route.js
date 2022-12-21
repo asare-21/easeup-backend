@@ -108,7 +108,7 @@ router.post('/create', async (req, res) => {
             email,
             profile_name,
             last_login,
-            uid: user_id, // firebase uid. Required
+            _id: user_id, // firebase uid. Required
             token,
             phone: req.body.phone || '',
             address: req.body.address || '',
