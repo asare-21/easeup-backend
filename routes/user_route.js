@@ -80,6 +80,7 @@ router.post('/create', async (req, res) => {
         const userExists = await userModel
             .findOne({ uid: user_id })
             .exec()
+        console.log(userExists)
         if (userExists) {
             // User Already Exists
             return res.status(200).json({ user: userExists, msg: 'User exists. Account not createdå', status: 200, success: true })
