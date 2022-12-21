@@ -76,6 +76,14 @@ router.post('/create', async (req, res) => {
         await admin.auth().getUser(user_id)
 
         if (!email || !name || !last_login) return res.status(400).json({ msg: 'Bad Request. Missing fields', status: 400, success: false }) // Email, Name and Last Login are required
+        // check if user already exists
+        const userExists = await userModel
+            .findOne({ uid: user_id })
+            .exec()
+        if (userExists) {
+            // User Already Exists
+            return res.status(200).json({ user: userExists, msg: 'User exists. Account not createdå', status: 200, success: true })
+        } // User Already Exists
         // Create the user
         const user = new userModel({
             email,
