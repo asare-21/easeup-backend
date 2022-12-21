@@ -24,11 +24,7 @@ router.get('/profile/:user_id', async (req, res) => {
             }
             if (!user) return res.status(404).json({ msg: 'User Not Found', status: 404, success: false }) // User Not Found
             return res.status(200).json({
-                msg: 'User Found', status: 200, success: true, user: {
-                    profile_name,
-                    uid, email, phone, address, city,
-                    profile_picture, email_verified, date_joined, last_login
-                }
+                msg: 'User Found', status: 200, success: true, user
             }) // User Found and returned
         })
     }
@@ -96,7 +92,7 @@ router.post('/create', async (req, res) => {
         if (missing_fields.length > 0) return res.status(400).json({ msg: 'Bad Request. Missing fields', status: 400, success: false, missing_fields }) // At least one field is required
         // check if user already exists
         const userExists = await userModel
-            .findOne({ uid: user_id })
+            .findOne({ _id: user_id })
             .exec()
         console.log(userExists)
         if (userExists) {
