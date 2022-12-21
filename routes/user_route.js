@@ -74,8 +74,15 @@ router.post('/create', async (req, res) => {
         if (!user_id) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID is required
         // required field : email, name, last_login
         await admin.auth().getUser(user_id)
-
-        if (!email || !name || !last_login || token) return res.status(400).json({ msg: 'Bad Request. Missing fields', status: 400, success: false }) // Email, Name and Last Login are required
+        const required_fields = ["email", "name", "last_login", "token", "user_id"]
+        var missing_fields = []
+        // check for required fields
+        for (let i = 0; i < required_fields.length; i++) {
+            if (!req.body[required_fields[i]]) {
+                missing_fields.push(required_fields[i])
+            }
+        }
+        if (missing_fields.length > 0) return res.status(400).json({ msg: 'Bad Request. Missing fields', status: 400, success: false, missing_fields }) // At least one field is required
         // check if user already exists
         const userExists = await userModel
             .findOne({ uid: user_id })
