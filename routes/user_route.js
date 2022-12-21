@@ -70,12 +70,12 @@ router.post('/update', async (req, res) => {
 
 router.post('/create', async (req, res) => {
     try {   // required field : user_id
-        const { user_id, email, name, last_login } = req.body;
+        const { user_id, email, name, last_login, token } = req.body;
         if (!user_id) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID is required
         // required field : email, name, last_login
         await admin.auth().getUser(user_id)
 
-        if (!email || !name || !last_login) return res.status(400).json({ msg: 'Bad Request. Missing fields', status: 400, success: false }) // Email, Name and Last Login are required
+        if (!email || !name || !last_login || token) return res.status(400).json({ msg: 'Bad Request. Missing fields', status: 400, success: false }) // Email, Name and Last Login are required
         // check if user already exists
         const userExists = await userModel
             .findOne({ uid: user_id })
@@ -91,6 +91,7 @@ router.post('/create', async (req, res) => {
             name,
             last_login,
             uid: user_id, // firebase uid. Required
+            token,
             phone: req.body.phone || '',
             address: req.body.address || '',
             email_verified: req.body.email_verified || false,
