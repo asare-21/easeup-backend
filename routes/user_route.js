@@ -12,7 +12,7 @@ function commonError(res, msg) {
 
 async function createNotification(user_id, title, body, type, read, created_at) {
     try {   // required field : user_id
-        const { user_id } = req.body;
+
         if (!user_id) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID is required
         //check firebase if uid exists
         await admin.auth().getUser(user_id)
@@ -26,11 +26,11 @@ async function createNotification(user_id, title, body, type, read, created_at) 
             // Create the notification
             const notification = new notificationModel({
                 user: user_id,
-                title: req.body.title,
-                body: req.body.body,
-                type: req.body.type,
-                read: req.body.read || false,
-                date: req.body.created_at || Date.now()
+                title: title,
+                body: body,
+                type: type,
+                read: read || false,
+                date: created_at || Date.now()
             })
             notification.save((err) => {
 
