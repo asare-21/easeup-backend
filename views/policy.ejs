@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Easeup is a mobile application that connects clients with handymen, allowing clients to get the help they need with handyman services and providing job opportunities for professionals.">
+    <meta name="author" content="Easeup">
+
+    <link rel="shortcut icon" href="images/logo.png">
+
+    <title>Easeup</title>
+
+
+    <!-- Bootstrap core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- tiny slider -->
+    <link href="css/tiny-slider.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/swiper.min.css" type="text/css" />
+
+
+    <!-- Materialdesign icons css -->
+    <link href="css/materialdesignicons.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="css/style.css" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/a37106eae1.js" crossorigin="anonymous"></script>
+
+</head>
+
+<body data-bs-spy="scroll" data-bs-target="#navbar-navlist" data-bs-offset="71">
+
+    <!--Navbar Start-->
+    <nav class="navbar navbar-expand-lg fixed-top sticky" id="navbar">
+        <div class="container-fluid custom-container">
+            <a class="navbar-brand logo text-uppercase" href="/">
+                <img src="images/logo-trans.png" class="logo-light" alt="" height="50">
+                <!-- <img src="images/logo-trans.png" class="logo-dark" alt="" height="28"> -->
+            </a>
+
+            <button class="navbar-toggler me-3 order-2 ms-4" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-label="Toggle navigation">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarCollapse">
+                <ul class="navbar-nav mx-auto navbar-center">
+                    <li class="nav-item">
+                        <a href="#home" class="nav-link ">Home</a>
+                    </li>
+                    <li class="nav-item dropdown dropdown-hover">
+                        <a href="#service" class="nav-link ">How it works</a>
+                    </li>
+                    <li class="nav-item dropdown dropdown-hover">
+                        <a href="#features" class="nav-link ">Features</a>
+                    </li>
+
+                    <li class="nav-item dropdown dropdown-hover">
+                        <a href="#user" class="nav-link ">User</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#pricing" class="nav-link">testimonial</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#faq" class="nav-link">Faq</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#blog" class="nav-link">Team</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#subscribe" class="nav-link">Subscribe</a>
+                    </li>
+                </ul>
+                <!--end navbar-nav-->
+            </div>
+
+
+
+        </div>
+        <!--end container-->
+    </nav>
+    <!-- Navbar End -->
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Sign up</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="row g-3 needs-validation">
+                        <div class="col-md-6">
+                            <label for="validationCustom01" class="form-label">First name <span
+                                    class="text-primary">*</span></label>
+                            <input type="text" class="form-control" id="validationCustom01" value="" required>
+                            <div class="valid-feedback">
+                                Looks good!
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="validationCustom02" class="form-label">Email <span
+                                    class="text-primary">*</span></label>
+                            <input type="email" class="form-control" id="validationCustom02" value="" required>
+                            <div class="valid-feedback">
+                                Looks good!
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="validationCustom03" class="form-label">Subject <span
+                                    class="text-primary">*</span></label>
+                            <input type="text" class="form-control" id="validationCustom03" required>
+                            <div class="invalid-feedback">
+                                Please provide a valid city.
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="validationCustom05" class="form-label">Password <span
+                                    class="text-primary">*</span></label>
+                            <input type="password" class="form-control" id="validationCustom05" required>
+                            <div class="invalid-feedback">
+                                Please provide a valid zip.
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <label for="validationTextarea" class="form-label">Textarea<span
+                                    class="text-primary">*</span></label>
+                            <textarea class="form-control" id="validationTextarea" required></textarea>
+                            <div class="invalid-feedback">
+                                You must agree before submitting.
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <button class="btn btn-primary" type="submit">Submit form</button>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <!-- end modal -->
+    <section class="section align-items-center bg-home-7 position-relative bg-light" id="home">
+
+        <div class="swiper-slide border-radius">
+            <h2 class="mb-4 text-black">Introduction</h2>
+            <p align="justify" class="f-16 text-muted">This privacy statement explains how Easeup will use and store
+                your personal
+                information on their platform. It also explains your legal rights in relation to this information. By
+                using the Easeup platform, you are agreeing to have read and understood the privacy policy and terms of
+                service. These documents outline the rules for using the Easeup platform and how Easeup will handle your
+                information.
+            </p>
+
+            <h2 class="mb-4 text-black">General Terms</h2>
+            <p align="justify" class="f-16 text-muted">In this Privacy Policy,
+                1. Easeup may be referred to as "Easeup," "we," "our," or "us."
+                2. A user of the Easeup platform may be referred to as "User," "Users," "you," "your," or "Client" and
+                "Handyman," depending on the context.
+                3. The community platform offered on the Easeup website (www.easeupgh.tech) is referred to as the
+                "Site," while the mobile application (for either iOS or Android) is referred to as the "App."
+                4. The Easeup website, mobile application, and any associated information and communication are
+                collectively referred to as the "Easeup Platform."
+                5. The "Terms of Service" refers to the terms and conditions for using the Easeup platform, which can be
+                found at a specified link. This Privacy Policy is considered a part of the Terms of Service.
+
+            </p>
+            <h2 class="mb-4 text-black">Information Collection
+                Information you provide to Easeup
+            </h2>
+            <p align="justify" class="f-16 text-muted">Easeup collects certain personally identifiable information about
+                you, including
+                information that can be used to identify, describe, or contact you (“Personal Information”). This may
+                include your name, address, phone number, email address, and other identifying information. Easeup may
+                also collect billing data, such as your payment instrument number, expiration date, and security code,
+                as needed to process your payments. For Handymen, Easeup may collect personal information such as date
+                of birth, address, national identification number (if applicable), and the results of basic criminal
+                record checks (to the extent permitted by law).
+                Easeup may also collect financial information, including credit card numbers, bank routing numbers, tax
+                information, and taxpayer identification numbers, in order to set up payment accounts for Handymen and
+                to facilitate payments between Clients and Handymen, as well as to pay fees to Easeup. To keep financial
+                data secure, Easeup has contracted with a third party to maintain and process payment information. This
+                is done in order to operate the Easeup platform and to fulfill contracts with users, as necessary for
+                our legitimate interests in providing our platform and services.
+                Certain optional offerings of the Easeup platform, such as newsletters, surveys, and contests, may
+                require you to provide personal information. If you choose to participate in these offerings, Easeup may
+                use your data to send you tailored newsletters and other communications or to operate and manage the
+                survey, contest, or other offering. This is done in connection with our legitimate interest in promoting
+                our business and the Easeup platform. You can opt out of receiving marketing communications from Easeup
+                by following the instructions in section 7, "Your Rights and Choices."
+                Easeup collects information related to your employment and education history, transcripts, skills, and
+                references in order to consider your job application for open positions. This information is collected
+                as necessary to evaluate your application.
+                Easeup collects personal information that you may choose to send in emails or chat messages asking about
+                the Easeup platform in order to respond to your inquiry. Easeup also collects the content of any
+                messages you exchange with other users through the Easeup platform, such as through the chat function.
+                When you register an account with Easeup, certain information is required in order to provide services
+                through the platform. For example, if you are a Client, Easeup will collect your name, email address,
+                and location information in order to create and manage your account and facilitate booking requests.
+                Additional information, such as details about the task you are seeking and billing data, may also be
+                collected. If you are a Handyman, Easeup will collect your name, email address, phone number, and
+                location information in order to create and manage your account and facilitate communication with
+                Clients. Information about your tasks, rates, skills, identity, and financial information may also be
+                collected.
+
+                Easeup may collaborate with external agents to conduct identity and criminal background checks on
+                Handymen if it is legal and necessary to protect our users and maintain the trustworthiness of the
+                Easeup platform. These checks may be performed to advance our legitimate interests in ensuring safety
+                and integrity.
+
+
+            </p>
+            <h2 class="mb-4 text-black">Information Easeup Collects Automatically</h2>
+            <p align="justify" class="f-16 text-muted">When you use the Easeup platform, we may automatically collect
+                certain
+                information about your activity on the platform, your device, and your location. This information may
+                include data about the features you use, the pages you visit, emails and ads you view, the time of day
+                you browse, and your referring and exit pages. It may also include information about your device, such
+                as the type of device or browser you use, your device's operating system, your internet service
+                provider, and device identifiers like IP address and Ad Id. We may use this device information to
+                monitor the geographic regions from which users access the Easeup platform and for security and fraud
+                prevention purposes. We may also collect location data, such as imprecise location data (like location
+                derived from an IP address) or precise location data (like latitude/longitude data) with your consent.
+                When you access the Easeup platform through a native mobile app, we may use GPS technology to determine
+                your location with your consent. We may also use cookies and similar technologies, which are described
+                in our cookie policy.
+            </p>
+            <h2 class="mb-4 text-black">Use of Information by Easeup</h2>
+            <p align="justify" class="f-16 text-muted">We use information for various business and commercial purposes,
+                as described in
+                this privacy policy. These purposes may include operating and providing access to the Easeup platform,
+                billing and fraud prevention, conducting identity and criminal background checks on users (where
+                permitted by law), analyzing platform usage to improve the Easeup platform, contacting users and
+                delivering marketing communications with their consent, providing customer support, conducting internal
+                market research, troubleshooting problems, assisting users in resolving disputes, enforcing our terms of
+                service, and as otherwise stated in the agreement. These activities may be carried out to fulfill our
+                contracts with users, for our legitimate interests in ensuring a safe and secure environment, improving
+                the platform, engaging with users, and promoting our business, and to comply with legal obligations.
+                Easeup may use interest-based advertising and tracking technologies to display ads to users on the
+                Easeup platform and other websites and services. We may also use your information to conduct market
+                analysis and offer services to users who may be interested in them. We may use your cell phone number to
+                call or send text messages for notifications about tasks, marketing purposes (with your consent when
+                required by law), and to administer the Easeup platform. You may opt out of these messages on your
+                mobile device and be charged for standard SMS and per-minute fees by your mobile carrier. Calls to or
+                from Easeup or its third-party agents may be recorded for quality control and training purposes and may
+                contain personal information. These activities may be carried out as necessary for our legitimate
+                interests in providing an engaging and relevant experience, promoting our services, and growing our
+                business. For more information about our advertising and cookie policies, please see the "Your Rights
+                and Choices" section or Section 7 of our terms of service.
+
+            </p>
+            <h2 class="mb-4 text-black">Information Sharing</h2>
+            <p align="justify" class="f-16 text-muted">We may share the information we collect about you with
+                third-party agents who
+                process information on our behalf for our business purposes. These agents may include vendors and
+                service providers that support the operation of the Easeup platform, such as email origination, identity
+                checks, criminal background checks (where permitted by law), fraud prevention and detection, receipt,
+                invoice, and customer relationship management services, data analytics, marketing and advertising,
+                website hosting, communications services, technical support, financial transaction fulfillment, and
+                chargeback and collection services. We require these third-party agents to only use your information for
+                the specific services they are providing and prohibit them from retaining, using, or disclosing your
+                information for any other purposes. However, we may allow them to use non-identifying information (such
+                as aggregated or de-identified data) for any purpose except as prohibited by applicable law.
+                Some content on the Easeup platform may be sponsored or presented by other companies. If you access the
+                Easeup platform through a co-branded version or participate in one of our partner programs, we may share
+                information about your use of the platform with the partner in order to offer an integrated platform and
+                evaluate the partner program. We may also share your personal information with our partners to receive
+                additional information about you or create offers that may be of interest to you. It is important to
+                review a partner's privacy policy before sharing information about yourself. If you do not want these
+                partners to have your personal information, you can choose not to participate in the partner program.
+                We may share information as required by law and for administrative purposes when you enter a
+                sweepstakes, contest, or other promotion. By entering a promotion, you agree to the official rules
+                governing that promotion and may allow the sponsor and other entities to use your name, voice, and/or
+                likeness in advertising or marketing materials, unless prohibited by applicable law. We may contact you
+                with information about special events, activities, promotions, contacts, submission opportunities, and
+                programs if you opt in to receive such communications.
+                We may also use matched ads by sharing personal information with another party or incorporating a pixel
+                from another party into our own sites for advertising purposes. For example, we may incorporate the
+                Facebook pixel on our sites and share your email address with Facebook as part of our use of Facebook
+                Custom Audiences. We facilitate contact between clients and handymen and may share one user's contact
+                information with other users or the recipient user's legal or authorized representative in order to
+                resolve an investigation or dispute related to an interaction between users or facilitate the
+                performance of a task. This exchange of information is necessary for the operation of the Easeup
+                platform.
+                Easeup and its third-party agents may disclose your personal information or user-generated content to
+                courts, law enforcement agencies, governmental or public authorities, tax authorities, or authorized
+                third parties if and to the extent required or permitted by law or if disclosure is reasonably necessary
+                to comply with Easeup's legal or regulatory obligations; respond to a court order, warrant, or subpoena;
+                investigate alleged criminal or illegal activity; or address any activity that may expose Easeup to
+                legal or regulatory liability. In certain jurisdictions, Easeup and its third-party agents may also
+                disclose information such as user contact details, identification information, transaction dates and
+                amounts, license and permit status, and tax identification numbers to relevant governmental authorities
+                if required by law. Easeup may also disclose personal information if it believes it is necessary to
+                protect the rights of its users, the general public, or Easeup or its affiliates in the event of a
+                compromise to a user's account or in the event of an emergency. In the event of a merger, acquisition,
+                or business combination, Easeup may share information about its users. Information in a user's profile,
+                including skills, expertise, pay rates, and feedback/rating information, may be visible to all users and
+                the general public. If a user posts a task, the contents of the listing will be visible to the handymen
+                selected for the task.
+
+            </p>
+            <h2 class="mb-4 text-black">Easeup's Information Retention Policy</h2>
+            <p align="justify" class="f-16 text-muted">We keep your personal data on file as long as you are a user of
+                our services in order to fulfill our obligations to you and to comply with legal requirements. We may
+                also store data that cannot be directly linked to your identity, such as information connected to a
+                randomly generated identifier. This data is used for research and to improve and develop our services,
+                and we take measures to ensure that it cannot be traced back to you. The specific length of time that we
+                retain personal data is outlined in Exhibit A.
+            </p>
+            <h2 class="mb-4 text-black">Your Rights and Choices</h2>
+            <p align="justify" class="f-16 text-muted">You have the option to stop receiving promotional messages from
+                us, including those related to the Easeup Platform, and request for your personal information to be
+                removed from our databases or deactivate your account by accessing the "Account" tab on the Site or App
+                or by contacting us.
+                During the registration process for Easeup, you have the option to choose whether or not you want to
+                receive marketing emails from the company. You can edit this preference at any time by logging in and
+                accessing the "Account" tab and selecting "Notifications". In addition to email marketing, you also have
+                the option to receive push notifications through the app, which can be configured in the settings of
+                your mobile device. You have the right to update and correct any inaccuracies on your Easeup profile at
+                any time by accessing the "Account" tab. Some information, such as your age, cannot be altered by you
+                and may require contacting Easeup at privacy@easeup.net to make corrections. You can opt out of
+                receiving promotional emails from Easeup by accessing the "Account" tab in your profile or by clicking
+                the unsubscribe link in any promotional email. You can also opt out of receiving promotional text
+                messages by following the instructions provided in those messages to text the word "STOP". Please note
+                that this opt-out is only applicable to the phone number used and will not affect any future
+                subscriptions. If you opt out of certain communications, you may still receive non-promotional emails
+                from Easeup regarding your account, tasks, transactions, servicing, or the ongoing business relationship
+                with the company. If you receive unsolicited promotional emails from Easeup domain, you can report them
+                by contacting the company.
+
+            </p>
+            <h2 class="mb-4 text-black">Easeup’s Security of Collected InformationPolicy</h2>
+            <p align="justify" class="f-16 text-muted">Your Easeup account is password-protected, and only you and
+                authorised Easeup staff should have access to your account information. To maintain this protection, do
+                not share your password with anyone. If you use a shared computer, make sure to sign out of your Easeup
+                account and close the browser window before someone else logs on. This will help protect your
+                information entered on public terminals from being accessed by third parties. Easeup takes reasonable
+                security precautions to protect your data from loss, theft, misuse, unauthorized access, disclosure,
+                alteration, and destruction. These measures include administrative, physical, and technical safeguards,
+                as well as staff dedicated to maintaining privacy and security. However, it's important to note that
+                internet transmissions are not completely secure, and we cannot guarantee the security of information
+                about you.
+            </p>
+            <h2 class="mb-4 text-black">Notification of Changes</h2>
+            <p align="justify" class="f-16 text-muted">Easeup's Privacy Policy is reviewed and updated on a regular
+                basis as needed. It may change as Easeup updates and expands its services. Easeup will try to notify you
+                of any significant changes to the policy by email. We recommend reviewing the Privacy Policy
+                periodically to stay informed of any updates.
+            </p>
+            <h2 class="mb-4 text-black">Children’s Privacy</h2>
+            <p align="justify" class="f-16 text-muted">This service is not intended for children under 18 years of age.
+                If you are a parent or guardian and believe that we have collected information from your child in an
+                unlawful manner, please contact us so that we can remove the data. We do not knowingly collect or "sell"
+                the personal information of minors under 18 years old who are residents of Ghana.
+            </p>
+            <h2 class="mb-4 text-black">Contacting Us</h2>
+            <p align="justify" class="f-16 text-muted">If you have any questions or concerns about this Privacy Policy,
+                the way we or our third-party agents handle your personal information, the practices of our site, your
+                interactions with the Easeup platform, or if you experience technical problems, you can contact us for
+                assistance. Easeup's staff will respond to all mail or email from users who have questions about
+                privacy, including inquiries about the types of personal information stored in our databases and
+                requests to know, delete, or correct that information.
+            </p>
+
+
+
+        </div>
+    </section>
+
+
+    <!-- start home section -->
+    <!--section class="section align-items-center bg-home-7 position-relative bg-light" id="home">
+
+
+        <iframe class="container" src="/docs/privacy_policy.pdf#zoom=80&toolbar=0" frameborder="0" height="800px"
+            width="90%"></iframe>
+
+
+    </section>
+    <!-- end section -->
+
+
+    <!-- end cta -->
+
+
+    <!-- start footer -->
+    <section class="footer py-5 bg-light">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="address-content fw-bold">
+                        <h5 class="text-black">Address</h5>
+                        <p class="mt-5  f-14 ">River Way behind Salt Lake City, UT 8402</p>
+                        <p class="mt-3 f-14 ">+(540)801-468-2313 (10am - 6pm, Monday - Saturday)</p>
+                        <a href="" class=" f-14">info@example.com</a>
+                    </div>
+                    <div class="social-icon d-flex mt-4 mb-4 mb-lg-0">
+                        <div class="facebook">
+                            <a href="#"><i class="mdi mdi-facebook-box f-30"></i></a>
+                        </div>
+                        <div class="twitter ms-4">
+                            <a href="#"><i class="mdi mdi-twitter f-30"></i></a>
+                        </div>
+                        <div class="twitter ms-4">
+                            <a href="#"><i class="mdi mdi-instagram f-30"></i></a>
+                        </div>
+                        <div class="twitter ms-4">
+                            <a href="#"><i class="mdi mdi-linkedin-box f-30"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <h5 class="text-black">Explore</h5>
+                    <ul class="menu list-unstyled mt-5">
+                        <li class="menu-item"><a href="#">Start here</a></li>
+                        <li class="menu-item"><a href="#">Services</a></li>
+                        <li class="menu-item"><a href="#">Features</a></li>
+                        <li class="menu-item"><a href="#">Client</a></li>
+                        <li class="menu-item"><a href="#">Pricing</a></li>
+                        <li class="menu-item"><a href="#">support center</a></li>
+                        <li class="menu-item"><a href="#">Blogs</a></li>
+                        <li class="menu-item"><a href="#">Newsletters</a></li>
+                    </ul>
+
+                </div>
+                <div class="col-lg-2">
+                    <h5 class="text-black">Explore</h5>
+                    <ul class="menu mt-5 list-unstyled d-block">
+                        <li class="info-item"><a href="#">Membership</a></li>
+                        <li class="info-item"><a href="#">Purchase guide</a></li>
+                        <li class="info-item"><a href="#">Privacy policy</a></li>
+                        <li class="info-item"><a href="#">Terms of service</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- end footer -->
+
+    <div class="bg-light">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <div class="copy-right mb-5 text-center text-muted">
+                        <script>document.write(new Date().getFullYear())</script> Easeup. Designed with
+                        <i class="fa-solid fa-heart"></i> by <a href="#" class="text-reset">Easeup</a>.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- bootstrap -->
+    <script src="js/bootstrap.bundle.min.js"></script>
+
+    <script src="js/tiny-slider.js"></script>
+    <script src="js/swiper.min.js"></script>
+
+    <!-- counter -->
+    <script src="js/counter.init.js"></script>
+
+    <!-- Custom -->
+    <script src="js/app.js"></script>
+
+</body>
+
+</html>
