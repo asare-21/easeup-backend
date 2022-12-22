@@ -155,6 +155,18 @@ router.post('/create', async (req, res) => {
         user.save((err) => {
             console.log(err)
             if (err) return res.status(500).json({ msg: err.message, status: 500, success: false }) // Internal Server Error
+            // create notification
+            const notification = new notificationModel({
+                user: user_id,
+                title: 'Welcome to the app',
+                message: "We're glad to have you on board. Enjoy your stay",
+                type: 'welcome',
+                read: false,
+                created_at: new Date()
+            })
+            notification.save((err) => {
+                // if (err) return res.status(500).json({ msg: err.message, status: 500, success: false }) // Internal Server Error
+            })
             return res.status(200).json({ msg: 'User Created', status: 200, success: true }) // User Created
         })
     }
@@ -176,15 +188,11 @@ router.get('/nofications/:user_id', async (req, res) => {
         //check firebase if uid exists
         await admin.auth().getUser(user_id)
         // Find the user
-        userModel.findById(user_id, (err, user) => {
+        notificationModel.find({ user: user_id }, (err, notifications) => {
             if (err) return res.status(500).json({ msg: 'Internal Server Error', status: 500, success: false }) // Internal Server Error
-            if (!user) return res.status(404).json({ msg: 'User Not Found', status: 404, success: false }) // User Not Found
-            // Find the notifications
-            notificationModel.findById(user_id, (err, notifications) => {
-                if (err) return res.status(500).json({ msg: 'Internal Server Error', status: 500, success: false }) // Internal Server Error
-                return res.status(200).json({ msg: 'Notifications Found', status: 200, success: true, notifications }) // Notifications Found and returned
-            })
+            return res.status(200).json({ msg: 'Notifications Found', status: 200, success: true, notifications }) // Notifications Found and returned
         })
+
     }
     catch (e) {
         if (e.errorInfo) {
