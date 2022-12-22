@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const { userModel } = require('../models/user_model');
+const { notificationModel } = require('../models/nofications');
 const admin = require("firebase-admin");
 const log = require('npmlog')
 
@@ -189,7 +190,7 @@ router.get('/nofications/:user_id', async (req, res) => {
         await admin.auth().getUser(user_id)
         // Find the user
         notificationModel.find({ user: user_id }, (err, notifications) => {
-            if (err) return res.status(500).json({ msg: 'Internal Server Error', status: 500, success: false }) // Internal Server Error
+            if (err) return res.status(500).json({ msg: err.message, status: 500, success: false, }) // Internal Server Error
             return res.status(200).json({ msg: 'Notifications Found', status: 200, success: true, notifications }) // Notifications Found and returned
         })
 
