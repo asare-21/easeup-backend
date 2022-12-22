@@ -3,7 +3,7 @@ const { userModel } = require('../models/user_model');
 const { notificationModel } = require('../models/nofications');
 const admin = require("firebase-admin");
 const log = require('npmlog')
-
+const mongoose = require('mongoose');
 function returnUnAuthUserError(res, msg) {
     return res.status(401).json({ msg: msg, status: 401, success: false })
 }
@@ -185,11 +185,12 @@ router.post('/create', async (req, res) => {
 router.get('/nofications/:user_id', async (req, res) => {
     try {   // required field : user_id
         const { user_id } = req.params;
+        const id = mongoose.Types.ObjectId(user_id);
         if (!user_id) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID is required
         //check firebase if uid exists
         await admin.auth().getUser(user_id)
         // Find the user
-        notificationModel.find({ user: user_id }, (err, notifications) => {
+        notificationModel.find({ user: id }, (err, notifications) => {
             if (err) return res.status(500).json({ msg: err.message, status: 500, success: false, }) // Internal Server Error
             return res.status(200).json({ msg: 'Notifications Found', status: 200, success: true, notifications }) // Notifications Found and returned
         })
