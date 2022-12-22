@@ -5,9 +5,9 @@ router.get('/', (req, res) => {
     return res.render('index',);
 }
 );
-router.get('/nda', (req, res) => {
+router.get('/policy', (req, res) => {
     console.log(req.headers)
-    return res.render('nda',);
+    return res.render('policy',);
 }
 );
 router.get('/terms', (req, res) => {
