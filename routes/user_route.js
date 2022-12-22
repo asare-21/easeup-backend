@@ -166,7 +166,7 @@ router.post('/create', async (req, res) => {
                 created_at: new Date()
             })
             notification.save((err) => {
-                // if (err) return res.status(500).json({ msg: err.message, status: 500, success: false }) // Internal Server Error
+                if (err) return res.status(500).json({ msg: err.message, status: 500, success: false }) // Internal Server Error
             })
             return res.status(200).json({ msg: 'User Created', status: 200, success: true }) // User Created
         })
@@ -185,8 +185,7 @@ router.post('/create', async (req, res) => {
 router.get('/nofications/:user_id', async (req, res) => {
     try {   // required field : user_id
         const { user_id } = req.params;
-        // const id = mongoose.Types.ObjectId(user_id.toString(16));
-        // mongoose.mongo.BSO
+
         if (!user_id) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID is required
         //check firebase if uid exists
         await admin.auth().getUser(user_id)
