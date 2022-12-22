@@ -9,6 +9,46 @@ function returnUnAuthUserError(res, msg) {
 function commonError(res, msg) {
     return res.status(500).json({ msg, status: 500, success: false })
 }
+
+async function createNotification(user_id, title, body, type, read, created_at) {
+    try {   // required field : user_id
+        const { user_id } = req.body;
+        if (!user_id) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID is required
+        //check firebase if uid exists
+        await admin.auth().getUser(user_id)
+        // Find the user
+        userModel.findById(user_id, (
+            err,
+            user
+        ) => {
+            if (err) return res.status(500).json({ msg: 'Internal Server Error', status: 500, success: false }) // Internal Server Error
+            if (!user) return res.status(404).json({ msg: 'User Not Found', status: 404, success: false }) // User Not Found
+            // Create the notification
+            const notification = new notificationModel({
+                user: user_id,
+                title: req.body.title,
+                body: req.body.body,
+                type: req.body.type,
+                read: req.body.read || false,
+                date: req.body.created_at || Date.now()
+            })
+            notification.save((err) => {
+
+                if (err) return res.status(500).json({ msg: err.message, status: 500, success: false }) // Internal Server Error
+                return res.status(200).json({ msg: 'Notification Created', status: 200, success: true }) // Notification Created
+            })
+        })
+    }
+    catch (e) {
+        if (e.errorInfo) {
+            // User Not Found
+            log.warn(e.message)
+
+            return returnUnAuthUserError(res, e.message)
+        }
+        return commonError(res, e.message)
+    }
+}
 router.get('/profile/:user_id', async (req, res) => {
     try {    // required field : user_id
         const user_id = req.params.user_id;
@@ -127,9 +167,9 @@ router.post('/create', async (req, res) => {
     }
 })
 
-router.get('/nofications', async (req, res) => {
+router.get('/nofications/:user_id', async (req, res) => {
     try {   // required field : user_id
-        const { user_id } = req.body;
+        const { user_id } = req.params;
         if (!user_id) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID is required
         //check firebase if uid exists
         await admin.auth().getUser(user_id)
@@ -138,7 +178,7 @@ router.get('/nofications', async (req, res) => {
             if (err) return res.status(500).json({ msg: 'Internal Server Error', status: 500, success: false }) // Internal Server Error
             if (!user) return res.status(404).json({ msg: 'User Not Found', status: 404, success: false }) // User Not Found
             // Find the notifications
-            notificationModel.find({ user: user_id }, (err, notifications) => {
+            notificationModel.findById(user_id, (err, notifications) => {
                 if (err) return res.status(500).json({ msg: 'Internal Server Error', status: 500, success: false }) // Internal Server Error
                 return res.status(200).json({ msg: 'Notifications Found', status: 200, success: true, notifications }) // Notifications Found and returned
             })
@@ -154,6 +194,9 @@ router.get('/nofications', async (req, res) => {
         return commonError(res, e.message)
     }
 })
+
+
+
 
 router.get('/bookmarks', async (req, res) => {
     try { // required field : user_id
