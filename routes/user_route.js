@@ -118,6 +118,7 @@ router.post('/update', async (req, res) => {
 router.post('/create', async (req, res) => {
     try {   // required field : user_id
         const { user_id, email, profile_name, last_login, token } = req.body;
+        console.log(req.body)
         if (!user_id) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID is required
         // required field : email, profile_name, last_login
         await admin.auth().getUser(user_id)
