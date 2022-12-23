@@ -15,8 +15,8 @@ var serviceAccount = require("./easeup.json");
 var admin = require("firebase-admin");
 const vhost = require('vhost');
 const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 1000, // Limit each IP to 1000 requests per `window` (here, per 15 minutes)
+    windowMs: 30 * 60 * 1000, // 39 minutes
+    max: 300, // Limit each IP to 300 requests per `window` (here, per 15 minutes)
     standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
     legacyHeaders: false, // Disable the `X-RateLimit-*` headers
     message: { msg: 'Too many requests from this IP, please try again later', status: 429, success: false },
@@ -24,6 +24,8 @@ const limiter = rateLimit({
         log.warn(`Rate limit reached for IP: ${req.ip}`)
     }
 })
+const compression = require('compression')
+const helmet = require('helmet')
 // Static files
 app.use(express.static(path.join(__dirname, 'public')));
 app.enable('trust proxy');
@@ -33,8 +35,12 @@ frontEndApp.use(express.static(path.join(__dirname, 'public')));
 frontEndApp.enable('trust proxy');
 frontEndApp.set('view engine', 'ejs');
 frontEndApp.set('views', 'views');
-
-
+frontEndApp.use(compression())
+api.use(compression())
+frontEndApp.use(helmet())
+api.use(helmet())
+api.disable('x-powered-by');
+frontEndApp.disable('x-powered-by');
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

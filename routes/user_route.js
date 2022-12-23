@@ -159,7 +159,7 @@ router.post('/create', async (req, res) => {
             // create notification
             const notification = new notificationModel({
                 user: user_id,
-                title: 'Welcome to the app',
+                title: 'Welcome to Easeup',
                 message: "We're glad to have you on board. Enjoy your stay",
                 type: 'welcome',
                 read: false,
