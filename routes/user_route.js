@@ -11,7 +11,7 @@ function commonError(res, msg) {
     return res.status(500).json({ msg, status: 500, success: false })
 }
 
-async function createNotification(user_id, title, body, type, read, created_at) {
+async function createNotification(user_id, title, body, type) {
     try {   // required field : user_id
 
         if (!user_id) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID is required
@@ -22,21 +22,19 @@ async function createNotification(user_id, title, body, type, read, created_at) 
             err,
             user
         ) => {
-            if (err) return res.status(500).json({ msg: 'Internal Server Error', status: 500, success: false }) // Internal Server Error
-            if (!user) return res.status(404).json({ msg: 'User Not Found', status: 404, success: false }) // User Not Found
+            if (err) return log.error('Internal Server Error') // Internal Server Error
+            if (!user) return log.warn('User Not Found') // User Not Found
             // Create the notification
             const notification = new notificationModel({
                 user: user_id,
                 title: title,
                 body: body,
                 type: type,
-                read: read || false,
-                date: created_at || Date.now()
+
             })
             notification.save((err) => {
-
-                if (err) return res.status(500).json({ msg: err.message, status: 500, success: false }) // Internal Server Error
-                return res.status(200).json({ msg: 'Notification Created', status: 200, success: true }) // Notification Created
+                if (err) return log.error(err.message) // Internal Server Error
+                return log.info('Notification created')
             })
         })
     }
@@ -153,7 +151,7 @@ router.post('/create', async (req, res) => {
             email_verified: req.body.email_verified || false,
             profile_picture: req.body.profile_picture || ''
         })
-        user.save((err) => {
+        user.save(async (err) => {
             console.log(err)
             if (err) return res.status(500).json({ msg: err.message, status: 500, success: false }) // Internal Server Error
             // create notification
@@ -165,9 +163,11 @@ router.post('/create', async (req, res) => {
                 read: false,
                 created_at: new Date()
             })
-            notification.save((err) => {
-                if (err) return res.status(500).json({ msg: err.message, status: 500, success: false }) // Internal Server Error
-            })
+            // create notification
+            await createNotification(user_id, 'Welcome to Easeup', "We're glad to have you on board. Enjoy your stay", 'welcome')
+            // send notification to update user profile
+            await createNotification(user_id, 'Update your profile', "We noticed you haven't updated your profile. Please update your profile to enjoy the full experience", 'update_profile')
+
             return res.status(200).json({ msg: 'User Created', status: 200, success: true }) // User Created
         })
     }
@@ -193,6 +193,34 @@ router.get('/nofications/:user_id', async (req, res) => {
         notificationModel.find({ user: user_id }, (err, notifications) => {
             if (err) return res.status(500).json({ msg: err.message, status: 500, success: false, }) // Internal Server Error
             return res.status(200).json({ msg: 'Notifications Found', status: 200, success: true, notifications }) // Notifications Found and returned
+        })
+
+    }
+    catch (e) {
+        if (e.errorInfo) {
+            // User Not Found
+            log.warn(e.message)
+
+            return returnUnAuthUserError(res, e.message)
+        }
+        return commonError(res, e.message)
+    }
+})
+
+router.post('/nofications/update/:user_id', async (req, res) => {
+    try {   // required field : user_id
+        const { user_id } = req.params;
+        const { id } = req.body;
+
+        if (!user_id) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID is required
+        //check firebase if uid exists
+        await admin.auth().getUser(user_id)
+        // Find the user
+        notificationModel.findOneAndUpdate({ user: user_id, _id: id }, {
+            read: true
+        }, (err, notification) => {
+            if (err) return res.status(500).json({ msg: err.message, status: 500, success: false, }) // Internal Server Error
+            return res.status(200).json({ msg: 'Notification updated', status: 200, success: true, notification }) // Notifications Found and returned
         })
 
     }
