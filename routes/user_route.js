@@ -11,7 +11,7 @@ function commonError(res, msg) {
     return res.status(500).json({ msg, status: 500, success: false })
 }
 
-async function createNotification(user_id, title, body, type) {
+async function createNotification(user_id, title, body, type, token) {
     try {   // required field : user_id
 
         if (!user_id) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID is required
@@ -32,9 +32,20 @@ async function createNotification(user_id, title, body, type) {
                 type: type,
 
             })
-            notification.save((err) => {
+            notification.save(async (err) => {
                 if (err) return log.error(err.message) // Internal Server Error
+                // Use token to send a notification to the user
+                const message = {
+                    notification: {
+                        title: title,
+                        body: body
+                    },
+                    token: token
+                };
+                await admin.messaging().send(message)
+                log.info('Notification sent to the user')
                 return log.info('Notification created')
+
             })
         })
     }
@@ -164,9 +175,9 @@ router.post('/create', async (req, res) => {
                 created_at: new Date()
             })
             // create notification
-            await createNotification(user_id, 'Welcome to Easeup', "We're glad to have you on board. Enjoy your stay", 'welcome')
+            await createNotification(user_id, 'Welcome to Easeup', "We're glad to have you on board. Enjoy your stay", 'welcome', token)
             // send notification to update user profile
-            await createNotification(user_id, 'Update your profile', "We noticed you haven't updated your profile. Please update your profile to enjoy the full experience", 'update_profile')
+            await createNotification(user_id, 'Update your profile', "We noticed you haven't updated your profile. Please update your profile to enjoy the full experience", 'update_profile', token)
 
             return res.status(200).json({ msg: 'User Created', status: 200, success: true }) // User Created
         })
