@@ -28,7 +28,7 @@ async function createNotification(user_id, title, body, type) {
             const notification = new notificationModel({
                 user: user_id,
                 title: title,
-                body: body,
+                message: body,
                 type: type,
 
             })
