@@ -97,6 +97,7 @@ app.listen(PORT, async () => {
         await connect(`mongodb+srv://${process.env.easeup_admin_founder_email}:${process.env.easeup_admin_founder_pass}@easeup-cluster.pfxvast.mongodb.net/?retryWrites=true&w=majority`, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
+            dbName: 'easeup'
         })
         await admin.initializeApp({
             credential: admin.credential.cert(serviceAccount)
