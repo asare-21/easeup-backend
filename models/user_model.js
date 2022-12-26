@@ -27,7 +27,7 @@ const userSchema = new Schema({
         type: String,
         default: ''
     },
-    addres: {
+    address: {
         type: String,
         default: ''
     },
@@ -47,6 +47,14 @@ const userSchema = new Schema({
         type: String,
         default: ''
     },
+    dob: {
+        type: Date,
+        default: Date.now
+    },
+    gender: {
+        type: String,
+        default: ''
+    }
 })
 
 module.exports.userModel = model('User', userSchema);

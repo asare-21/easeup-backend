@@ -90,28 +90,66 @@ router.get('/profile/:user_id', async (req, res) => {
 })
 
 
+router.post('/update/image', (req, res) => {
+    try {  // required field : user_id
+        const { user_id, image } = req.body;
+        if (!user_id) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID is required
+        //check firebase if uid exists
+        admin.auth().getUser(user_id)
+        // check for required fields
+        if (!profile_picture) return res.status(400).json({ msg: 'Bad Request. Missing fields', status: 400, success: false }) // At least one field is required
+        // Find the user
+        userModel.findByIdAndUpdate
+
+            (user_id, {
+                $set: {
+                    profile_picture: image
+                }
+            }, (err, user) => {
+                if (err) {
+                    log.warn(err.message)
+                    return res.status(500).json({ msg: err.message, status: 500, success: false }) // Internal Server Error
+                }
+                if (!user) return res.status(404).json({ msg: 'User Not Found', status: 404, success: false }) // User Not Found
+                return res.status(200).json({
+                    msg: 'Profile updated', status: 200, success: true, user
+                }) // User Found and returned
+            }
+            )
+    }
+    catch (e) {
+        if (e.errorInfo) {
+            // User Not Found
+            log.warn(e.message)
+
+            return returnUnAuthUserError(res, e.message)
+        }
+        return commonError(res, e.message)
+    }
+})
 
 router.post('/update', async (req, res) => {
     try {  // required field : user_id
-        const { user_id } = req.body;
+        const { user_id, gender, dob, phone, address } = req.body;
         if (!user_id) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID is required
         //check firebase if uid exists
         await admin.auth().getUser(user_id)
         // check for required fields
         if (!req.body.profile_name && !req.body.phone && !req.body.address && !req.body.profile_picture) return res.status(400).json({ msg: 'Bad Request. Missing fields', status: 400, success: false }) // At least one field is required
         // Find the user
-        userModel.findById(user_id, (err, user) => {
+        userModel.findByIdAndUpdate(user_id, {
+            $set: {
+                phone: phone,
+                address: address,
+                dob: dob,
+                gender: gender
+            }
+        }, (err, user) => {
             if (err) return res.status(500).json({ msg: 'Internal Server Error', status: 500, success: false }) // Internal Server Error
             if (!user) return res.status(404).json({ msg: 'User Not Found', status: 404, success: false }) // User Not Found
             // Update the user
-            user.profile_name = req.body.profile_name || user.profile_name
-            user.phone = req.body.phone || user.phone
-            user.address = req.body.address || user.address
-            user.profile_picture = req.body.profile_picture || user.profile_picture
-            user.save((err) => {
-                if (err) return res.status(500).json({ msg: 'Internal Server Error', status: 500, success: false }) // Internal Server Error
-                return res.status(200).json({ msg: 'User Updated', status: 200, success: true }) // User Updated
-            })
+            return res.status(200).json({ msg: 'User Updated', status: 200, success: true }) // User Updated
+
         })
     }
     catch (e) {
