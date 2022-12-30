@@ -59,6 +59,9 @@ async function createNotification(user_id, title, body, type, token) {
         return commonError(res, e.message)
     }
 }
+
+
+
 router.get('/profile/:user_id', async (req, res) => {
     try {    // required field : user_id
         const user_id = req.params.user_id;
@@ -186,7 +189,7 @@ router.post('/create', async (req, res) => {
         console.log(userExists)
         if (userExists) {
             // User Already Exists
-            return res.status(200).json({ user: userExists, msg: 'User exists. Account not createdå', status: 200, success: true })
+            return res.status(200).json({ user: userExists, msg: 'User exists. Account not created', status: 200, success: true })
         } // User Already Exists
         // Create the user
         const user = new userModel({
