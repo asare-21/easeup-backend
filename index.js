@@ -3,6 +3,7 @@ const express = require('express');
 const api = express();
 const frontEndApp = express();
 const app = express();
+const admin = express();
 var path = require('path');
 const PORT = process.env.PORT || 3000;
 const morgan = require('morgan')
@@ -37,6 +38,13 @@ frontEndApp.set('view engine', 'ejs');
 frontEndApp.set('views', 'views');
 frontEndApp.use(compression())
 api.use(compression())
+admin.use(compression())
+admin.use(helmet())
+admin.use(express.json());
+admin.use(express.urlencoded({ extended: true }));
+admin.use(morgan('combined'))
+admin.use(limiter)
+admin.disable('x-powered-by');
 frontEndApp.use(helmet())
 api.use(helmet())
 api.disable('x-powered-by');
@@ -52,6 +60,7 @@ if (process.env.NODE_ENV === 'production') {
     app.use(vhost('api.easeupgh.tech', api));
     app.use(vhost('easeupgh.tech', frontEndApp));
     app.use(vhost('www.easeupgh.tech', frontEndApp));
+    admin.use(vhost('admin.easeupgh.tech', admin));
     // Production Routes
     api.use('/user', USER_ROUTE);
     frontEndApp.use('/', HOME)

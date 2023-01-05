@@ -59,10 +59,7 @@ const workerProfileVerificationSchema = new Schema({
         type: String,
         required: true
     },
-    gh_card_height: {
-        type: String,
-        required: true
-    },
+
     police_report_doc: {
         type: String,
         required: true

@@ -60,8 +60,6 @@ async function createNotification(user_id, title, body, type, token) {
     }
 }
 
-
-
 router.get('/profile/:user_id', async (req, res) => {
     try {    // required field : user_id
         const user_id = req.params.user_id;
@@ -82,7 +80,7 @@ router.get('/profile/:user_id', async (req, res) => {
         })
     }
     catch (e) {
-        if (e.errorInfo) {
+        if (e.errorInfo) { // User Not Found firebase error
             // User Not Found
             log.warn(e.message)
 
@@ -91,7 +89,6 @@ router.get('/profile/:user_id', async (req, res) => {
         return commonError(res, e.message)
     }
 })
-
 
 router.post('/update/image', (req, res) => {
     try {  // required field : user_id
@@ -286,8 +283,6 @@ router.post('/nofications/update/:user_id', async (req, res) => {
         return commonError(res, e.message)
     }
 })
-
-
 
 
 router.get('/bookmarks', async (req, res) => {
