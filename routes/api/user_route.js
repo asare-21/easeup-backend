@@ -1,6 +1,6 @@
 const router = require('express').Router();
-const { userModel } = require('../models/user_model');
-const { notificationModel } = require('../models/nofications');
+const { userModel } = require('../../models/user_model');
+const { notificationModel } = require('../../models/nofications');
 const admin = require("firebase-admin");
 const log = require('npmlog')
 const mongoose = require('mongoose');
