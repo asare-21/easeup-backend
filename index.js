@@ -27,7 +27,9 @@ const limiter = rateLimit({
     }
 })
 const compression = require('compression')
-const helmet = require('helmet')
+const helmet = require('helmet');
+const { bookmarkRoute } = require('./routes/api/bookmarkRoute');
+const { workerProfileRoute } = require('./routes/api/workerProfileRoute');
 // Static files
 app.use(express.static(path.join(__dirname, 'public')));
 app.enable('trust proxy');
@@ -65,6 +67,9 @@ if (process.env.NODE_ENV === 'production') {
     // Production Routes
     api.use('/user', USER_ROUTE);
     api.use('/search', searchRoute)
+    api.use('/bookmark', bookmarkRoute)
+    api.use('/wprofile', workerProfileRoute)
+
     frontEndApp.use('/', HOME)
     // handle 404
     api.use((req, res, next) => {
@@ -96,6 +101,8 @@ else {
     app.use('/user', USER_ROUTE);
     app.use('/', HOME)
     api.use('/search', searchRoute)
+    api.use('/bookmark', bookmarkRoute)
+    api.use('/wprofile', workerProfileRoute)
 
 }
 

@@ -2,9 +2,9 @@ These are the endpoints we'll be writing
 
 1. Search (search for services availble near you) - done
 
-2. Bookmarks (add,remove,get) done(get,delete)
+2. Bookmarks (add,remove,get) done(get,delete,add)
 
-3.  worker profile ( show the public profile of workers)
+3.  worker profile ( show the public profile of workers) -done
 
 4. bookings (view upcoming, completed and cancelled, create and delete a booking)
 

@@ -105,7 +105,7 @@ router.post("/add", async (req, res) => {
     const { uid, worker_id } = req.body
     try {
         await admin.auth().getUser(uid) // check if uid is valid
-        await workerProfileModel.findOne({ _id: worker_id }, (err, worker_profile) => {
+        workerProfileModel.findOne({ _id: worker_id }, (err, worker_profile) => {
             if (err) {
                 return commonError(res, err.message)
             }
@@ -143,3 +143,5 @@ router.post("/add", async (req, res) => {
         return commonError(res, e.message)
     }
 })
+
+module.exports.bookmarkRoute = router;
