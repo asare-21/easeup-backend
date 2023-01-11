@@ -6,15 +6,19 @@ const {
 
 const bookmarkSchema = new Schema({
     user: {
-        type: Schema.Types.ObjectId,
+        type: String,
         ref: 'User',
         required: true
     },
     worker_profile: {
-        type: Schema.Types.ObjectId,
+        type: String,
         ref: 'WorkerProfile',
         required: true
     },
+    created_at: {
+        type: Date,
+        default: Date.now
+    }
 });
 
 module.exports.bookmarkModel = model('Bookmark', bookmarkSchema);
