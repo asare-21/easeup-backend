@@ -3,6 +3,35 @@ const {
     model
 } = require('mongoose');
 
+const media = new Schema({
+    url: {
+        type: String,
+        required: true
+    },
+    image: {
+        type: Boolean,
+        default: false
+    },
+    description: {
+        type: String,
+        default: ''
+    },
+    thumbnail: {
+        type: String,
+        default: ''
+    }
+});
+
+const workRadius = new Schema({
+    latlng: {
+        type: [Number],
+        required: true
+    },
+    radius: {
+        type: Number,
+        required: true
+    }
+})
 
 const workerProfileSchema = new Schema({
     worker: {
@@ -19,7 +48,7 @@ const workerProfileSchema = new Schema({
         default: []
     },
     images: {
-        type: [String],
+        type: [media],
         default: []
     },
     rate_hourly: {
@@ -34,6 +63,10 @@ const workerProfileSchema = new Schema({
         type: [Schema.Types.ObjectId],
         ref: 'Review',
         default: []
+    },
+    work_radius: {
+        type: workRadius,
+        default: {}
     },
 });
 

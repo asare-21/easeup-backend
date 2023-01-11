@@ -1,0 +1,9 @@
+These are the endpoints we'll be writing
+1. Search (search for services availble near you)
+2. Bookmarks (add,remove,update)
+3.  worker profile ( show the public profile of workers)
+4. bookings (view upcoming, completed and cancelled, create and delete a booking)
+5. calendar ( will be used to show the bookings on a calendar in the app. We'll return little info here, like the date of boking, who the service was booked with the price.)
+6. chat end point
+7 user (update user profile, store device information)
+8 notifications end point

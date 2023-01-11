@@ -3,7 +3,9 @@ const { userModel } = require('../../models/user_model');
 const { notificationModel } = require('../../models/nofications');
 const admin = require("firebase-admin");
 const log = require('npmlog')
-const mongoose = require('mongoose');
+
+
+
 function returnUnAuthUserError(res, msg) {
     return res.status(401).json({ msg: msg, status: 401, success: false })
 }
@@ -348,3 +350,5 @@ router.delete('/bookmarks/delete', async (req, res) => {
 })
 // exports all the routes
 module.exports.USER_ROUTE = router;
+module.exports.commonError = commonError;
+module.exports.returnUnAuthUserError = returnUnAuthUserError;   

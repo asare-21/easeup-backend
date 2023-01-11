@@ -10,10 +10,11 @@ const morgan = require('morgan')
 const { connect } = require('mongoose')
 const log = require('npmlog')
 const rateLimit = require('express-rate-limit')
-const { USER_ROUTE } = require('./routes/user_route')
-const { HOME } = require('./routes/index')
+const { USER_ROUTE } = require('./routes/api/user_route')
+const { HOME } = require('./routes/api/index')
+const { searchRoute } = require('./routes/api/searchRoute')
 var serviceAccount = require("./easeup.json");
-var admin = require("firebase-admin");
+var FBadmin = require("firebase-admin");
 const vhost = require('vhost');
 const limiter = rateLimit({
     windowMs: 30 * 60 * 1000, // 39 minutes
@@ -63,6 +64,7 @@ if (process.env.NODE_ENV === 'production') {
     admin.use(vhost('admin.easeupgh.tech', admin));
     // Production Routes
     api.use('/user', USER_ROUTE);
+    api.use('/search', searchRoute)
     frontEndApp.use('/', HOME)
     // handle 404
     api.use((req, res, next) => {
@@ -93,6 +95,8 @@ else {
     // Development Routes
     app.use('/user', USER_ROUTE);
     app.use('/', HOME)
+    api.use('/search', searchRoute)
+
 }
 
 
@@ -108,8 +112,8 @@ app.listen(PORT, async () => {
             useUnifiedTopology: true,
             dbName: 'easeup'
         })
-        await admin.initializeApp({
-            credential: admin.credential.cert(serviceAccount)
+        await FBadmin.initializeApp({
+            credential: FBadmin.credential.cert(serviceAccount)
         });
         log.info('Connected to MongoDB')
     } catch (err) {
