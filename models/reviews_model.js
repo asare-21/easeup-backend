@@ -32,4 +32,4 @@ const reviewSchema = new Schema({
     },
 });
 
-module.exports = model('Review', reviewSchema);
+module.exports.reviewModel = model('Review', reviewSchema);

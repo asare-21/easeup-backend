@@ -52,4 +52,4 @@ const workerSchema = new Schema({
     },
 })
 
-module.exports = model('Worker', workerSchema);
+module.exports.workerModel = model('Worker', workerSchema);

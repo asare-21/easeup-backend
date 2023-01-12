@@ -11,9 +11,15 @@ const imageSchema = new Schema({
     sent_by: {
         type: String,
         required: true
+    },
+    is_mage: {
+        type: Boolean,
+        default: false
     }
-
 });
+
+
+
 
 const chatMessageSchema = new Schema({
     worker: {
@@ -42,7 +48,7 @@ const chatMessageSchema = new Schema({
         type: String,
         required: true
     },
-    images: {
+    media: {
         type: [imageSchema],
         default: []
     }
@@ -50,4 +56,4 @@ const chatMessageSchema = new Schema({
 
 });
 
-module.exports = model('ChatMessage', chatMessageSchema);
+module.exports.chatModel = model('ChatMessage', chatMessageSchema);

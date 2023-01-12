@@ -42,7 +42,6 @@ router.get('/search', async (req, res) => {
     // check if user is authenticated
     try {
         await admin.auth().getUser(uid) // check if uid is valid
-
         // search for workers in the service
         await workerProfileModel.find({
             skills: {
@@ -69,7 +68,6 @@ router.get('/search', async (req, res) => {
         if (e.errorInfo) {
             // User Not Found
             log.warn(e.message)
-
             return returnUnAuthUserError(res, e.message)
         }
         return commonError(res, e.message)

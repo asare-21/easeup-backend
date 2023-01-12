@@ -45,4 +45,4 @@ const userBookingSchema = new Schema({
     },
 })
 
-module.exports = model('UserBooking', userBookingSchema);
+module.exports.userBooking = model('UserBooking', userBookingSchema);

@@ -78,4 +78,4 @@ const workerProfileVerificationSchema = new Schema({
     },
 });
 
-module.exports = model('WorkerProfileVerification', workerProfileVerificationSchema);
+module.exports.workerProfileVerificationModel = model('WorkerProfileVerification', workerProfileVerificationSchema);
