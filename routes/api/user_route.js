@@ -94,7 +94,7 @@ router.get('/profile/:user_id', async (req, res) => {
 
 router.post('/update/image', (req, res) => {
     try {  // required field : user_id
-        const { user_id, image } = req.body;
+        const { user_id, profile_picture } = req.body;
         if (!user_id) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID is required
         //check firebase if uid exists
         admin.auth().getUser(user_id)
@@ -105,7 +105,7 @@ router.post('/update/image', (req, res) => {
 
             (user_id, {
                 $set: {
-                    profile_picture: image
+                    profile_picture
                 }
             }, (err, user) => {
                 if (err) {
