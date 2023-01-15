@@ -104,9 +104,9 @@ router.post('/update/image', (req, res) => {
         userModel.findByIdAndUpdate
 
             (user_id, {
-                $set: {
-                    profile_picture
-                }
+
+                profile_picture
+
             }, (err, user) => {
                 if (err) {
                     log.warn(err.message)
