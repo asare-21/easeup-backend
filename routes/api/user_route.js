@@ -131,7 +131,7 @@ router.post('/update/image', (req, res) => {
 })
 router.post('/update/address', (req, res) => {
     try {  // required field : user_id
-        const { user_id, address } = req.body;
+        const { user_id, address, latlng } = req.body;
         if (!user_id) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID is required
         //check firebase if uid exists
         admin.auth().getUser(user_id)
@@ -142,7 +142,10 @@ router.post('/update/address', (req, res) => {
 
             (user_id, {
 
-                address: address
+                address: {
+                    address,
+                    latlng
+                }
 
             }, (err, user) => {
                 if (err) {

@@ -3,6 +3,17 @@ const {
     model
 } = require('mongoose');
 
+const addressSchema = new Schema({
+    address: {
+        type: String,
+        default: ''
+    },
+    latlng: {
+        type: Array,
+        default: []
+    }
+})
+
 const userSchema = new Schema({
     _id: {
         type: String,
@@ -27,10 +38,7 @@ const userSchema = new Schema({
         type: String,
         default: ''
     },
-    address: {
-        type: String,
-        default: ''
-    },
+    address: addressSchema,
     email_verified: {
         type: Boolean,
         default: false
