@@ -176,7 +176,7 @@ router.post('/update/gender', (req, res) => {
         //check firebase if uid exists
         admin.auth().getUser(user_id)
         // check for required fields
-        if (!address) return res.status(400).json({ msg: 'Bad Request. Missing fields', status: 400, success: false }) // At least one field is required
+        if (!gender) return res.status(400).json({ msg: 'Bad Request. Missing fields', status: 400, success: false }) // At least one field is required
         // Find the user
         userModel.findByIdAndUpdate
 
@@ -213,13 +213,13 @@ router.post('/update/phone', (req, res) => {
         //check firebase if uid exists
         admin.auth().getUser(user_id)
         // check for required fields
-        if (!address) return res.status(400).json({ msg: 'Bad Request. Missing fields', status: 400, success: false }) // At least one field is required
+        if (!phone) return res.status(400).json({ msg: 'Bad Request. Missing fields', status: 400, success: false }) // At least one field is required
         // Find the user
         userModel.findByIdAndUpdate
 
             (user_id, {
 
-                phone
+                phone: phone
 
             }, (err, user) => {
                 if (err) {
