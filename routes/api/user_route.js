@@ -206,6 +206,43 @@ router.post('/update/gender', (req, res) => {
         return commonError(res, e.message)
     }
 })
+router.post('/update/phone', (req, res) => {
+    try {  // required field : user_id
+        const { user_id, phone } = req.body;
+        if (!user_id) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID is required
+        //check firebase if uid exists
+        admin.auth().getUser(user_id)
+        // check for required fields
+        if (!address) return res.status(400).json({ msg: 'Bad Request. Missing fields', status: 400, success: false }) // At least one field is required
+        // Find the user
+        userModel.findByIdAndUpdate
+
+            (user_id, {
+
+                phone
+
+            }, (err, user) => {
+                if (err) {
+                    log.warn(err.message)
+                    return res.status(500).json({ msg: err.message, status: 500, success: false }) // Internal Server Error
+                }
+                if (!user) return res.status(404).json({ msg: 'User Not Found', status: 404, success: false }) // User Not Found
+                return res.status(200).json({
+                    msg: 'Profile updated', status: 200, success: true, user
+                }) // User Found and returned
+            }
+            )
+    }
+    catch (e) {
+        if (e.errorInfo) {
+            // User Not Found
+            log.warn(e.message)
+
+            return returnUnAuthUserError(res, e.message)
+        }
+        return commonError(res, e.message)
+    }
+})
 
 router.post('/update', async (req, res) => {
     try {  // required field : user_id
