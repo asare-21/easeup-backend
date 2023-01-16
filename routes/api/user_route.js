@@ -182,7 +182,7 @@ router.post('/update/gender', (req, res) => {
 
             (user_id, {
 
-                gender
+                gender: gender
 
             }, (err, user) => {
                 if (err) {
