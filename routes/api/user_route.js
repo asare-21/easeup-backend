@@ -312,7 +312,7 @@ router.post('/create', async (req, res) => {
             _id: user_id, // firebase uid. Required
             token,
             phone: req.body.phone || '',
-            address: req.body.address || '',
+            address: req.body.address || {},
             email_verified: req.body.email_verified || false,
             profile_picture: req.body.profile_picture || ''
         })

@@ -38,7 +38,10 @@ const userSchema = new Schema({
         type: String,
         default: ''
     },
-    address: addressSchema,
+    address: {
+        type: addressSchema,
+        default: {}
+    },
     email_verified: {
         type: Boolean,
         default: false
