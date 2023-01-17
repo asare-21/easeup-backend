@@ -1,5 +1,6 @@
 require('dotenv').config();
 const express = require('express');
+const http = require("http");
 const api = express();
 const frontEndApp = express();
 const app = express();
@@ -18,7 +19,7 @@ var FBadmin = require("firebase-admin");
 const vhost = require('vhost');
 const limiter = rateLimit({
     windowMs: 30 * 60 * 1000, // 39 minutes
-    max: 1000, // Limit each IP to 300 requests per `window` (here, per 15 minutes)
+    max: 3000, // Limit each IP to 3000 requests per `window` (here, per 15 minutes)
     standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
     legacyHeaders: false, // Disable the `X-RateLimit-*` headers
     message: { msg: 'Too many requests from this IP, please try again later', status: 429, success: false },

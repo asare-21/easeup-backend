@@ -10,7 +10,8 @@ const headers = {
     "Content-Type": "application/json",
     Accept: "application/json",
     Host: "api.smsonlinegh.com",
-    Authorization: `key ${process.env.SMS_API_KEY}`
+    Authorization:
+        `key ${process.env.SMS_API_KEY}`
 }
 
 const options = {
@@ -308,29 +309,31 @@ router.post('/phone/send-code', async (req, res) => {
             lowerCaseAlphabets: false,
             upperCaseAlphabets: false,
             specialChars: false,
-
         })
         // Send SMS
         const body = {
-            messages: [
+            "messages": [
                 {
-                    text: `${code} is your verification code for Easeup.`,
-                    type: 1,
-                    destinations: [
+                    "text": "Hello world!",
+                    "type": 0,
+                    "sender": "Easeup",
+                    "destinations": [
                         {
-                            to: phone,
+                            "to": "233202737487",
                         }
-                    ],
-                    sender: process.env.SMS_SENDER
+                    ]
                 }]
         }
+
+        const response = await axios.post(options.hostname, body, headers)// wait for the sms to be sent
+        console.log(response.data)
+        if (response.data.label !== "HSHK_OK") return res.json({ msg: 'Handshake error. Access Denied', status: 500, success: false }) // Internal Server Error
         // Find the user
         userModel.findByIdAndUpdate(user_id, {
             code: code
         }, async (err, user) => {
             if (err) return res.status(500).json({ msg: 'Internal Server Error', status: 500, success: false }) // Internal Server Error
             if (!user) return res.status(404).json({ msg: 'User Not Found', status: 404, success: false }) // User Not Found
-            await axios.post(options.hostname, body, headers) // wait for the sms to be sent
             // Update the user
             return res.status(200).json({ msg: `Verification code has been sent to ${phone}`, status: 200, success: true }) // User Updated
         })
@@ -344,6 +347,7 @@ router.post('/phone/send-code', async (req, res) => {
         return commonError(res, e.message)
     }
 })
+
 router.post('/phone/verify-code', async (req, res) => {
     // 
     try {  // required field : user_id
