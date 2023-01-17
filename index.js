@@ -1,10 +1,11 @@
 require('dotenv').config();
 const express = require('express');
-const http = require("http");
 const api = express();
 const frontEndApp = express();
 const app = express();
 const admin = express();
+const http = require("http").createServer(app);
+
 var path = require('path');
 const PORT = process.env.PORT || 3000;
 const morgan = require('morgan')
@@ -112,7 +113,7 @@ else {
 
 
 // Starting the server
-app.listen(PORT, async () => {
+http.listen(PORT, async () => {
     try {
         log.info(`Listening on port ${PORT}`);
         await connect(`mongodb+srv://${process.env.easeup_admin_founder_email}:${process.env.easeup_admin_founder_pass}@easeup-cluster.pfxvast.mongodb.net/?retryWrites=true&w=majority`, {

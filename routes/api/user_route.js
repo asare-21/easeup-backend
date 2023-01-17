@@ -5,13 +5,13 @@ const admin = require("firebase-admin");
 const log = require('npmlog')
 const otpGenerator = require('otp-generator')
 const axios = require('axios')
-
+const bodyParser = require("body-parser");
+const express = require("express");
 const headers = {
     "Content-Type": "application/json",
     Accept: "application/json",
     Host: "api.smsonlinegh.com",
-    Authorization:
-        `key ${process.env.SMS_API_KEY}`
+    Authorization: `key ${process.env.EASEUP_SMS_API_KEY}`
 }
 
 const options = {
@@ -76,6 +76,9 @@ async function createNotification(user_id, title, body, type, token) {
         return commonError(res, e.message)
     }
 }
+
+router.use(bodyParser.urlencoded({ extended: false }));
+router.use(express.json());
 
 router.get('/profile/:user_id', async (req, res) => {
     try {    // required field : user_id
@@ -310,24 +313,25 @@ router.post('/phone/send-code', async (req, res) => {
             upperCaseAlphabets: false,
             specialChars: false,
         })
-        // Send SMS
-        const body = {
-            "messages": [
-                {
-                    "text": "Hello world!",
-                    "type": 0,
-                    "sender": "Easeup",
-                    "destinations": [
-                        {
-                            "to": "233202737487",
-                        }
-                    ]
-                }]
-        }
 
-        const response = await axios.post(options.hostname, body, headers)// wait for the sms to be sent
-        console.log(response.data)
-        if (response.data.label !== "HSHK_OK") return res.json({ msg: 'Handshake error. Access Denied', status: 500, success: false }) // Internal Server Error
+        const body = {
+            messages: [
+                {
+                    text: `Your EaseUp verification code is ${code}`,
+                    type: 1,
+                    sender: process.env.EASEUP_SMS_SENDER,
+                    destinations: {
+                        to: phone
+                    },
+                },
+            ],
+        };
+        // Send SMS
+        const message = `Your Easeup verification code is ${code}`
+
+        const response = await axios.get(`https://api.smsonlinegh.com/v4/message/sms/send?key=${process.env.EASEUP_SMS_API_KEY}&text=${message}&type=0&sender=${process.env.EASEUP_SMS_SENDER}&to=${phone}`)// wait for the sms to be sent
+        console.log(response)
+        if (response.data.handshake.label !== "HSHK_OK") return res.json({ msg: 'Handshake error. Access Denied', status: 500, success: false }) // Internal Server Error
         // Find the user
         userModel.findByIdAndUpdate(user_id, {
             code: code
