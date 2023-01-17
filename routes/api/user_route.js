@@ -3,8 +3,22 @@ const { userModel } = require('../../models/user_model');
 const { notificationModel } = require('../../models/nofications');
 const admin = require("firebase-admin");
 const log = require('npmlog')
+const otpGenerator = require('otp-generator')
+const axios = require('axios')
 
+const headers = {
+    "Content-Type": "application/json",
+    Accept: "application/json",
+    Host: "api.smsonlinegh.com",
+    Authorization: `key ${process.env.SMS_API_KEY}`
+}
 
+const options = {
+    method: "POST",
+    headers: headers,
+    hostname: "https://api.smsonlinegh.com/v4/message/sms/send",
+
+}
 
 function returnUnAuthUserError(res, msg) {
     return res.status(401).json({ msg: msg, status: 401, success: false })
@@ -273,6 +287,88 @@ router.post('/update', async (req, res) => {
             // User Not Found
             log.warn(e.message)
 
+            return returnUnAuthUserError(res, e.message)
+        }
+        return commonError(res, e.message)
+    }
+})
+router.post('/phone/send-code', async (req, res) => {
+    // 
+    try {  // required field : user_id
+        const { user_id, phone } = req.body;
+        if (!user_id) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID is required
+        //check firebase if uid exists
+        await admin.auth().getUser(user_id)
+        // check for required fields
+        if (!phone) return res.status(400).json({ msg: 'Bad Request. Missing fields. phone field is required', status: 400, success: false }) // At least one field is required
+        // Generate OTP and send SMS
+        const code = otpGenerator.generate(6, {
+            digits: true,
+            alphabets: false,
+            lowerCaseAlphabets: false,
+            upperCaseAlphabets: false,
+            specialChars: false,
+
+        })
+        // Send SMS
+        const body = {
+            messages: [
+                {
+                    text: `${code} is your verification code for Easeup.`,
+                    type: 1,
+                    destinations: [
+                        {
+                            to: phone,
+                        }
+                    ],
+                    sender: process.env.SMS_SENDER
+                }]
+        }
+        // Find the user
+        userModel.findByIdAndUpdate(user_id, {
+            code: code
+        }, async (err, user) => {
+            if (err) return res.status(500).json({ msg: 'Internal Server Error', status: 500, success: false }) // Internal Server Error
+            if (!user) return res.status(404).json({ msg: 'User Not Found', status: 404, success: false }) // User Not Found
+            await axios.post(options.hostname, body, headers) // wait for the sms to be sent
+            // Update the user
+            return res.status(200).json({ msg: `Verification code has been sent to ${phone}`, status: 200, success: true }) // User Updated
+        })
+    }
+    catch (e) {
+        if (e.errorInfo) {
+            // User Not Found
+            log.warn(e.message)
+            return returnUnAuthUserError(res, e.message)
+        }
+        return commonError(res, e.message)
+    }
+})
+router.post('/phone/verify-code', async (req, res) => {
+    // 
+    try {  // required field : user_id
+        const { user_id, phone, code } = req.body;
+        if (!user_id) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID is required
+        //check firebase if uid exists
+        await admin.auth().getUser(user_id)
+        // check for required fields
+        if (!phone) return res.status(400).json({ msg: 'Bad Request. Missing fields. phone field is required', status: 400, success: false }) // At least one field is required
+
+        // Find the user
+        userModel.findById(user_id, async (err, user) => {
+            if (err) return res.status(500).json({ msg: 'Internal Server Error', status: 500, success: false }) // Internal Server Error
+            if (!user) return res.status(404).json({ msg: 'User Not Found', status: 404, success: false }) // User Not Found
+            // Check if code matches
+            if (user.code.toString() !== code.toString()) return res.status(400).json({ msg: 'Verification code is incorrect', status: 400, success: false }) // Verification code is incorrect
+            // Update the user if code matched
+            await userModel.findByIdAndUpdate(user_id, { code: "" },)
+            return res.status(200).json({ msg: `Code has been verified successfully.`, status: 200, success: true }) // User Updated
+        })
+    }
+    catch (e) {
+        if (e.errorInfo) {
+            // User Not Found
+            log.warn(e.message)
             return returnUnAuthUserError(res, e.message)
         }
         return commonError(res, e.message)
