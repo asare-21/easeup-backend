@@ -305,6 +305,10 @@ router.post('/phone/send-code', async (req, res) => {
         await admin.auth().getUser(user_id)
         // check for required fields
         if (!phone) return res.status(400).json({ msg: 'Bad Request. Missing fields. phone field is required', status: 400, success: false }) // At least one field is required
+        // check if the phone number is equal to the one in the database
+        const user = await userModel.findById(user_id)
+        if (user.phone.toString() === phone.toString()) return res.status(400).json({ msg: 'Sorry. Operation not allowed', status: 400, success: false }) // At least one field is required
+
         // Generate OTP and send SMS
         const code = otpGenerator.generate(6, {
             digits: true,
