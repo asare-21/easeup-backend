@@ -84,7 +84,6 @@ router.post('/update/image', (req, res) => {
         return commonError(res, e.message)
     }
 })
-
 //accepts url of front and back of ghana card
 // update ghc front
 // update ghc back

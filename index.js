@@ -63,13 +63,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(morgan('combined'))
 app.use(limiter)
 
-// api routes for production
-api.use('/user', USER_ROUTE);
-api.use('/search', searchRoute)
-api.use('/bookmark', bookmarkRoute)
-api.use('/verify-worker-profile', workerProfileVerificationRoute)
-api.use('/worker', workerRoute)
-api.use('/worker-profile', workerProfileRoute)
+
 
 // vhost (subdomain and domain)
 if (process.env.NODE_ENV === 'production') {
@@ -78,6 +72,13 @@ if (process.env.NODE_ENV === 'production') {
     app.use(vhost('www.easeupgh.tech', frontEndApp));
     admin.use(vhost('admin.easeupgh.tech', admin));
     frontEndApp.use('/', HOME)
+    // api routes for production
+    api.use('/user', USER_ROUTE);
+    api.use('/search', searchRoute)
+    api.use('/bookmark', bookmarkRoute)
+    api.use('/verify-worker-profile', workerProfileVerificationRoute)
+    api.use('/worker', workerRoute)
+    api.use('/worker-profile', workerProfileRoute)
     // handle 404
     api.use((req, res, next) => {
         return res.status(404).json({
