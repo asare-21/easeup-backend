@@ -2,17 +2,22 @@ const {
     Schema,
     model
 } = require('mongoose');
-
+const addressSchema = new Schema({
+    address: {
+        type: String,
+        default: ''
+    },
+    latlng: {
+        type: Array,
+        default: []
+    }
+})
 
 const workerProfileVerificationSchema = new Schema({
     worker: {
         type: Schema.Types.ObjectId,
         ref: 'Worker',
         required: true
-    },
-    gh_card_no: {
-        type: String,
-        default: ''
     },
     gh_card_image_front: {
         type: String,
@@ -25,48 +30,20 @@ const workerProfileVerificationSchema = new Schema({
     gh_card_verified: {
         type: Boolean,
         default: false,
-
     },
     gh_card_verified_date: {
         type: Date,
-        required: true
+        required: false
     },
-    gh_card_issue_date: {
-        type: Date,
-        required: true
-    },
-    gh_card_expiry_date: {
-        type: Date,
-        required: true
-    },
-    gh_card_issue_place: {
+    gh_card_verified_by: {
         type: String,
-        required: true
+        required: false,
+        default: ''
     },
-    gh_card_sex: {
+    phone: {
         type: String,
-        required: true
-    },
-    gh_card_dob: {
-        type: Date,
-        required: true
-    },
-    gh_card_name: {
-        type: String,
-        required: true
-    },
-    gh_card_nationality: {
-        type: String,
-        required: true
-    },
-
-    police_report_doc: {
-        type: String,
-        required: true
-    },
-    police_report_verified: {
-        type: Boolean,
-        default: false
+        required: false,
+        default: ''
     },
     selfie: {
         type: String,
@@ -75,6 +52,51 @@ const workerProfileVerificationSchema = new Schema({
     selfie_verified: {
         type: Boolean,
         default: false
+    },
+    age_verfication: {
+        type: Boolean,
+        default: false,
+    },
+    age_verification_document: {
+        type: String,
+        required: false,
+        default: ''
+    },
+    insurance_verified: {
+        type: Boolean,
+        default: false
+    },
+    insurance_document: {
+        type: String,
+        required: false,
+        default: ''
+    },
+    gender: {
+        type: String,
+        required: false,
+        default: ''
+    },
+    address: {
+        type: addressSchema,
+        required: false,
+        default: {
+            address: '',
+            latlng: []
+        }
+    },
+    proof_skill: {
+        type: String,
+        required: false,
+        default: ''
+    },
+    skill_verified: {
+        type: Boolean,
+        default: false
+    },
+    code: {
+        type: String,
+        required: false,
+        default: ''
     },
 });
 

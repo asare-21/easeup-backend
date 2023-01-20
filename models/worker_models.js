@@ -28,7 +28,7 @@ const workerSchema = new Schema({
     },
     email_verified: {
         type: Boolean,
-        default: false
+        default: true
     },
     date_joined: {
         type: Date,

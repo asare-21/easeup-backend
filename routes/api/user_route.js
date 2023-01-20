@@ -364,7 +364,7 @@ router.post('/phone/verify-code', async (req, res) => {
         //check firebase if uid exists
         await admin.auth().getUser(user_id)
         // check for required fields
-        if (!phone) return res.status(400).json({ msg: 'Bad Request. Missing fields. phone field is required', status: 400, success: false }) // At least one field is required
+        if (!phone && !code) return res.status(400).json({ msg: 'Bad Request. Missing fields. phone and code fields are required', status: 400, success: false }) // At least one field is required
 
         // Find the user
         userModel.findById(user_id, async (err, user) => {
@@ -573,4 +573,5 @@ router.delete('/bookmarks/delete', async (req, res) => {
 // exports all the routes
 module.exports.USER_ROUTE = router;
 module.exports.commonError = commonError;
-module.exports.returnUnAuthUserError = returnUnAuthUserError;   
+module.exports.returnUnAuthUserError = returnUnAuthUserError;
+module.exports.createNotification = createNotification; 
