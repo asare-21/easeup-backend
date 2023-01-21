@@ -57,9 +57,7 @@ async function createNotification(worker, title, body, type, token) {
 }
 
 router.get('/:worker', async (req, res) => {
-
     const { worker } = req.params
-
     // check if user is authenticated
     try {
         await admin.auth().getUser(worker) // check if worker is valid
@@ -87,11 +85,6 @@ router.get('/:worker', async (req, res) => {
 
 router.post('/create', async (req, res) => {
     try {   // required field : worker
-        const { worker, email, profile_name, last_login, token } = req.body;
-        console.log(req.body)
-        if (!worker) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID is required
-        // required field : email, profile_name, last_login
-        await admin.auth().getUser(worker)
         const required_fields = ["email", "profile_name", "last_login", "token", "worker"]
         var missing_fields = []
         // check for required fields
@@ -101,6 +94,12 @@ router.post('/create', async (req, res) => {
             }
         }
         if (missing_fields.length > 0) return res.status(400).json({ msg: 'Bad Request. Missing fields', status: 400, success: false, missing_fields }) // At least one field is required
+        const { worker, email, profile_name, last_login, token } = req.body;
+        console.log(req.body)
+        if (!worker) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID is required
+        // required field : email, profile_name, last_login
+        await admin.auth().getUser(worker)
+
         // check if user already exists
         const userExists = await workerModel
             .findOne({ _id: worker })
