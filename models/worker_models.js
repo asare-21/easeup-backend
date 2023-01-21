@@ -4,6 +4,11 @@ const {
 } = require('mongoose');
 
 const workerSchema = new Schema({
+    _id: {
+        type: String,
+        required: true
+    },
+
     email: {
         type: String,
         required: true,
