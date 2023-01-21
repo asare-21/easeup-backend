@@ -13,7 +13,7 @@ router.get('/:worker', async (req, res) => {
     // check if user is authenticated
     try {
         await admin.auth().getUser(worker) // check if uid is valid
-        workerProfileModel.findById(worker, (err, worker) => {
+        workerProfileModel.findOne({ worker }, (err, worker) => {
             if (err) {
                 return commonError(res, err.message)
             }
