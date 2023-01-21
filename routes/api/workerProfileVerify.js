@@ -137,7 +137,6 @@ router.post('/update/age-verify', (req, res) => {
         if (e.errorInfo) {
             // User Not Found
             log.warn(e.message)
-
             return returnUnAuthUserError(res, e.message)
         }
         return commonError(res, e.message)
@@ -174,7 +173,6 @@ router.post('/update/pos', (req, res) => {
         if (e.errorInfo) {
             // User Not Found
             log.warn(e.message)
-
             return returnUnAuthUserError(res, e.message)
         }
         return commonError(res, e.message)
