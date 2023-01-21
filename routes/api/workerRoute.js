@@ -112,7 +112,7 @@ router.post('/create', async (req, res) => {
         // Create the user
         const user = new workerModel({
             email,
-            profile_name,
+            name: profile_name,
             last_login,
             _id: worker, // firebase worker. Required
             token,
