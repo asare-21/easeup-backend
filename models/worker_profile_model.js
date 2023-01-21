@@ -6,7 +6,7 @@ const {
 const media = new Schema({
     url: {
         type: String,
-        required: true
+        required: false
     },
     image: {
         type: Boolean,
@@ -25,17 +25,17 @@ const media = new Schema({
 const workRadius = new Schema({
     latlng: {
         type: [Number],
-        required: true
+        required: false
     },
     radius: {
         type: Number,
-        required: true
+        required: false
     }
 })
 
 const workerProfileSchema = new Schema({
     worker: {
-        type: Schema.Types.ObjectId,
+        type: String,
         ref: 'Worker',
         required: true
     },

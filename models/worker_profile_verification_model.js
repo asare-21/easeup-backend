@@ -16,7 +16,7 @@ const addressSchema = new Schema({
 
 const workerProfileVerificationSchema = new Schema({
     worker: {
-        type: Schema.Types.ObjectId,
+        type: String,
         ref: 'Worker',
         required: true
     },
