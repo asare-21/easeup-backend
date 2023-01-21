@@ -29,7 +29,6 @@ router.get('/:worker', async (req, res) => {
         if (e.errorInfo) {
             // User Not Found
             log.warn(e.message)
-
             return returnUnAuthUserError(res, e.message)
         }
         return commonError(res, e.message)

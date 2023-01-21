@@ -25,13 +25,11 @@ router.get('/:worker', async (req, res) => {
                 worker
             })
         })
-
     }
     catch (e) {
         if (e.errorInfo) {
             // User Not Found
             log.warn(e.message)
-
             return returnUnAuthUserError(res, e.message)
         }
         return commonError(res, e.message)
@@ -67,7 +65,6 @@ router.post('/update/image', (req, res) => {
         if (e.errorInfo) {
             // User Not Found
             log.warn(e.message)
-
             return returnUnAuthUserError(res, e.message)
         }
         return commonError(res, e.message)
@@ -86,7 +83,6 @@ router.post('/update/ghc-images', (req, res) => {
         if (!ghc_back && !ghc_front) return res.status(400).json({ msg: 'Bad Request. Missing fields. ghc_back and ghc_front are required', status: 400, success: false }) // At least one field is required
         // Find the user
         workerProfileVerificationModel.findByIdAndUpdate
-
             (worker, {
                 ghc_back,
                 ghc_front
@@ -106,7 +102,6 @@ router.post('/update/ghc-images', (req, res) => {
         if (e.errorInfo) {
             // User Not Found
             log.warn(e.message)
-
             return returnUnAuthUserError(res, e.message)
         }
         return commonError(res, e.message)
@@ -124,7 +119,6 @@ router.post('/update/age-verify', (req, res) => {
         if (!age_doc) return res.status(400).json({ msg: 'Bad Request. Missing fields. ghc_back and ghc_front are required', status: 400, success: false }) // At least one field is required
         // Find the user
         workerProfileVerificationModel.findByIdAndUpdate
-
             (worker, {
                 age_doc
             }, (err, user) => {
