@@ -46,8 +46,8 @@ router.post('/update/image', (req, res) => {
         // check for required fields
         if (!selfie) return res.status(400).json({ msg: 'Bad Request. Missing fields', status: 400, success: false }) // At least one field is required
         // Find the user
-        workerProfileVerificationModel.findByIdAndUpdate
-            (worker, {
+        workerProfileVerificationModel.findOne
+            ({ worker }, {
                 selfie
             }, (err, user) => {
                 if (err) {
@@ -82,8 +82,8 @@ router.post('/update/ghc-images', (req, res) => {
         // check for required fields
         if (!ghc_back && !ghc_front) return res.status(400).json({ msg: 'Bad Request. Missing fields. ghc_back and ghc_front are required', status: 400, success: false }) // At least one field is required
         // Find the user
-        workerProfileVerificationModel.findByIdAndUpdate
-            (worker, {
+        workerProfileVerificationModel.findOne
+            ({ worker }, {
                 ghc_back,
                 ghc_front
             }, (err, user) => {
@@ -118,8 +118,8 @@ router.post('/update/age-verify', (req, res) => {
         // check for required fields
         if (!age_doc) return res.status(400).json({ msg: 'Bad Request. Missing fields. ghc_back and ghc_front are required', status: 400, success: false }) // At least one field is required
         // Find the user
-        workerProfileVerificationModel.findByIdAndUpdate
-            (worker, {
+        workerProfileVerificationModel.findOne
+            ({ worker }, {
                 age_doc
             }, (err, user) => {
                 if (err) {
@@ -153,9 +153,9 @@ router.post('/update/pos', (req, res) => {
         // check for required fields
         if (!proof_skill) return res.status(400).json({ msg: 'Bad Request. Missing fields', status: 400, success: false }) // At least one field is required
         // Find the user
-        workerProfileVerificationModel.findByIdAndUpdate
+        workerProfileVerificationModel.findOne
 
-            (worker, {
+            ({ worker }, {
                 proof_skill
             }, (err, user) => {
                 if (err) {
@@ -189,8 +189,8 @@ router.post('/update/insurance', (req, res) => {
         // check for required fields
         if (!insurance_doc) return res.status(400).json({ msg: 'Bad Request. Missing fields', status: 400, success: false }) // At least one field is required
         // Find the user
-        workerProfileVerificationModel.findByIdAndUpdate
-            (worker, {
+        workerProfileVerificationModel.findOne
+            ({ worker }, {
                 insurance_doc
             }, (err, user) => {
                 if (err) {
@@ -224,9 +224,9 @@ router.post('/update/address', (req, res) => {
         // check for required fields
         if (!address) return res.status(400).json({ msg: 'Bad Request. Missing fields', status: 400, success: false }) // At least one field is required
         // Find the user
-        workerProfileVerificationModel.findByIdAndUpdate
+        workerProfileVerificationModel.findOne
 
-            (worker, {
+            ({ worker }, {
                 address: {
                     address,
                     latlng
@@ -264,9 +264,9 @@ router.post('/update/gender', (req, res) => {
         // check for required fields
         if (!gender) return res.status(400).json({ msg: 'Bad Request. Missing fields', status: 400, success: false }) // At least one field is required
         // Find the user
-        workerProfileVerificationModel.findByIdAndUpdate
+        workerProfileVerificationModel.findOne
 
-            (worker, {
+            ({ worker }, {
                 gender
             }, (err, user) => {
                 if (err) {
@@ -302,7 +302,7 @@ router.post('/phone/send-code', async (req, res) => {
         // check for required fields
         if (!phone) return res.status(400).json({ msg: 'Bad Request. Missing fields. phone field is required', status: 400, success: false }) // At least one field is required
         // check if the phone number is equal to the one in the database
-        const user = await workerProfileVerificationModel.findById(worker)
+        const user = await workerProfileVerificationModel.findOne({ worker })
         if (user.phone.toString() === phone.toString()) return res.status(400).json({ msg: 'Sorry. Operation not allowed', status: 400, success: false }) // At least one field is required
 
         // Generate OTP and send SMS
@@ -351,7 +351,7 @@ router.post('/phone/verify-code', async (req, res) => {
         if (!phone && !code) return res.status(400).json({ msg: 'Bad Request. Missing fields. phone and code fields are required', status: 400, success: false }) // At least one field is required
 
         // Find the user
-        workerProfileVerificationModel.findById(worker, async (err, user) => {
+        workerProfileVerificationModel.findOne({ worker }, async (err, user) => {
             if (err) return res.status(500).json({ msg: 'Internal Server Error', status: 500, success: false }) // Internal Server Error
             if (!user) return res.status(404).json({ msg: 'User Not Found', status: 404, success: false }) // User Not Found
             // Check if code matches
