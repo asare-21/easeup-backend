@@ -144,9 +144,9 @@ router.post('/create', async (req, res) => {
             await userProfile.save();
             await userVerification.save();
             // create notification
-            await createNotification(worker, 'Welcome to Easeup', "We're glad to have you on board. Enjoy your stay", 'welcome', token)
-            // send notification to update user profile
-            await createNotification(worker, 'Update your profile', "We noticed you haven't updated your profile. Please update your profile to enjoy the full experience", 'update_profile', token)
+            // await createNotification(worker, 'Welcome to Easeup', "We're glad to have you on board. Enjoy your stay", 'welcome', token)
+            // // send notification to update user profile
+            // await createNotification(worker, 'Update your profile', "We noticed you haven't updated your profile. Please update your profile to enjoy the full experience", 'update_profile', token)
 
             return res.status(200).json({ msg: 'User Created', status: 200, success: true }) // User Created
         })
