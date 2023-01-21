@@ -3,7 +3,9 @@ const { workerModel } = require('../../models/worker_models');
 const { notificationModel } = require('../../models/nofications');
 const admin = require("firebase-admin");
 const log = require('npmlog')
-const { commonError, returnUnAuthUserError } = require('../api/user_route')
+const { commonError, returnUnAuthUserError } = require('../api/user_route');
+const { workerProfileModel } = require('../../models/worker_profile_model');
+const { workerProfileVerificationModel } = require('../../models/worker_profile_verification_model');
 
 async function createNotification(worker, title, body, type, token) {
     try {   // required field : worker
@@ -54,19 +56,9 @@ async function createNotification(worker, title, body, type, token) {
     }
 }
 
-router.get('/', async (req, res) => {
-    const required_fields = ['worker']
-    const missing_fields = required_fields.filter(field => !req.body[field])
-    if (missing_fields.length > 0) {
-        // return error of a field is misising
-        return res.status(400).json({
-            msg: 'Missing fields',
-            status: 400,
-            success: false,
-            missing_fields
-        })
-    }
-    const { worker } = req.body
+router.get('/:worker', async (req, res) => {
+
+    const { worker } = req.params
 
     // check if user is authenticated
     try {
@@ -131,6 +123,12 @@ router.post('/create', async (req, res) => {
             address: req.body.address || {},
             profile_picture: req.body.profile_picture || ''
         })
+        const userProfile = new workerProfileModel({
+            worker
+        })
+        const userVerification = new workerProfileVerificationModel({
+            worker
+        })
         user.save(async (err) => {
             console.log(err)
             if (err) return res.status(500).json({ msg: err.message, status: 500, success: false }) // Internal Server Error
@@ -143,6 +141,8 @@ router.post('/create', async (req, res) => {
                 read: false,
                 created_at: new Date()
             })
+            await userProfile.save();
+            await userVerification.save();
             // create notification
             await createNotification(worker, 'Welcome to Easeup', "We're glad to have you on board. Enjoy your stay", 'welcome', token)
             // send notification to update user profile

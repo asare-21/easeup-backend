@@ -2,6 +2,7 @@ const {
     Schema,
     model
 } = require('mongoose');
+
 const addressSchema = new Schema({
     address: {
         type: String,
@@ -21,11 +22,11 @@ const workerProfileVerificationSchema = new Schema({
     },
     gh_card_image_front: {
         type: String,
-        required: true
+        required: false
     },
     gh_card_image_back: {
         type: String,
-        required: true
+        required: false
     },
     gh_card_verified: {
         type: Boolean,
@@ -47,7 +48,7 @@ const workerProfileVerificationSchema = new Schema({
     },
     selfie: {
         type: String,
-        required: true
+        required: false
     },
     selfie_verified: {
         type: Boolean,
