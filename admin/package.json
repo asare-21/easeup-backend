@@ -11,6 +11,7 @@
     "format": "prettier --write \"src/**/*.{js,jsx}\"",
     "build:icons": "tsc -b src/iconify-bundle && node src/iconify-bundle/bundle-icons-react.js"
   },
+
   "dependencies": {
     "@babel/core": "7.20.2",
     "@babel/eslint-parser": "7.19.1",

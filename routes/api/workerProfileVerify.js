@@ -121,7 +121,8 @@ router.post('/update/age-verify', (req, res) => {
         // Find the user
         workerProfileVerificationModel.findOneAndUpdate
             ({ worker }, {
-                age_doc
+
+                age_verification_document: age_doc
             }, (err, user) => {
                 if (err) {
                     log.warn(err.message)

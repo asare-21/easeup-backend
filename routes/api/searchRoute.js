@@ -4,6 +4,7 @@ const log = require('npmlog');
 const { workerProfileModel } = require('../../models/worker_profile_model');
 const { commonError, returnUnAuthUserError } = require('./user_route')
 const pageLimit = 20;
+const fs = require('fs')
 
 // search function
 function getDistance(coord1, coord2) {
@@ -26,6 +27,7 @@ function getDistance(coord1, coord2) {
 }
 
 router.get('/search', async (req, res) => {
+
     // search for service
     const required_fields = ['service', 'uid', "page", "searchRadius", "location"]
     const missing_fields = required_fields.filter(field => !req.body[field])
@@ -38,6 +40,7 @@ router.get('/search', async (req, res) => {
             missing_fields
         })
     }
+
     const { service, uid, page, searchRadius, location } = req.body
     // check if user is authenticated
     try {
@@ -46,6 +49,7 @@ router.get('/search', async (req, res) => {
         await workerProfileModel.find({
             skills: {
                 "$in": [service]
+
             }
         }, (err, workers) => {
             if (err) {
