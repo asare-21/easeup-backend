@@ -22,11 +22,19 @@ const workerProfileVerificationSchema = new Schema({
     },
     gh_card_image_front: {
         type: String,
-        required: false
+        required: false,
+        default: ''
+
     },
     gh_card_image_back: {
         type: String,
-        required: false
+        default: '',
+        required: false,
+    },
+    gh_card_to_face: {
+        type: String,
+        required: false,
+        default: ''
     },
     gh_card_verified: {
         type: Boolean,
@@ -48,7 +56,8 @@ const workerProfileVerificationSchema = new Schema({
     },
     selfie: {
         type: String,
-        required: false
+        required: false,
+        default: ''
     },
     selfie_verified: {
         type: Boolean,
