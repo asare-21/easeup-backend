@@ -80,7 +80,7 @@ router.post('/update/ghc-images', (req, res) => {
         //check firebase if uid exists
         admin.auth().getUser(worker)
         // check for required fields
-        if (!ghc_back && !ghc_front) return res.status(400).json({ msg: 'Bad Request. Missing fields. ghc_back and ghc_front are required', status: 400, success: false }) // At least one field is required
+        if (!gh_card_image_back && !gh_card_image_front && !gh_card_to_face) return res.status(400).json({ msg: 'Bad Request. Missing fields. ghc_back and ghc_front are required', status: 400, success: false }) // At least one field is required
         // Find the user
         workerProfileVerificationModel.findOneAndUpdate
             ({ worker }, {
