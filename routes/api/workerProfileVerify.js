@@ -193,7 +193,8 @@ router.post('/update/insurance', (req, res) => {
         // Find the user
         workerProfileVerificationModel.findOneAndUpdate
             ({ worker }, {
-                insurance_doc
+
+                insurance_document:insurance_doc
             }, (err, user) => {
                 if (err) {
                     log.warn(err.message)
