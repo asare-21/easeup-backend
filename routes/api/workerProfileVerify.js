@@ -320,7 +320,7 @@ router.post('/phone/send-code', async (req, res) => {
         console.log(response)
         if (response.data.handshake.label !== "HSHK_OK") return res.json({ msg: 'Handshake error. Access Denied', status: 500, success: false }) // Internal Server Error
         // Find the user
-        workerProfileVerificationModel.findByIdAndUpdate(worker, {
+        workerProfileVerificationModel.findOneAndUpdate({ worker }, {
             code: code
         }, async (err, user) => {
             if (err) return res.status(500).json({ msg: 'Internal Server Error', status: 500, success: false }) // Internal Server Error
@@ -357,7 +357,7 @@ router.post('/phone/verify-code', async (req, res) => {
             // Check if code matches
             if (user.code.toString() !== code.toString()) return res.status(400).json({ msg: 'Verification code is incorrect', status: 400, success: false }) // Verification code is incorrect
             // Update the user if code matched
-            await workerProfileVerificationModel.findByIdAndUpdate(worker, { code: "", phone },)
+            await workerProfileVerificationModel.findOneAndUpdate(worker, { code: "", phone },)
             return res.status(200).json({ msg: `Code has been verified successfully.`, status: 200, success: true }) // User Updated
         })
     }
