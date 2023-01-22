@@ -357,7 +357,7 @@ router.post('/phone/verify-code', async (req, res) => {
             // Check if code matches
             if (user.code.toString() !== code.toString()) return res.status(400).json({ msg: 'Verification code is incorrect', status: 400, success: false }) // Verification code is incorrect
             // Update the user if code matched
-            await workerProfileVerificationModel.findOneAndUpdate(worker, { code: "", phone },)
+            await workerProfileVerificationModel.findOneAndUpdate({ worker }, { code: "", phone },)
             return res.status(200).json({ msg: `Code has been verified successfully.`, status: 200, success: true }) // User Updated
         })
     }
