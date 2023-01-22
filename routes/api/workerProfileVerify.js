@@ -75,7 +75,7 @@ router.post('/update/image', (req, res) => {
 // update ghc back
 router.post('/update/ghc-images', (req, res) => {
     try {  // required field : user_id
-        const { worker, ghc_back, ghc_front, card_face } = req.body;
+        const { worker, gh_card_image_back, gh_card_image_front, gh_card_to_face } = req.body;
         if (!worker) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID is required
         //check firebase if uid exists
         admin.auth().getUser(worker)
@@ -84,9 +84,9 @@ router.post('/update/ghc-images', (req, res) => {
         // Find the user
         workerProfileVerificationModel.findOneAndUpdate
             ({ worker }, {
-                ghc_back,
-                ghc_front,
-                card_face
+                gh_card_to_face,
+                gh_card_image_front,
+                gh_card_image_back
             }, (err, user) => {
                 if (err) {
                     log.warn(err.message)
