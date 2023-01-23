@@ -76,7 +76,7 @@ const workerProfileSchema = new Schema({
         type: [media],
         default: []
     },
-    rate_hourly: {
+    rating: {
         type: Number,
         default: 0
     },
