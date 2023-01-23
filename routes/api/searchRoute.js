@@ -57,7 +57,7 @@ router.post('/', async (req, res) => {
             // filter workers by distance
             const filteredWorkers = workers.filter(worker => {
                 const distance = getDistance(worker.location, location)
-                return distance <= searchRadius
+                return distance <= radius
             })
             return res.status(200).json({
                 msg: 'Workers found',
