@@ -5,12 +5,12 @@ const {
 
 const reviewSchema = new Schema({
     worker: {
-        type: Schema.Types.ObjectId,
+        type: String,
         ref: 'Worker',
         required: true
     },
     user: {
-        type: Schema.Types.ObjectId,
+        type:String,
         ref: 'User',
         required: true
     },
@@ -32,4 +32,4 @@ const reviewSchema = new Schema({
     },
 });
 
-module.exports.reviewModel = model('Review', reviewSchema);
+module.exports.reviewSchema = reviewSchema

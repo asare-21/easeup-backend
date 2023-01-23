@@ -3,7 +3,7 @@ const admin = require("firebase-admin");
 const log = require('npmlog');
 const { workerProfileModel } = require('../../models/worker_profile_model');
 const { commonError, returnUnAuthUserError } = require('./user_route')
-const pageLimit = 20;
+const pageLimit = 50;
 const fs = require('fs')
 
 // search function
@@ -26,10 +26,10 @@ function getDistance(coord1, coord2) {
     return radius * c;
 }
 
-router.get('/search', async (req, res) => {
+router.post('/search', async (req, res) => {
 
     // search for service
-    const required_fields = ['service', 'uid', "page", "searchRadius", "location"]
+    const required_fields = ['service', 'uid', "page", "radius", "location"]
     const missing_fields = required_fields.filter(field => !req.body[field])
     if (missing_fields.length > 0) {
         // return error of a field is misising
@@ -41,7 +41,7 @@ router.get('/search', async (req, res) => {
         })
     }
 
-    const { service, uid, page, searchRadius, location } = req.body
+    const { service, uid, page, radius, location } = req.body
     // check if user is authenticated
     try {
         await admin.auth().getUser(uid) // check if uid is valid

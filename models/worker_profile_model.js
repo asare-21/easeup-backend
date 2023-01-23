@@ -3,6 +3,21 @@ const {
     model
 } = require('mongoose');
 
+const comment = new Schema({
+    from: {
+        type:String,
+        required:true
+    },
+    comment:{
+        type:String,
+        required :true
+    },
+    date:{
+        type:Date,
+        default:Date.now
+    }
+})
+
 const media = new Schema({
     url: {
         type: String,
@@ -19,7 +34,8 @@ const media = new Schema({
     thumbnail: {
         type: String,
         default: ''
-    }
+    },
+    comments:[comment]
 });
 
 const workRadius = new Schema({
@@ -65,7 +81,7 @@ const workerProfileSchema = new Schema({
         default: false
     },
     reviews: {
-        type: [Schema.Types.ObjectId],
+        type: [],
         ref: 'Review',
         default: []
     },
