@@ -56,6 +56,10 @@ const workerProfileSchema = new Schema({
         ref: 'Worker',
         required: true
     },
+    profile_url: {
+        type:String,
+        required:true
+    },
     bio: {
         type: String,
         default: ''

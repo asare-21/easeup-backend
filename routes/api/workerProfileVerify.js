@@ -6,6 +6,7 @@ const log = require('npmlog')
 const otpGenerator = require('otp-generator')
 const axios = require('axios')
 const { commonError, returnUnAuthUserError } = require('../api/user_route')
+const {workerProfileModel} = require("../../models/worker_profile_model");
 
 // worker profile verification data
 router.get('/:worker', async (req, res) => {
@@ -55,9 +56,20 @@ router.post('/update/image', (req, res) => {
                     return res.status(500).json({ msg: err.message, status: 500, success: false }) // Internal Server Error
                 }
                 if (!user) return res.status(404).json({ msg: 'User Not Found', status: 404, success: false }) // User Not Found
-                return res.status(200).json({
-                    msg: 'Profile updated', status: 200, success: true, user
-                }) // User Found and returned
+                workerProfileModel.findOneAndUpdate({
+                    worker
+                },{
+                    profile_url:selfie
+                },(err,result)=>{
+                    if (err) {
+                        log.warn(err.message)
+                        return res.status(500).json({ msg: err.message, status: 500, success: false }) // Internal Server Error
+                    }
+                    return res.status(200).json({
+                        msg: 'Profile updated', status: 200, success: true, user
+                    })
+                })
+                // User Found and returned
             }
             )
     }
