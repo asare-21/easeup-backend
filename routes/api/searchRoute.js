@@ -76,9 +76,11 @@ router.post('/', async (req, res) => {
         if (e.errorInfo) {
             // User Not Found
 
-            // return returnUnAuthUserError(res, e.message)
+            return returnUnAuthUserError(res, e.message)
+        }else{
+            return commonError(res, e.message)
+
         }
-        // return commonError(res, e.message)
     }
 })
 
