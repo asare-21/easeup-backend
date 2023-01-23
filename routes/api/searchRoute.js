@@ -54,7 +54,7 @@ router.post('/', async (req, res) => {
         }, (err, workers) => {
             if (err) {
                 console.log(err)
-                return commonError(res, err.message)
+                // return commonError(res, err.message)
             }
             // filter workers by distance
             const filteredWorkers = workers.filter(worker => {
