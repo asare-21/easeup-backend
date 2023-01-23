@@ -25,6 +25,7 @@ function returnUnAuthUserError(res, msg) {
     return res.status(401).json({ msg: msg, status: 401, success: false })
 }
 function commonError(res, msg) {
+    console.log(msg)
     return res.status(500).json({ msg, status: 500, success: false })
 }
 

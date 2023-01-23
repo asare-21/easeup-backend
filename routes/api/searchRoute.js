@@ -53,8 +53,7 @@ router.post('/', async (req, res) => {
                 "$in": [service]
             }
         }, (err, workers) => {
-            console.log(workers,err)
-            console.log(service,uid)
+
             if (err) {
                 console.log(err)
                 return commonError(res, err.message)
@@ -77,6 +76,7 @@ router.post('/', async (req, res) => {
         if (e.errorInfo) {
             // User Not Found
             log.warn(e.message)
+            console.log(e.message)
             return returnUnAuthUserError(res, e.message)
         }
         return commonError(res, e.message)
