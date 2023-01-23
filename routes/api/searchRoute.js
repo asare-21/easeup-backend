@@ -49,7 +49,6 @@ router.post('/', async (req, res) => {
         await workerProfileModel.find({
             skills: {
                 "$in": [service]
-
             }
         }, (err, workers) => {
             if (err) {
