@@ -27,10 +27,11 @@ function getDistance(coord1, coord2) {
 }
 
 router.post('/', async (req, res) => {
-
     // search for service
     const required_fields = ['service', 'uid', "page", "radius", "location"]
+
     const missing_fields = required_fields.filter(field => !req.body[field])
+
     if (missing_fields.length > 0) {
         // return error of a field is misising
         return res.status(400).json({
@@ -52,6 +53,7 @@ router.post('/', async (req, res) => {
             }
         }, (err, workers) => {
             if (err) {
+                console.log(err)
                 return commonError(res, err.message)
             }
             // filter workers by distance
