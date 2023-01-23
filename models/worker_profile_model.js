@@ -58,7 +58,7 @@ const workerProfileSchema = new Schema({
     },
     profile_url: {
         type:String,
-        required:true
+        default: ""
     },
     bio: {
         type: String,

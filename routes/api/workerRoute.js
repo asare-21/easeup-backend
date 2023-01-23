@@ -123,11 +123,9 @@ router.post('/create', async (req, res) => {
         const userProfile = new workerProfileModel({
             worker,
             name: profile_name,
-
         })
         const userVerification = new workerProfileVerificationModel({
             worker,
-
         })
         user.save(async (err) => {
             console.log(err)
