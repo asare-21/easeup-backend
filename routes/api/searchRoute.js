@@ -46,7 +46,6 @@ router.post('/', async (req, res) => {
     // check if user is authenticated
     try {
         await admin.auth().getUser(uid) // check if uid is valid
-
         // search for workers in the service
         await workerProfileModel.find({
             skills: {
@@ -58,17 +57,16 @@ router.post('/', async (req, res) => {
                 return commonError(res, err.message)
             }
             // filter workers by distance
-            // const filteredWorkers = workers.filter(worker => {
-            //     const distance = getDistance(worker.location, location)
-            //     return distance <= radius
-            // })
-
+            const filteredWorkers = workers.filter(worker => {
+                const distance = getDistance(worker.location, location)
+                return distance <= radius
+            })
             // Filtered
             return res.status(200).json({
                 msg: 'Workers found',
                 status: 200,
                 success: true,
-                workers
+                workers:filteredWorkers
             })
         }).limit(pageLimit).skip((page - 1) * pageLimit) // paginate the results
     }
@@ -77,7 +75,7 @@ router.post('/', async (req, res) => {
             // User Not Found
             log.warn(e.message)
             console.log(e.message)
-            return returnUnAuthUserError(res, e.message)
+            // return returnUnAuthUserError(res, e.message)
         }
         return commonError(res, e.message)
     }
