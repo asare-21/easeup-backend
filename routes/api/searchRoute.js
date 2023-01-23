@@ -54,7 +54,7 @@ router.post('/', async (req, res) => {
             }
         }, (err, workers) => {
             console.log(workers,err)
-            console.log(service)
+            console.log(service,uid)
             if (err) {
                 console.log(err)
                 return commonError(res, err.message)
