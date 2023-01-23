@@ -58,16 +58,17 @@ router.post('/', async (req, res) => {
                 return commonError(res, err.message)
             }
             // filter workers by distance
-            const filteredWorkers = workers.filter(worker => {
-                const distance = getDistance(worker.location, location)
-                return distance <= radius
-            })
+            // const filteredWorkers = workers.filter(worker => {
+            //     const distance = getDistance(worker.location, location)
+            //     return distance <= radius
+            // })
 
+            // Filtered
             return res.status(200).json({
                 msg: 'Workers found',
                 status: 200,
                 success: true,
-                workers:filteredWorkers
+                workers
             })
         }).limit(pageLimit).skip((page - 1) * pageLimit) // paginate the results
     }
