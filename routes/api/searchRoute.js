@@ -54,19 +54,20 @@ router.post('/', async (req, res) => {
         }, (err, workers) => {
             if (err) {
                 console.log(err)
-                // return commonError(res, err.message)
+                return commonError(res, err.message)
             }
             // filter workers by distance
             const filteredWorkers = workers.filter(worker => {
                 const distance = getDistance(worker.location, location)
                 return distance <= radius
             })
-            return res.status(200).json({
-                msg: 'Workers found',
-                status: 200,
-                success: true,
-                workers:filteredWorkers
-            })
+
+            // return res.status(200).json({
+            //     msg: 'Workers found',
+            //     status: 200,
+            //     success: true,
+            //     workers:filteredWorkers
+            // })
         }).limit(pageLimit).skip((page - 1) * pageLimit) // paginate the results
     }
     catch (e) {
