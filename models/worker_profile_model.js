@@ -23,6 +23,7 @@ const media = new Schema({
 });
 
 const workRadius = new Schema({
+
     latlng: {
         type: [Number],
         required: false
@@ -42,6 +43,10 @@ const workerProfileSchema = new Schema({
     bio: {
         type: String,
         default: ''
+    },
+    name:{
+        type: String,
+        default:''
     },
     skills: {
         type: [String],
@@ -66,7 +71,10 @@ const workerProfileSchema = new Schema({
     },
     work_radius: {
         type: workRadius,
-        default: {}
+        default: {
+            latlng:[],
+            radius:0
+        }
     },
 });
 
