@@ -78,7 +78,7 @@ router.post('/', async (req, res) => {
 
             return returnUnAuthUserError(res, e.message)
         }else{
-            return commonError(res, e.message)
+            // return commonError(res, e.message)
 
         }
     }
