@@ -63,7 +63,7 @@ router.post('/', async (req, res) => {
                 msg: 'Workers found',
                 status: 200,
                 success: true,
-                workers
+                workers:filteredWorkers
             })
         }).limit(pageLimit).skip((page - 1) * pageLimit) // paginate the results
     }
