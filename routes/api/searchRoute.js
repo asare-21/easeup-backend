@@ -26,7 +26,7 @@ function getDistance(coord1, coord2) {
     return radius * c;
 }
 
-router.post('/search', async (req, res) => {
+router.post('/', async (req, res) => {
 
     // search for service
     const required_fields = ['service', 'uid', "page", "radius", "location"]
