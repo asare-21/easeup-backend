@@ -71,13 +71,14 @@ router.post('/', async (req, res) => {
         }).limit(pageLimit).skip((page - 1) * pageLimit) // paginate the results
     }
     catch (e) {
+        log.warn(e.message)
+        console.log(e.message)
         if (e.errorInfo) {
             // User Not Found
-            log.warn(e.message)
-            console.log(e.message)
+
             // return returnUnAuthUserError(res, e.message)
         }
-        return commonError(res, e.message)
+        // return commonError(res, e.message)
     }
 })
 
