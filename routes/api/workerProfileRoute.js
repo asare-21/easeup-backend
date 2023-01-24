@@ -38,6 +38,7 @@ router.get('/:worker', async (req, res) => {
 router.post('/skills', async (req, res) => {
     const { worker, skills } = req.body
     try {
+        if (!skills) return commonError(res, 'No skills provided')
         await admin.auth().getUser(worker) // check if worker is valid
         workerProfileModel.findOneAndUpdate({ worker }, {
             skills
@@ -67,6 +68,7 @@ router.post('/skills', async (req, res) => {
 router.post('/bio', async (req, res) => {
     const { worker, bio } = req.body
     try {
+        if (!bio) return commonError(res, 'No bio provided')
         await admin.auth().getUser(worker) // check if worker is valid
         workerProfileModel.findOneAndUpdate({ worker }, {
             bio
@@ -95,6 +97,7 @@ router.post('/bio', async (req, res) => {
 router.post('/portfolio', async (req, res) => {
     const { worker, media } = req.body
     try {
+        if (!media) return commonError(res, 'No media provided');
         await admin.auth().getUser(worker) // check if worker is valid
         workerProfileModel.findOneAndUpdate({ worker }, {
             images: media
@@ -103,7 +106,6 @@ router.post('/portfolio', async (req, res) => {
                 console.log(err)
                 return commonError(res, err.message)
             }
-            console.log(worker)
             return res.status(200).json({
                 msg: 'Worker Profile Updated',
                 status: 200,
@@ -126,6 +128,7 @@ router.post('/portfolio', async (req, res) => {
 router.post('/work-radius', async (req, res) => {
     const { worker, radius } = req.body
     try {
+        if (!radius) return commonError(res, 'No radius provided')
         await admin.auth().getUser(worker) // check if worker is valid
         if (radius.radius > 50 || radius.radius < 5) return commonError(res, 'Radius must be between 5 and 50')
         workerProfileModel.findOneAndUpdate({ worker }, {
