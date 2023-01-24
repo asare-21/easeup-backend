@@ -2,19 +2,20 @@ const {
     Schema,
     model
 } = require('mongoose');
+const { reviewSchema } = require('./reviews_model');
 
 const comment = new Schema({
     from: {
-        type:String,
-        required:true
+        type: String,
+        required: true
     },
-    comment:{
-        type:String,
-        required :true
+    comment: {
+        type: String,
+        required: true
     },
-    date:{
-        type:Date,
-        default:Date.now
+    date: {
+        type: Date,
+        default: Date.now
     }
 })
 
@@ -35,7 +36,7 @@ const media = new Schema({
         type: String,
         default: ''
     },
-    comments:[comment]
+    comments: [comment]
 });
 
 const workRadius = new Schema({
@@ -57,16 +58,16 @@ const workerProfileSchema = new Schema({
         required: true
     },
     profile_url: {
-        type:String,
+        type: String,
         default: ""
     },
     bio: {
         type: String,
         default: ''
     },
-    name:{
+    name: {
         type: String,
-        default:''
+        default: ''
     },
     skills: {
         type: [String],
@@ -85,15 +86,15 @@ const workerProfileSchema = new Schema({
         default: false
     },
     reviews: {
-        type: [],
+        type: [reviewSchema],
         ref: 'Review',
         default: []
     },
     work_radius: {
         type: workRadius,
         default: {
-            latlng:[],
-            radius:0
+            latlng: [],
+            radius: 0
         }
     },
 });
