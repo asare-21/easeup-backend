@@ -112,6 +112,7 @@ else {
     app.use('/bookmark', bookmarkRoute)
     app.use('/verify-worker-profile', workerProfileVerificationRoute)
     app.use('/worker', workerRoute)
+    app.use('/worker-profile', workerProfileRoute)
 }
 
 

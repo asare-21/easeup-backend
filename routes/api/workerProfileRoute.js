@@ -39,7 +39,7 @@ router.post('/skills', async (req, res) => {
     const { worker, skills } = req.body
     try {
         await admin.auth().getUser(worker) // check if worker is valid
-        workerProfileModel.findByIdAndUpdate({ worker }, {
+        workerProfileModel.findOneAndUpdate({ worker }, {
             skills
         }, (err, worker) => {
             if (err) {
@@ -68,7 +68,7 @@ router.post('/bio', async (req, res) => {
     const { worker, bio } = req.body
     try {
         await admin.auth().getUser(worker) // check if worker is valid
-        workerProfileModel.findByIdAndUpdate({ worker }, {
+        workerProfileModel.findOneAndUpdate({ worker }, {
             bio
         }, (err, worker) => {
             if (err) {
@@ -96,7 +96,7 @@ router.post('/portfolio', async (req, res) => {
     const { worker, media } = req.body
     try {
         await admin.auth().getUser(worker) // check if worker is valid
-        workerProfileModel.findByIdAndUpdate({ worker }, {
+        workerProfileModel.findOneAndUpdate({ worker }, {
             images: media
         }, (err, worker) => {
             if (err) {
@@ -128,7 +128,7 @@ router.post('/work-radius', async (req, res) => {
     try {
         await admin.auth().getUser(worker) // check if worker is valid
         if (radius.radius > 50 || radius.radius < 5) return commonError(res, 'Radius must be between 5 and 50')
-        workerProfileModel.findByIdAndUpdate({ worker }, {
+        workerProfileModel.findOneAndUpdate({ worker }, {
             work_radius: radius
         }, (err, worker) => {
             if (err) {

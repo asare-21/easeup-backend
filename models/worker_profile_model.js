@@ -75,7 +75,15 @@ const workerProfileSchema = new Schema({
     },
     images: {
         type: [media],
-        default: []
+        default: [
+            {
+                url: '',
+                image: false,
+                description: '',
+                thumbnail: '',
+                comments: []
+            }
+        ]
     },
     rating: {
         type: Number,
@@ -88,7 +96,16 @@ const workerProfileSchema = new Schema({
     reviews: {
         type: [reviewSchema],
         ref: 'Review',
-        default: []
+        default: [
+            {
+                worker: '',
+                user: '',
+                rating: 0,
+                review: '',
+                date: Date.now,
+                images: []
+            }
+        ]
     },
     work_radius: {
         type: workRadius,
