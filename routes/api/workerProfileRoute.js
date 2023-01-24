@@ -100,6 +100,7 @@ router.post('/portfolio', async (req, res) => {
             images: media
         }, (err, worker) => {
             if (err) {
+                console.log(err)
                 return commonError(res, err.message)
             }
             return res.status(200).json({
@@ -111,6 +112,7 @@ router.post('/portfolio', async (req, res) => {
         })
     }
     catch (e) {
+        console.log(e)
         if (e.errorInfo) {
             // User Not Found
             log.warn(e.message)
