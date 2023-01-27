@@ -34,4 +34,4 @@ const commentSchema = new Schema({
 
 });
 
-module.exports.commentModel = model('Review', commentSchema);
+module.exports.commentModel = model('Comment', commentSchema);
