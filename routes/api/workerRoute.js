@@ -144,18 +144,22 @@ router.post('/create', async (req, res) => {
                 created_at: new Date()
             })
             await userProfile.save(
-                (err)=>{
+              async  (err)=>{
                     if (err) {
                         console.log(err)
+                     await   workerModel.findOneAndDelete({worker})
                         // return res.status(500).json({ msg: err.message, status: 500, success: false }) // Internal Server Error
 
                     }
                 }
             );
             await userVerification.save(
-                (err)=>{
+               async (err)=>{
                     if (err) {
                         console.log(err)
+                        await   workerModel.findOneAndDelete({worker})
+                      await  workerProfileModel.findByIdAndDelete({worker})
+
                         // return res.status(500).json({ msg: err.message, status: 500, success: false }) // Internal Server Error
 
                     }
