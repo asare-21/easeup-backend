@@ -129,7 +129,11 @@ router.post('/create', async (req, res) => {
         })
         user.save(async (err) => {
             console.log(err)
-            if (err) return res.status(500).json({ msg: err.message, status: 500, success: false }) // Internal Server Error
+            if (err) {
+                console.log(err)
+                return res.status(500).json({ msg: err.message, status: 500, success: false }) // Internal Server Error
+
+            }
             // create notification
             const notification = new notificationModel({
                 user: worker,
@@ -139,8 +143,24 @@ router.post('/create', async (req, res) => {
                 read: false,
                 created_at: new Date()
             })
-            await userProfile.save();
-            await userVerification.save();
+            await userProfile.save(
+                (err)=>{
+                    if (err) {
+                        console.log(err)
+                        return res.status(500).json({ msg: err.message, status: 500, success: false }) // Internal Server Error
+
+                    }
+                }
+            );
+            await userVerification.save(
+                (err)=>{
+                    if (err) {
+                        console.log(err)
+                        return res.status(500).json({ msg: err.message, status: 500, success: false }) // Internal Server Error
+
+                    }
+                }
+            );
             // create notification
             // await createNotification(worker, 'Welcome to Easeup', "We're glad to have you on board. Enjoy your stay", 'welcome', token)
             // // send notification to update user profile
