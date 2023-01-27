@@ -97,14 +97,7 @@ const workerProfileSchema = new Schema({
         type: [reviewSchema],
         ref: 'Review',
         default: [
-            {
-                worker: '',
-                user: '',
-                rating: 0,
-                review: '',
-                date: Date.now,
-                images: []
-            }
+
         ]
     },
     work_radius: {

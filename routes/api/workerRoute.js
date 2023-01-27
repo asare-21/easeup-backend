@@ -147,7 +147,7 @@ router.post('/create', async (req, res) => {
                 (err)=>{
                     if (err) {
                         console.log(err)
-                        return res.status(500).json({ msg: err.message, status: 500, success: false }) // Internal Server Error
+                        // return res.status(500).json({ msg: err.message, status: 500, success: false }) // Internal Server Error
 
                     }
                 }
@@ -156,7 +156,7 @@ router.post('/create', async (req, res) => {
                 (err)=>{
                     if (err) {
                         console.log(err)
-                        return res.status(500).json({ msg: err.message, status: 500, success: false }) // Internal Server Error
+                        // return res.status(500).json({ msg: err.message, status: 500, success: false }) // Internal Server Error
 
                     }
                 }
