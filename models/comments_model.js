@@ -3,22 +3,27 @@ const {
     model
 } = require('mongoose');
 
-const reviewSchema = new Schema({
+/**
+ *   /// Comment by users on the worker profile's posts
+  String? from;
+  String? comment;
+  String? date;
+
+  Comments({required this.from, required this.comment, required this.date});
+ */
+
+const commentSchema = new Schema({
     worker: {
         type: String,
         ref: 'Worker',
         required: true
     },
-    user: {
+    from: {
         type: String,
         ref: 'User',
         required: true
     },
-    rating: {
-        type: Number,
-        required: true
-    },
-    review: {
+    comment: {
         type: String,
         default: ''
     },
@@ -26,10 +31,7 @@ const reviewSchema = new Schema({
         type: Date,
         default: Date.now
     },
-    images: {
-        type: [String],
-        default: []
-    },
+
 });
 
-module.exports.reviewModel = model('Review', reviewSchema);
+module.exports.commentModel = model('Review', commentSchema);

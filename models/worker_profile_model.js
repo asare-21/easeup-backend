@@ -93,13 +93,7 @@ const workerProfileSchema = new Schema({
         type: Boolean,
         default: false
     },
-    reviews: {
-        type: [reviewSchema],
-        ref: 'Review',
-        default: [
 
-        ]
-    },
     work_radius: {
         type: workRadius,
         default: {

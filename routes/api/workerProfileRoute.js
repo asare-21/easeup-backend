@@ -2,6 +2,8 @@ const router = require('express').Router();
 const admin = require("firebase-admin");
 const log = require('npmlog');
 const { bookmarkModel } = require('../../models/bookmark_model');
+const { commentModel } = require('../../models/comments_model');
+const { reviewModel } = require('../../models/reviews_model');
 const { workerProfileModel } = require('../../models/worker_profile_model');
 
 const { commonError, returnUnAuthUserError } = require('./user_route')
@@ -34,6 +36,65 @@ router.get('/:worker', async (req, res) => {
         return commonError(res, e.message)
     }
 })
+
+router.get('/reviews/:worker', async (req, res) => {
+
+    const { worker } = req.params
+    // check if user is authenticated
+    try {
+        await admin.auth().getUser(worker) // check if uid is valid
+        reviewModel.findOne({ worker }, (err, worker) => {
+            if (err) {
+                return commonError(res, err.message)
+            }
+            return res.status(200).json({
+                msg: 'Worker Profile',
+                status: 200,
+                success: true,
+                worker
+            })
+        })
+    }
+    catch (e) {
+        if (e.errorInfo) {
+            // User Not Found
+            log.warn(e.message)
+            return returnUnAuthUserError(res, e.message)
+        }
+        return commonError(res, e.message)
+    }
+})
+
+router.get('/comments/:worker', async (req, res) => {
+
+    const { worker } = req.params
+
+    // check if user is authenticated
+    try {
+        await admin.auth().getUser(worker) // check if uid is valid
+        commentModel.findOne({ worker }, (err, worker) => {
+            if (err) {
+                return commonError(res, err.message)
+            }
+            return res.status(200).json({
+                msg: 'Worker Profile',
+                status: 200,
+                success: true,
+                worker
+            })
+        })
+    }
+    catch (e) {
+        if (e.errorInfo) {
+            // User Not Found
+            log.warn(e.message)
+            return returnUnAuthUserError(res, e.message)
+        }
+        return commonError(res, e.message)
+    }
+})
+
+
 
 router.post('/skills', async (req, res) => {
     const { worker, skills } = req.body
