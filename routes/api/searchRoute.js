@@ -59,7 +59,7 @@ router.post('/', async (req, res) => {
             // filter workers by distance
             const filteredWorkers = workers.filter(worker => {
                 const distance = getDistance(worker.location, location)
-                return distance <= radius
+                return worker.bio.length > 0
             })
             // Filtered
             return res.status(200).json({
