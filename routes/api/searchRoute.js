@@ -48,9 +48,9 @@ router.post('/', async (req, res) => {
         await admin.auth().getUser(uid) // check if uid is valid
         // search for workers in the service
         await workerProfileModel.find({
-            skills: {
-                $in: [service]
-            }
+            // skills: {
+            //     $in: [service]
+            // }
         }, (err, workers) => {
             if (err) {
                 console.log(err)
