@@ -191,7 +191,6 @@ router.post('/portfolio', async (req, res) => {
 router.get('/portfolio/:worker', async (req, res) => {
     const { worker, media } = req.body
     try {
-        if (!media) return commonError(res, 'No media provided');
         await admin.auth().getUser(worker) // check if worker is valid
         mediaModel.findOne({ worker }, (err, worker) => {
             if (err) {
