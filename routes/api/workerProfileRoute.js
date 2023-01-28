@@ -3,6 +3,7 @@ const admin = require("firebase-admin");
 const log = require('npmlog');
 const { bookmarkModel } = require('../../models/bookmark_model');
 const { commentModel } = require('../../models/comments_model');
+const { mediaModel } = require('../../models/mediaModel');
 const { reviewModel } = require('../../models/reviews_model');
 const { workerProfileModel } = require('../../models/worker_profile_model');
 
@@ -160,8 +161,10 @@ router.post('/portfolio', async (req, res) => {
     try {
         if (!media) return commonError(res, 'No media provided');
         await admin.auth().getUser(worker) // check if worker is valid
-        workerProfileModel.findOneAndUpdate({ worker }, {
-            images: media
+        mediaModel.findOneAndUpdate({ worker }, {
+            $push: {
+                media: media
+            }
         }, (err, worker) => {
             if (err) {
                 console.log(err)
@@ -169,6 +172,34 @@ router.post('/portfolio', async (req, res) => {
             }
             return res.status(200).json({
                 msg: 'Worker Profile Updated',
+                status: 200,
+                success: true,
+                worker
+            })
+        })
+    }
+    catch (e) {
+        console.log(e)
+        if (e.errorInfo) {
+            // User Not Found
+            log.warn(e.message)
+            return returnUnAuthUserError(res, e.message)
+        }
+        return commonError(res, e.message)
+    }
+})
+router.get('/portfolio/:worker', async (req, res) => {
+    const { worker, media } = req.body
+    try {
+        if (!media) return commonError(res, 'No media provided');
+        await admin.auth().getUser(worker) // check if worker is valid
+        mediaModel.findOne({ worker }, (err, worker) => {
+            if (err) {
+                console.log(err)
+                return commonError(res, err.message)
+            }
+            return res.status(200).json({
+                msg: 'Worker Profile Fetched Successfully',
                 status: 200,
                 success: true,
                 worker
