@@ -283,7 +283,7 @@ router.post('/portfolio', async (req, res) => {
 })
 
 router.get('/portfolio/:worker', async (req, res) => {
-    const { worker, media } = req.body
+    const { worker } = req.body
     try {
         await admin.auth().getUser(worker) // check if worker is valid
         mediaModel.findOne({ worker }, (err, worker) => {
