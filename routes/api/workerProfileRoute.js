@@ -215,13 +215,17 @@ router.post('/twitter', async (req, res) => {
 })
 
 router.post('/portfolio', async (req, res) => {
-    const { worker, media } = req.body
+    const { worker, media, description } = req.body
     try {
-        if (!media) return commonError(res, 'No media provided');
+        if (!media && !description) return commonError(res, 'No media provided');
         await admin.auth().getUser(worker) // check if worker is valid
         mediaModel.findOneAndUpdate({ worker }, {
             $push: {
-                media: media
+                media: {
+                    url: media,
+                    description,
+                    image: true
+                }
             }
         }, (err, worker) => {
             if (err) {
