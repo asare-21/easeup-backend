@@ -154,7 +154,7 @@ router.post('/bio', async (req, res) => {
 router.post('/instagram', async (req, res) => {
     const { worker, ig } = req.body
     try {
-        if (!ig) return commonError(res, 'No bio provided')
+        if (!ig) return commonError(res, 'No username provided')
         await admin.auth().getUser(worker) // check if worker is valid
         workerProfileModel.findOneAndUpdate({ worker }, {
             links: {
@@ -182,9 +182,9 @@ router.post('/instagram', async (req, res) => {
     }
 })
 router.post('/twitter', async (req, res) => {
-    const { worker, fb } = req.body
+    const { worker, twitter } = req.body
     try {
-        if (!fb) return commonError(res, 'No bio provided')
+        if (!twitter) return commonError(res, 'No username provided')
         await admin.auth().getUser(worker) // check if worker is valid
         workerProfileModel.findOneAndUpdate({ worker }, {
             links: {
