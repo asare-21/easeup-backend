@@ -158,9 +158,7 @@ router.post('/instagram', async (req, res) => {
         await admin.auth().getUser(worker) // check if worker is valid
         workerProfileModel.findOneAndUpdate({ worker }, {
             $set: {
-                links: {
-                    instagram: ig
-                }
+                'links.instagram': ig
             }
         }, (err, worker) => {
             if (err) {
@@ -190,9 +188,9 @@ router.post('/twitter', async (req, res) => {
         await admin.auth().getUser(worker) // check if worker is valid
         workerProfileModel.findOneAndUpdate({ worker }, {
             $set: {
-                links: {
+                'links.twitter':
                     twitter
-                }
+
             }
         }, (err, worker) => {
             if (err) {
