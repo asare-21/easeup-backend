@@ -151,6 +151,66 @@ router.post('/bio', async (req, res) => {
         return commonError(res, e.message)
     }
 })
+router.post('/instagram', async (req, res) => {
+    const { worker, ig } = req.body
+    try {
+        if (!ig) return commonError(res, 'No bio provided')
+        await admin.auth().getUser(worker) // check if worker is valid
+        workerProfileModel.findOneAndUpdate({ worker }, {
+            links: {
+                instagram: ig
+            }
+        }, (err, worker) => {
+            if (err) {
+                return commonError(res, err.message)
+            }
+            return res.status(200).json({
+                msg: 'Worker Profile Updated',
+                status: 200,
+                success: true,
+                worker
+            })
+        })
+    }
+    catch (e) {
+        if (e.errorInfo) {
+            // User Not Found
+            log.warn(e.message)
+            return returnUnAuthUserError(res, e.message)
+        }
+        return commonError(res, e.message)
+    }
+})
+router.post('/twitter', async (req, res) => {
+    const { worker, fb } = req.body
+    try {
+        if (!fb) return commonError(res, 'No bio provided')
+        await admin.auth().getUser(worker) // check if worker is valid
+        workerProfileModel.findOneAndUpdate({ worker }, {
+            links: {
+                twitter
+            }
+        }, (err, worker) => {
+            if (err) {
+                return commonError(res, err.message)
+            }
+            return res.status(200).json({
+                msg: 'Worker Profile Updated',
+                status: 200,
+                success: true,
+                worker
+            })
+        })
+    }
+    catch (e) {
+        if (e.errorInfo) {
+            // User Not Found
+            log.warn(e.message)
+            return returnUnAuthUserError(res, e.message)
+        }
+        return commonError(res, e.message)
+    }
+})
 
 router.post('/portfolio', async (req, res) => {
     const { worker, media } = req.body
