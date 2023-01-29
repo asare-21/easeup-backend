@@ -58,7 +58,7 @@ router.post('/', async (req, res) => {
             }
             // filter workers by distance
             const filteredWorkers = workers.filter(worker => {
-                // const distance = getDistance(worker.location, location)
+                const distance = getDistance(worker.location, location)
                 return worker.bio.length > 0
             })
             // Filtered
@@ -66,7 +66,7 @@ router.post('/', async (req, res) => {
                 msg: 'Workers found',
                 status: 200,
                 success: true,
-                workers:filteredWorkers
+                workers: filteredWorkers
             })
         }).limit(pageLimit).skip((page - 1) * pageLimit) // paginate the results
     }
@@ -77,7 +77,7 @@ router.post('/', async (req, res) => {
             // User Not Found
 
             return returnUnAuthUserError(res, e.message)
-        }else{
+        } else {
             // return commonError(res, e.message)
 
         }

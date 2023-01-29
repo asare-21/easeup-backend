@@ -6,7 +6,6 @@ const { commentModel } = require('../../models/comments_model');
 const { mediaModel } = require('../../models/mediaModel');
 const { reviewModel } = require('../../models/reviews_model');
 const { workerProfileModel } = require('../../models/worker_profile_model');
-
 const { commonError, returnUnAuthUserError } = require('./user_route')
 
 router.get('/:worker', async (req, res) => {
@@ -95,8 +94,6 @@ router.get('/comments/:worker', async (req, res) => {
     }
 })
 
-
-
 router.post('/skills', async (req, res) => {
     const { worker, skills } = req.body
     try {
@@ -125,7 +122,6 @@ router.post('/skills', async (req, res) => {
         return commonError(res, e.message)
     }
 })
-
 
 router.post('/bio', async (req, res) => {
     const { worker, bio } = req.body
@@ -188,6 +184,7 @@ router.post('/portfolio', async (req, res) => {
         return commonError(res, e.message)
     }
 })
+
 router.get('/portfolio/:worker', async (req, res) => {
     const { worker, media } = req.body
     try {
@@ -246,6 +243,5 @@ router.post('/work-radius', async (req, res) => {
         return commonError(res, e.message)
     }
 })
-
 
 module.exports.workerProfileRoute = router

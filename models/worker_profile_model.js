@@ -85,6 +85,20 @@ const workerProfileSchema = new Schema({
             }
         ]
     },
+    links: {
+        instagram: {
+            type: String,
+            default: ''
+        },
+        facebook: {
+            type: String,
+            default: ''
+        },
+        twitter: {
+            type: String,
+            default: ''
+        }
+    },
     rating: {
         type: Number,
         default: 0
