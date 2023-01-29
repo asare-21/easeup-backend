@@ -33,7 +33,11 @@ const media = new Schema({
         type: String,
         default: ''
     },
-    comments: [comment]
+    comments: [comment],
+    views: {
+        type: Number,
+        default: 0
+    },
 });
 
 const mediaModelSchema = new Schema({
