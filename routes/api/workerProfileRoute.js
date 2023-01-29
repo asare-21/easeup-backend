@@ -157,8 +157,10 @@ router.post('/instagram', async (req, res) => {
         if (!ig) return commonError(res, 'No username provided')
         await admin.auth().getUser(worker) // check if worker is valid
         workerProfileModel.findOneAndUpdate({ worker }, {
-            links: {
-                instagram: ig
+            $set: {
+                links: {
+                    instagram: ig
+                }
             }
         }, (err, worker) => {
             if (err) {
@@ -187,8 +189,10 @@ router.post('/twitter', async (req, res) => {
         if (!twitter) return commonError(res, 'No username provided')
         await admin.auth().getUser(worker) // check if worker is valid
         workerProfileModel.findOneAndUpdate({ worker }, {
-            links: {
-                twitter
+            $set: {
+                links: {
+                    twitter
+                }
             }
         }, (err, worker) => {
             if (err) {
