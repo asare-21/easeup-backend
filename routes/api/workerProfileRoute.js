@@ -219,26 +219,57 @@ router.post('/portfolio', async (req, res) => {
     try {
         if (!media && !description) return commonError(res, 'No media provided');
         await admin.auth().getUser(worker) // check if worker is valid
-        mediaModel.findOneAndUpdate({ worker }, {
-            $push: {
-                media: {
-                    url: media,
-                    description,
-                    image: true
-                }
-            }
-        }, (err, worker) => {
+        mediaModel.find({ worker }, (err, result) => {
             if (err) {
                 console.log(err)
                 return commonError(res, err.message)
             }
-            return res.status(200).json({
-                msg: 'Worker Profile Updated',
-                status: 200,
-                success: true,
-                worker
-            })
+
+            if (result.length === 0) {
+                const newMedia = new mediaModel({
+                    worker,
+                    media: {
+                        url: media,
+                        description,
+                        image: true
+                    }
+                })
+                newMedia.save((err, worker) => {
+                    if (err) {
+                        console.log(err)
+                        return commonError(res, err.message)
+                    }
+                    return res.status(200).json({
+                        msg: 'Worker Profile Updated',
+                        status: 200,
+                        success: true,
+                        worker
+                    })
+                })
+            } else {
+                mediaModel.findOneAndUpdate({ worker }, {
+                    $push: {
+                        media: {
+                            url: media,
+                            description,
+                            image: true
+                        }
+                    }
+                }, (err, worker) => {
+                    if (err) {
+                        console.log(err)
+                        return commonError(res, err.message)
+                    }
+                    return res.status(200).json({
+                        msg: 'Worker Profile Updated',
+                        status: 200,
+                        success: true,
+                        worker
+                    })
+                })
+            }
         })
+
     }
     catch (e) {
         console.log(e)
