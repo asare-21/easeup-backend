@@ -228,7 +228,7 @@ router.post('/location',async (res,req)=>{
         })
 
     }catch (e) {
-
+return commonError(res,e.message)
     }
 })
 module.exports.workerRoute = router
