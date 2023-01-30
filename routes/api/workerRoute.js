@@ -219,7 +219,7 @@ router.post('/location',async (req,res)=>{
                     logs:updates
                 }).save((err)=>{
                     if(err) return res.status(400).json({ msg: 'Something went wrong',success:false})
-                    return res.json({success:true})
+
                 })
 
             }
