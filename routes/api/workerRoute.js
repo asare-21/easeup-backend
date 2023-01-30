@@ -6,6 +6,7 @@ const log = require('npmlog')
 const { commonError, returnUnAuthUserError } = require('../api/user_route');
 const { workerProfileModel } = require('../../models/worker_profile_model');
 const { workerProfileVerificationModel } = require('../../models/worker_profile_verification_model');
+const {locationModel} = require("../../models/workerLocationModel");
 
 async function createNotification(worker, title, body, type, token) {
     try {   // required field : worker
@@ -182,4 +183,52 @@ router.post('/create', async (req, res) => {
     }
 })
 
+router.post('/location',async (res,req)=>{
+    try{
+        /*
+        *     "heading": Number,
+    "lat": Number ,
+    'lng': Number,
+    'speed': Number,
+    'accuracy': Number,
+    'timestamp': Date.now
+        * */
+        const required_fields = ["updates", "worker"]
+        var missing_fields = []
+        // check for required fields
+        for (let i = 0; i < required_fields.length; i++) {
+            if (!req.body[required_fields[i]]) {
+                missing_fields.push(required_fields[i])
+            }
+        }
+        if (missing_fields.length > 0) return res.status(400).json({ msg: 'Bad Request. Missing fields', status: 400, success: false, missing_fields }) // At least one field is required
+        const { worker, updates } = req.body;
+        await admin.auth().getUser(worker)
+        locationModel.findOneAndUpdate({worker },{
+            $push:{
+                logs:updates
+            }
+        },(err,result)=>{
+            if (err) {
+                return commonError(res, err.message)
+            }
+            if(!worker){
+                //create and update
+                locationModel({
+                    worker,
+                    logs:updates
+                }).save((err)=>{
+                    if(err) return res.status(400).json({ msg: 'Something went wrong',success:false})
+                    return res.json({success:true})
+                })
+
+            }
+            return res.json({success:true})
+
+        })
+
+    }catch (e) {
+
+    }
+})
 module.exports.workerRoute = router
