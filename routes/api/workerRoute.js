@@ -183,7 +183,7 @@ router.post('/create', async (req, res) => {
     }
 })
 
-router.post('/location',async (res,req)=>{
+router.post('/location',async (req,res)=>{
     try{
         /*
         *     "heading": Number,
@@ -231,4 +231,6 @@ router.post('/location',async (res,req)=>{
 return commonError(res,e.message)
     }
 })
+
+
 module.exports.workerRoute = router
