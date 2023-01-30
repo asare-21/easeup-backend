@@ -212,7 +212,7 @@ router.post('/location',async (res,req)=>{
             if (err) {
                 return commonError(res, err.message)
             }
-            if(!worker){
+            if(!result){
                 //create and update
                 locationModel({
                     worker,
