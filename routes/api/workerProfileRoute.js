@@ -254,7 +254,8 @@ router.post('/portfolio', async (req, res) => {
                         media: {
                             url: media,
                             description,
-                            image: true
+                            image,
+                            thumbnail
                         }
                     }
                 }, (err, worker) => {
