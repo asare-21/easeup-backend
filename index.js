@@ -5,7 +5,8 @@ const frontEndApp = express();
 const app = express();
 const admin = express();
 const http = require("http").createServer(app);
-
+const { Server } = require("socket.io");
+const io = new Server(http);
 const path = require('path');
 const PORT = process.env.PORT || 3000;
 const morgan = require('morgan')
@@ -136,6 +137,24 @@ http.listen(PORT, async () => {
         log.error(err)
     }
 })
+
+
+// /////////////////////// Socket.io
+io.on('connection', (socket) => {
+    console.log('a user connected');
+    socket.on('disconnect', () => {
+        console.log('user disconnected');
+    });
+    socket.on('chat message', (msg) => {
+        console.log('message: ' + msg);
+    });
+    // create chat room
+    socket.on('createRoom', (room) => {
+        socket.join(room)
+        console.log('room created')
+    })
+}
+)
 
 
 

@@ -12,7 +12,7 @@ const imageSchema = new Schema({
         type: String,
         required: true
     },
-    is_mage: {
+    is_image: {
         type: Boolean,
         default: false
     }
@@ -23,13 +23,17 @@ const imageSchema = new Schema({
 
 const chatMessageSchema = new Schema({
     worker: {
-        type: Schema.Types.ObjectId,
+        type: String,
         ref: 'Worker',
         required: true
     },
     user: {
-        type: Schema.Types.ObjectId,
+        type: String,
         ref: 'User',
+        required: true
+    },
+    from: {
+        type: String,
         required: true
     },
     message: {
@@ -44,16 +48,11 @@ const chatMessageSchema = new Schema({
         type: Boolean,
         default: false
     },
-    sent_by: {
-        type: String,
-        required: true
-    },
     media: {
         type: [imageSchema],
         default: []
     }
-
-
 });
 
 module.exports.chatModel = model('ChatMessage', chatMessageSchema);
+module.exports.chatMessageSchema = chatMessageSchema;

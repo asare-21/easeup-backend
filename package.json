@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js"
+    "start": "node index.js",
+    "build:digitalocean": "npm run start"
   },
   "author": "Joseph ASARE",
   "license": "ISC",
@@ -23,6 +24,7 @@
     "morgan": "^1.10.0",
     "npmlog": "^7.0.1",
     "otp-generator": "^4.0.0",
+    "socket.io": "^4.5.4",
     "vhost": "^3.0.2"
   }
 }
