@@ -142,11 +142,11 @@ http.listen(PORT, async () => {
 // /////////////////////// Socket.io
 io.on('connection', (socket) => {
     console.log('a user connected');
-    socket.on('disconnect', () => {
-        console.log('user disconnected');
+    socket.on('disconnected', (msg) => {
+        console.log('message: ', msg);
     });
     socket.on('connected', (msg) => {
-        console.log('message: ' + msg);
+        console.log('message: ', msg);
     });
     // create chat room
     socket.on('createRoom', (room) => {
