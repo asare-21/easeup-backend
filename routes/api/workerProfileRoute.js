@@ -233,7 +233,6 @@ router.post('/portfolio', async (req, res) => {
                         description,
                         image,
                         thumbnail
-
                     },
                 })
                 newMedia.save((err, worker) => {
@@ -263,6 +262,7 @@ router.post('/portfolio', async (req, res) => {
                         console.log(err)
                         return commonError(res, err.message)
                     }
+
                     return res.status(200).json({
                         msg: 'Worker Profile Updated',
                         status: 200,
