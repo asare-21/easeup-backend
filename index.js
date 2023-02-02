@@ -145,6 +145,10 @@ io.on('connection', (socket) => {
     socket.on('disconnected', (msg) => {
         console.log('message: ', msg);
     });
+    // log any event
+    socket.onAny((event, ...args) => {
+        console.log("Socket events ", event, args);
+    })
     socket.on('connected', (msg) => {
         console.log('message: ', msg);
     });
@@ -153,6 +157,7 @@ io.on('connection', (socket) => {
         socket.join(room)
         console.log('room created')
     })
+
 }
 )
 
