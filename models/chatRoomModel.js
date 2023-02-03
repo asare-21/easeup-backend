@@ -12,7 +12,7 @@ const chatRoomSchema = new Schema({
     messages: {
         type: [chatMessageSchema],
     },
-    users: {
+    user: {
         type: String,
         required: true
     },

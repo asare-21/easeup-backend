@@ -36,6 +36,38 @@ router.get('/get-chat-room/:id', async (req, res) => {
         return commonError(res, e.message)
     }
 })
+router.get('/rooms/:id', async (req, res) => {
+    try {
+        const { type } = req.query; // type = worker or user
+        const { id } = req.params;
+        console.log(id, type)
+        if (!id) {
+            return res.status(400).json({ msg: 'No user id provided', status: 400, success: false })
+        }
+        if (!type) {
+            return res.status(400).json({ msg: 'No type provided', status: 400, success: false })
+        }
+        // check if user is authenticated
+        await admin.auth().getUser(id)
+
+        let userWorker = type === 'worker' ? 'worker' : 'user';
+
+        chatRoomModel.find({ [userWorker]: id }, (err, rooms) => {
+            if (err) {
+                return res.status(400).json({ msg: 'Error fetching chat rooms', status: 400, success: false })
+            }
+            return res.status(200).json({ msg: 'Chat rooms fetched', status: 200, success: true, rooms })
+        })
+
+    } catch (error) {
+        if (e.errorInfo) {
+            // User Not Found
+            log.warn(e.message)
+            return returnUnAuthUserError(res, e.message)
+        }
+        return commonError(res, e.message)
+    }
+})
 
 
 
