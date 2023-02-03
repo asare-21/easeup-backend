@@ -103,6 +103,14 @@ const workerProfileSchema = new Schema({
         type: Number,
         default: 0
     },
+    jobs: {
+        type: Number,
+        default: 0
+    },
+    amount_earned: {
+        type: Number,
+        default: 0
+    },
     is_charge_hourly: {
         type: Boolean,
         default: false
