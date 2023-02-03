@@ -69,6 +69,10 @@ const userSchema = new Schema({
     gender: {
         type: String,
         default: ''
+    },
+    rooms: {
+        type: [String],
+        default: []
     }
 })
 

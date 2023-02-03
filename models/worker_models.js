@@ -55,6 +55,10 @@ const workerSchema = new Schema({
         type: String,
         default: ''
     },
+    rooms: {
+        type: [String],
+        default: []
+    }
 })
 
 module.exports.workerModel = model('Worker', workerSchema);

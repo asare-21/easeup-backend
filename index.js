@@ -25,6 +25,9 @@ const FBadmin = require("firebase-admin");
 const vhost = require('vhost');
 const compression = require('compression')
 const helmet = require('helmet');
+const { chatRoute } = require('./routes/api/chat');
+const { chatRoomModel } = require('./models/chatRoomModel');
+const { workerModel } = require('./models/worker_models');
 const limiter = rateLimit({
     windowMs: 30 * 60 * 1000, // 30 minutes
     max: 2000, // Limit each IP to 2000 requests per `window` (here, per 15 minutes)
@@ -80,6 +83,7 @@ if (process.env.NODE_ENV === 'production') {
     api.use('/verify-worker-profile', workerProfileVerificationRoute)
     api.use('/worker', workerRoute)
     api.use('/worker-profile', workerProfileRoute)
+    api.use('/room', chatRoute)
     // handle 404
     api.use((req, res, next) => {
         return res.status(404).json({
@@ -114,6 +118,7 @@ else {
     app.use('/verify-worker-profile', workerProfileVerificationRoute)
     app.use('/worker', workerRoute)
     app.use('/worker-profile', workerProfileRoute)
+    app.use('/room', chatRoute)
 }
 
 
@@ -153,13 +158,52 @@ io.on('connection', (socket) => {
         console.log('message: ', msg);
     });
     // create chat room
-    socket.on('createRoom', (room) => {
-        socket.join(room)
+    socket.on('new-room', async (room) => {
+        /**
+         * new room structure
+         * {
+         * room,
+         * worker,
+         * user
+         * }
+         */
+        // socket.join(room)
+        await createNewRoom(room)
         console.log('room created')
     })
-
 }
 )
 
+// Create a new room
+async function createNewRoom(_room) {
+    const { room, worker, user } = _room
+    const newRoom = new chatRoomModel({
+        room,
+        worker,
+        user
+    })
+    try {
+        chatRoomModel.findOne({
+            room, worker, user
+        }, async (err, doc) => {
+            if (err) {
 
+                console.log(err)
+            }
+            if (doc) {
+                console.log('room already exists')
+                io.emit(user, 'Room already exists')
+            }
+            else {
+                await newRoom.save()
+                await userModel.findOneAndUpdate({ _id: doc.user }, { $push: { rooms: doc.room } })
+                await workerModel.findOneAndUpdate({ _id: doc.worker }, { $push: { rooms: doc.room } })
 
+                io.emit(user, 'Room created')
+                console.log('room created')
+            }
+        })
+    } catch (e) {
+        console.log('Something went room ', e)
+    }
+}

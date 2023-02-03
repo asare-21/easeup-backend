@@ -5,7 +5,7 @@ const {
 const { chatMessageSchema } = require('./chat_message_model');
 
 const chatRoomSchema = new Schema({
-    roomID: {
+    room: {
         type: String,
         required: true
     },
@@ -13,7 +13,15 @@ const chatRoomSchema = new Schema({
         type: [chatMessageSchema],
     },
     users: {
-        type: [String],
+        type: String,
+        required: true
+    },
+    worker: {
+        type: String,
+        required: true
     },
 });
+
+const chatRoomModel = model('chatRoom', chatRoomSchema);
+module.exports.chatRoomModel = chatRoomModel;
 
