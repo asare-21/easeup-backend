@@ -201,8 +201,8 @@ async function createNewRoom(_room) {
             }
             else {
                 await newRoom.save()
-                await userModel.findOneAndUpdate({ _id: doc.user }, { $push: { rooms: doc.room } })
-                await workerModel.findOneAndUpdate({ _id: doc.worker }, { $push: { rooms: doc.room } })
+                await userModel.findOneAndUpdate({ _id: user }, { $push: { rooms: doc.room } })
+                await workerModel.findOneAndUpdate({ _id: worker }, { $push: { rooms: doc.room } })
 
                 io.emit(user, 'Room created')
                 console.log('room created')
