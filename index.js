@@ -173,13 +173,16 @@ io.on('connection', (socket) => {
          * }
          */
         // socket.join(room)
+
         await createNewRoom(room)
         console.log('room created')
     })
     socket.on('message', async (chat) => {
         // join room
-        socket.join(chat.room)
+        socket.emit('message', chat)
+
         await saveChat(chat)
+
     })
 }
 )
@@ -197,7 +200,6 @@ async function saveChat(chat) {
     try {
         // emit message to user
 
-        io.to(room).emit(room, chat)
         // emit mesaage to user before saving to database
         await newChat.save()
 
