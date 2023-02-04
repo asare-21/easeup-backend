@@ -193,13 +193,13 @@ async function saveChat(chat) {
         media
     })
     try {
-        socket.emit(room, chat)
+        io.emit(room, chat)
         // emit mesaage to user before saving to database
         await newChat.save()
 
     } catch (err) {
         console.log(err)
-        socket.emit(room, 'Error saving message')
+        io.emit(room, 'Error saving message')
     }
 }
 
