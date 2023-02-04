@@ -176,11 +176,15 @@ io.on('connection', (socket) => {
 
 // Create a new room
 async function createNewRoom(_room) {
-    const { room, worker, user } = _room
+    const { room, worker, user, userName, userPhoto, workerName, workerPhoto } = _room
     const newRoom = new chatRoomModel({
         room,
         worker,
-        user
+        user,
+        userName,
+        userPhoto,
+        workerName,
+        workerPhoto
     })
     try {
         chatRoomModel.findOne({

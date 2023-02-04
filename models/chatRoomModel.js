@@ -20,6 +20,22 @@ const chatRoomSchema = new Schema({
         type: String,
         required: true
     },
+    workerName: {
+        type: String,
+        required: true
+    },
+    userName: {
+        type: String,
+        required: true
+    },
+    workerPhoto: {
+        type: String,
+        required: true
+    },
+    userPhoto: {
+        type: String,
+        required: true
+    },
 });
 
 const chatRoomModel = model('chatRoom', chatRoomSchema);
