@@ -179,7 +179,6 @@ io.on('connection', (socket) => {
     })
     socket.on('message', async (chat) => {
         // join room
-        socket.emit('message', chat)
 
         await saveChat(chat)
 
@@ -199,6 +198,7 @@ async function saveChat(chat) {
     })
     try {
         // emit message to user
+        socket.emit(from === user ? user : worker, chat)
 
         // emit mesaage to user before saving to database
         await newChat.save()
