@@ -28,6 +28,7 @@ const helmet = require('helmet');
 const { chatRoute } = require('./routes/api/chat');
 const { chatRoomModel } = require('./models/chatRoomModel');
 const { workerModel } = require('./models/worker_models');
+const { userModel } = require('./models/user_model');
 const limiter = rateLimit({
     windowMs: 30 * 60 * 1000, // 30 minutes
     max: 2000, // Limit each IP to 2000 requests per `window` (here, per 15 minutes)
