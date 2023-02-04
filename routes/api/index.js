@@ -2,7 +2,7 @@ const router = require('express').Router();
 
 router.get('/', (req, res) => {
     console.log(req.headers)
-    return res.render('index',);
+    return res.render('soon',);
 }
 );
 router.get('/policy', (req, res) => {

@@ -46,6 +46,7 @@ app.enable('trust proxy');
 app.set('view engine', 'ejs');
 app.set('views', 'views');
 frontEndApp.use(express.static(path.join(__dirname, 'public')));
+frontEndApp.use(express.static(path.join(__dirname, 'soon/assets')));
 frontEndApp.enable('trust proxy');
 frontEndApp.set('view engine', 'ejs');
 frontEndApp.set('views', 'views');
