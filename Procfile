@@ -1,1 +1,1 @@
-web: npm balance
+web: npm run balance
