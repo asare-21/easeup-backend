@@ -27,11 +27,12 @@ const compression = require('compression')
 const helmet = require('helmet');
 const { chatRoute } = require('./routes/api/chat');
 const { chatRoomModel } = require('./models/chatRoomModel');
+const { chatModel } = require('./models/chat_message_model');
 const { workerModel } = require('./models/worker_models');
 const { userModel } = require('./models/user_model');
 const limiter = rateLimit({
     windowMs: 30 * 60 * 1000, // 30 minutes
-    max: 2000, // Limit each IP to 2000 requests per `window` (here, per 15 minutes)
+    max: 1000, // Limit each IP to 1000 requests per `window` (here, per 15 minutes)
     standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
     legacyHeaders: false, // Disable the `X-RateLimit-*` headers
     message: { msg: 'Too many requests from this IP, please try again later', status: 429, success: false },
@@ -148,6 +149,7 @@ http.listen(PORT, async () => {
 
 // /////////////////////// Socket.io
 io.on('connection', (socket) => {
+
     console.log('a user connected');
     socket.on('disconnected', (msg) => {
         console.log('message: ', msg);
@@ -161,6 +163,7 @@ io.on('connection', (socket) => {
     });
     // create chat room
     socket.on('new-room', async (room) => {
+
         /**
          * new room structure
          * {
@@ -173,8 +176,33 @@ io.on('connection', (socket) => {
         await createNewRoom(room)
         console.log('room created')
     })
+    socket.on('message', async (chat) => {
+        await saveChat(chat)
+    })
 }
 )
+// Save chat to database
+async function saveChat(chat) {
+    const { room, user, message, from, worker, media } = chat
+    const newChat = new chatModel({
+        room,
+        user,
+        message,
+        from,
+        worker,
+        media
+    })
+    try {
+        socket.emit(room, chat)
+        // emit mesaage to user before saving to database
+        await newChat.save()
+
+    } catch (err) {
+        console.log(err)
+        socket.emit(room, 'Error saving message')
+    }
+}
+
 
 // Create a new room
 async function createNewRoom(_room) {
