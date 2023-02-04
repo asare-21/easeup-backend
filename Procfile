@@ -1,1 +1,1 @@
-web: npm run balance
+web: npm start

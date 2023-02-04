@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js",
-    "balance": "pm2 start index.js -i max",
+    "start": "pm2-runtime start ecosystem.config.js --env production",
+
     "build:digitalocean": "npm run start"
   },
   "author": "Joseph ASARE",
