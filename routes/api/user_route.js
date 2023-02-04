@@ -83,7 +83,7 @@ async function createNotification(user_id, title, body, type, token) {
 router.use(bodyParser.urlencoded({ extended: false }));
 router.use(express.json());
 
-router.get('/profile/:user_id', {}, async (req, res) => {
+router.get('/profile/:user_id', async (req, res) => {
     try {    // required field : user_id
         const user_id = req.params.user_id;
         if (!user_id) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID is required
