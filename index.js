@@ -161,6 +161,11 @@ io.on('connection', (socket) => {
     socket.on('connected', (msg) => {
         console.log('message: ', msg);
     });
+    // list all rooms
+    socket.rooms.forEach(room => {
+        console.log(room)
+    })
+
     // create chat room
     socket.on('new-room', async (room) => {
 
