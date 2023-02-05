@@ -69,6 +69,42 @@ router.get('/rooms/:id', async (req, res) => {
     }
 })
 
+// update message status
+router.post('/update-message-status', async (req, res) => {
+    try {
+        const { id, from, user, type, room, worker } = req.body;
+        if (!id) {
+            return res.status(400).json({ msg: 'No message id provided', status: 400, success: false })
+        }
+        if (!from || !user || !type || !room) {
+            return res.status(400).json({ msg: 'Missing keys', status: 400, success: false })
+        }
+        // check if user is authenticated
+        await admin.auth().getUser(from === user ? user : worker)
+        chatModel.findAndUpdate({
+            _id: id,
+            from,
+            user,
+            type,
+            room,
+            worker
+        }, {
+            is_read: true
+        }, (err, doc) => {
+            if (err) {
+                return res.status(400).json({ msg: 'Error updating message status', status: 400, success: false })
+            }
+            return res.status(200).json({ msg: 'Message status updated', status: 200, success: true, doc })
+        })
+    } catch (error) {
+        if (e.errorInfo) {
+            // User Not Found
+            log.warn(e.message)
+            return returnUnAuthUserError(res, e.message)
+        }
+        return commonError(res, e.message)
+    }
+})
 
 
 module.exports.chatRoute = router;
