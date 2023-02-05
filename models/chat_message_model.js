@@ -36,6 +36,10 @@ const chatMessageSchema = new Schema({
         type: String,
         required: true
     },
+    room: {
+        type: String,
+        required: true
+    },
     message: {
         type: String,
         required: true
