@@ -187,6 +187,8 @@ io.on('connection', (socket) => {
         console.log('room created')
     })
     socket.on('message', async (chat) => {
+        // broadcast message to all users 
+        socket.broadcast.emit(chat.from === chat.user ? chat.worker : chat.user, chat)
         socket.emit(chat.from === chat.user ? chat.worker : chat.user, chat)
 
         await saveChat(chat)
