@@ -163,7 +163,7 @@ io.on('connection', (socket) => {
     });
     // list all rooms
     socket.rooms.forEach(room => {
-        console.log(room)
+        console.log('Rooms ', room)
     })
 
     // create chat room
