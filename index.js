@@ -166,10 +166,10 @@ io.on('connection', (socket) => {
         console.log('Rooms ', room)
     })
 
-    socket.on('typing', (room) => {
-        socket.to(room).emit(from === user ? worker : user, chat)
+    // socket.on('typing', (room) => {
+    //     socket.to(room).emit(from === user ? worker : user, chat)
 
-    });
+    // });
 
     // create chat room
     socket.on('new-room', async (room) => {
