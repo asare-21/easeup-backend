@@ -195,6 +195,7 @@ io.on('connection', (socket) => {
         }
         const clientIds = Object.keys(clients.sockets);
         console.log(`Clients in room '${chat.room}':`, clientIds);
+        console.log(`Room data sent'${chat.room}':`, chat);
     })
 
     socket.on('message', async (chat) => {
