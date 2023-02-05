@@ -183,7 +183,10 @@ io.on('connection', (socket) => {
     })
     socket.on('message', async (chat) => {
         // join room
-
+        if (!io.sockets.adapter.rooms.get(chat.room)) {
+            // join room
+            socket.join(chat.room)
+        }
         await saveChat(chat)
 
     })
@@ -202,10 +205,7 @@ async function saveChat(chat) {
     })
     try {
         // check if room exist in socket
-        if (!io.sockets.adapter.rooms.get(room)) {
-            // join room
-            io.join(room)
-        }
+
 
         // emit message to user
         io.to(room).emit(from === user ? user : worker, chat)
