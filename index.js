@@ -208,7 +208,7 @@ async function saveChat(chat) {
 
 
         // emit message to user
-        io.to(room).emit(from === user ? user : worker, chat)
+        io.to(room).emit(from === user ? worker : user, chat)
 
         // emit mesaage to user before saving to database
         await newChat.save()
