@@ -155,9 +155,9 @@ io.on('connection', (socket) => {
         console.log('message: ', msg);
     });
     // log any event
-    socket.onAny((event, ...args) => {
-        console.log("Socket events ", event, args);
-    })
+    // socket.onAny((event, ...args) => {
+    //     console.log("Socket events ", event, args);
+    // })
     socket.on('connected', (msg) => {
         console.log('message: ', msg);
     });
