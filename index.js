@@ -188,6 +188,9 @@ io.on('connection', (socket) => {
     // join room
     socket.on('join-room', async (chat) => {
         socket.join(chat.room); // add socket to room
+        socket.rooms.forEach(room => {
+            console.log('Rooms ', room)
+        })
     })
 
     socket.on('message', async (chat) => {
