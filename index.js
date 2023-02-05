@@ -188,13 +188,13 @@ io.on('connection', (socket) => {
     // join room
     socket.on('join-room', async (chat) => {
         socket.join(chat.room); // add socket to room
-        const clients = io.sockets.adapter.rooms[room];
+        const clients = io.sockets.adapter.rooms[chat.room];
         if (!clients) {
-            console.log(`No clients in room: ${room}`);
+            console.log(`No clients in room: ${chat.room}`);
             return;
         }
         const clientIds = Object.keys(clients.sockets);
-        console.log(`Clients in room '${room}':`, clientIds);
+        console.log(`Clients in room '${chat.room}':`, clientIds);
     })
 
     socket.on('message', async (chat) => {
