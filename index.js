@@ -200,9 +200,9 @@ io.on('connection', (socket) => {
         // io.to(chat.room).emit('message', chat); // broadcast message to all users except sender
         socket.broadcast.to(chat.room).emit('message', chat);
         // broadcast message to all users 
-        socket.broadcast.emit('message', chat, (msg) => {
-            console.log('message sent', chat)
-        })
+        // socket.broadcast.emit('message', chat, (msg) => {
+        //     console.log('message sent', chat)
+        // })
         // socket.emit(chat.from === chat.user ? chat.worker : chat.user, chat)
 
         await saveChat(chat)
