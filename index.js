@@ -161,10 +161,6 @@ io.on('connection', (socket) => {
     socket.on('connected', (msg) => {
         console.log('message: ', msg);
     });
-    // list all rooms
-    socket.rooms.forEach(room => {
-        console.log('Rooms ', room)
-    })
 
     // socket.on('typing', (room) => {
     //     socket.to(room).emit(from === user ? worker : user, chat)
@@ -189,6 +185,7 @@ io.on('connection', (socket) => {
     socket.on('join-room', async (chat) => {
         socket.join(chat.room); // add socket to room
         const clients = io.sockets.adapter.rooms[chat.room];
+        console.log('rooms ', io.sockets.adapter.rooms)
         if (!clients) {
             console.log(`No clients in room: ${chat.room}`);
             return;
