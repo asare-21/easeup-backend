@@ -188,12 +188,17 @@ io.on('connection', (socket) => {
     // join room
     socket.on('join-room', async (chat) => {
         socket.join(chat.room); // add socket to room
-        socket.rooms.forEach(room => {
-            console.log('Rooms ', room)
-        })
+        const clients = io.sockets.adapter.rooms[room];
+        if (!clients) {
+            console.log(`No clients in room: ${room}`);
+            return;
+        }
+        const clientIds = Object.keys(clients.sockets);
+        console.log(`Clients in room '${room}':`, clientIds);
     })
 
     socket.on('message', async (chat) => {
+
         // io.to(chat.room).emit('message', chat); // broadcast message to all users except sender
         socket.broadcast.to(chat.room).emit('message', chat);
         // broadcast message to all users 
