@@ -166,6 +166,11 @@ io.on('connection', (socket) => {
         console.log('Rooms ', room)
     })
 
+    socket.on('typing', (room) => {
+        socket.to(room).emit(from === user ? worker : user, chat)
+
+    });
+
     // create chat room
     socket.on('new-room', async (room) => {
         /**
@@ -204,12 +209,9 @@ async function saveChat(chat) {
         media
     })
     try {
-        // check if room exist in socket
-
-
         // emit message to user
         io.to(room).emit(from === user ? worker : user, chat)
-
+        io.to(room).emit(from === user ? user : worker, chat)
         // emit mesaage to user before saving to database
         await newChat.save()
 
