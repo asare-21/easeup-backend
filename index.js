@@ -185,8 +185,12 @@ io.on('connection', (socket) => {
         console.log('room created')
     })
 
-    socket.on('message', async (chat) => {
+    // join room
+    socket.on('join-room', async (chat) => {
         socket.join(chat.room); // add socket to room
+    })
+
+    socket.on('message', async (chat) => {
         // io.to(chat.room).emit('message', chat); // broadcast message to all users except sender
         socket.broadcast.to(chat.room).emit('message', chat);
         // broadcast message to all users 
@@ -221,7 +225,7 @@ async function saveChat(chat) {
 
     } catch (err) {
         console.log(err)
-        io.emit(room, 'Error saving message')
+        io.emit(room, ' Error saving message')
     }
 }
 
