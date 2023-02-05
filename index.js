@@ -204,11 +204,11 @@ async function saveChat(chat) {
         // check if room exist in socket
         if (!io.sockets.adapter.rooms.get(room)) {
             // join room
-            socket.join(room)
+            io.join(room)
         }
 
         // emit message to user
-        socket.to(room).emit(from === user ? user : worker, chat)
+        io.to(room).emit(from === user ? user : worker, chat)
 
         // emit mesaage to user before saving to database
         await newChat.save()
