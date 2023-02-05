@@ -106,5 +106,41 @@ router.post('/update-message-status', async (req, res) => {
     }
 })
 
+// get messages
+router.get('/messages/:id', async (req, res) => {
+
+    try {
+        const { room } = req.query; // type = worker or user
+        const { id, page } = req.params;
+        const pageSize = 100;
+        if (!id) {
+            return res.status(400).json({ msg: 'No user id provided', status: 400, success: false })
+        }
+
+        if (!room) {
+            return res.status(400).json({ msg: 'No room provided', status: 400, success: false })
+        }
+        // check if user is authenticated
+        await admin.auth().getUser(id)
+        chatModel.find({
+            room,
+        }).skip((page - 1) * pageSize).limit(pageSize).sort({ createdAt: -1 }).exec((err, messages) => {
+            if (err) {
+                return res.status(400).json({ msg: 'Error fetching messages', status: 400, success: false })
+            }
+            return res.status(200).json({ msg: 'Messages fetched', status: 200, success: true, messages })
+        }
+        )
+    }
+    catch (error) {
+        if (e.errorInfo) {
+            // User Not Found
+            log.warn(e.message)
+            return returnUnAuthUserError(res, e.message)
+        }
+        return commonError(res, e.message)
+    }
+})
+
 
 module.exports.chatRoute = router;
