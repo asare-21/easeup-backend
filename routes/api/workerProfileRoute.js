@@ -8,8 +8,8 @@ const { mediaModel } = require('../../models/mediaModel');
 const { reviewModel } = require('../../models/reviews_model');
 const { workerProfileModel } = require('../../models/worker_profile_model');
 const { commonError, returnUnAuthUserError } = require('./user_route')
-const NodeCache = require("node-cache");
-const workerCache = new NodeCache();
+const { cache } = require('../../cache/user_cache');
+const workerCache = cache;
 
 router.get('/:worker', getWorkerProfileCache, async (req, res) => {
     const { worker } = req.params

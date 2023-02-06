@@ -21,8 +21,8 @@ const options = {
 
 }
 const NodeCache = require("node-cache");
-const { getUserCache } = require('../../cache/user_cache');
-const userCache = new NodeCache();
+const { getUserCache, cache } = require('../../cache/user_cache');
+const userCache = cache;
 function returnUnAuthUserError(res, msg) {
     console.log(msg)
 

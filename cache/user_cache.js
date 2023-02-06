@@ -18,3 +18,5 @@ module.exports.getUserCache = async function getUserCache(req, res, next) {
     console.log('User not found in cache');
     next();
 }
+
+module.exports.cache = myCache;

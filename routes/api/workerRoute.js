@@ -8,8 +8,8 @@ const { workerProfileModel } = require('../../models/worker_profile_model');
 const { workerProfileVerificationModel } = require('../../models/worker_profile_verification_model');
 const { locationModel } = require("../../models/workerLocationModel");
 const { getWorkerCache } = require('../../cache/worker_cache');
-const NodeCache = require("node-cache");
-const workerCache = new NodeCache();
+const { cache } = require('../../cache/user_cache');
+const workerCache = cache;
 
 async function createNotification(worker, title, body, type, token) {
     try {   // required field : worker
