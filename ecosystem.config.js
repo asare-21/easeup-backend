@@ -2,7 +2,7 @@ module.exports = {
   apps: [{
     script: 'index.js',
     watch: '.',
-    instances: '3',
+    instances: '2',
   }],
 
   deploy: {
