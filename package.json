@@ -6,7 +6,6 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "pm2-runtime start ecosystem.config.js --env production",
-
     "build:digitalocean": "npm run start"
   },
   "author": "Joseph ASARE",
@@ -23,6 +22,7 @@
     "helmet": "^6.0.1",
     "mongoose": "^6.8.0",
     "morgan": "^1.10.0",
+    "node-cache": "^5.1.2",
     "npmlog": "^7.0.1",
     "otp-generator": "^4.0.0",
     "pm2": "^5.2.2",

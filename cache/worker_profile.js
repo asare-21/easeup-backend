@@ -1,0 +1,19 @@
+const NodeCache = require("node-cache");
+const myCache = new NodeCache(
+    {
+        stdTTL: 900,
+        checkperiod: 120,
+    }
+);
+
+module.exports.getWorkerProfileCache = async function getWorkerProfileCache(req, res, next) {
+    // use user id to get user cache
+    const worker = myCache.get($`worker-profile/${req.params.worker}`);
+    if (worker !== null && worker !== undefined) {
+        return res.status(200).json({
+            msg: 'worker Found', status: 200, success: true, worker
+        })
+    }
+    console.log('Worker not found in cache');
+    next();
+}

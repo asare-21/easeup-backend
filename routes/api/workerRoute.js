@@ -6,7 +6,10 @@ const log = require('npmlog')
 const { commonError, returnUnAuthUserError } = require('../api/user_route');
 const { workerProfileModel } = require('../../models/worker_profile_model');
 const { workerProfileVerificationModel } = require('../../models/worker_profile_verification_model');
-const {locationModel} = require("../../models/workerLocationModel");
+const { locationModel } = require("../../models/workerLocationModel");
+const { getWorkerCache } = require('../../cache/worker_cache');
+const NodeCache = require("node-cache");
+const workerCache = new NodeCache();
 
 async function createNotification(worker, title, body, type, token) {
     try {   // required field : worker
@@ -57,7 +60,7 @@ async function createNotification(worker, title, body, type, token) {
     }
 }
 
-router.get('/:worker', async (req, res) => {
+router.get('/:worker', getWorkerCache, async (req, res) => {
     const { worker } = req.params
     // check if user is authenticated
     try {
@@ -66,6 +69,7 @@ router.get('/:worker', async (req, res) => {
             if (err) {
                 return commonError(res, err.message)
             }
+            workerCache.set(`worker/${worker._id}`, worker);
             return res.status(200).json({
                 msg: 'Worker Profile',
                 status: 200,
@@ -135,6 +139,17 @@ router.post('/create', async (req, res) => {
                 return res.status(500).json({ msg: err.message, status: 500, success: false }) // Internal Server Error
 
             }
+            workerCache.set(`worker/${worker}`, {
+                email,
+                name: profile_name,
+                last_login,
+                _id: worker, // firebase worker. Required
+                token,
+                phone: req.body.phone || '',
+                address: req.body.address || {},
+                profile_picture: req.body.profile_picture || ''
+            }
+            );
             // create notification
             const notification = new notificationModel({
                 user: worker,
@@ -145,24 +160,21 @@ router.post('/create', async (req, res) => {
                 created_at: new Date()
             })
             await userProfile.save(
-              async  (err)=>{
+                async (err) => {
                     if (err) {
                         console.log(err)
-                     await   workerModel.findOneAndDelete({worker})
+                        await workerModel.findOneAndDelete({ worker })
                         // return res.status(500).json({ msg: err.message, status: 500, success: false }) // Internal Server Error
 
                     }
                 }
             );
             await userVerification.save(
-               async (err)=>{
+                async (err) => {
                     if (err) {
                         console.log(err)
-                        await   workerModel.findOneAndDelete({worker})
-                      await  workerProfileModel.findByIdAndDelete({worker})
-
-                        // return res.status(500).json({ msg: err.message, status: 500, success: false }) // Internal Server Error
-
+                        await workerModel.findOneAndDelete({ worker })
+                        await workerProfileModel.findByIdAndDelete({ worker })   // return res.status(500).json({ msg: err.message, status: 500, success: false }) // Internal Server Error
                     }
                 }
             );
@@ -183,8 +195,8 @@ router.post('/create', async (req, res) => {
     }
 })
 
-router.post('/location',async (req,res)=>{
-    try{
+router.post('/location', async (req, res) => {
+    try {
         /*
         *     "heading": Number,
     "lat": Number ,
@@ -204,31 +216,32 @@ router.post('/location',async (req,res)=>{
         if (missing_fields.length > 0) return res.status(400).json({ msg: 'Bad Request. Missing fields', status: 400, success: false, missing_fields }) // At least one field is required
         const { worker, updates } = req.body;
         await admin.auth().getUser(worker)
-        locationModel.findOneAndUpdate({worker },{
-            $push:{
-                logs:updates
+        locationModel.findOneAndUpdate({ worker }, {
+            $push: {
+                logs: updates
             }
-        },(err,result)=>{
+        }, (err, result) => {
             if (err) {
                 return commonError(res, err.message)
             }
-            if(!result){
+
+            if (!result) {
                 //create and update
                 locationModel({
                     worker,
-                    logs:updates
-                }).save((err)=>{
-                    if(err) return res.status(400).json({ msg: 'Something went wrong',success:false})
+                    logs: updates
+                }).save((err) => {
+                    if (err) return res.status(400).json({ msg: 'Something went wrong', success: false })
 
                 })
 
             }
-            return res.json({success:true})
+            return res.json({ success: true })
 
         })
 
-    }catch (e) {
-return commonError(res,e.message)
+    } catch (e) {
+        return commonError(res, e.message)
     }
 })
 

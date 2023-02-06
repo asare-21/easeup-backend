@@ -1,17 +1,18 @@
 const router = require('express').Router();
 const admin = require("firebase-admin");
 const log = require('npmlog');
+const { getWorkerProfileCache } = require('../../cache/worker_profile');
 const { bookmarkModel } = require('../../models/bookmark_model');
 const { commentModel } = require('../../models/comments_model');
 const { mediaModel } = require('../../models/mediaModel');
 const { reviewModel } = require('../../models/reviews_model');
 const { workerProfileModel } = require('../../models/worker_profile_model');
 const { commonError, returnUnAuthUserError } = require('./user_route')
+const NodeCache = require("node-cache");
+const workerCache = new NodeCache();
 
-router.get('/:worker', async (req, res) => {
-
+router.get('/:worker', getWorkerProfileCache, async (req, res) => {
     const { worker } = req.params
-
     // check if user is authenticated
     try {
         await admin.auth().getUser(worker) // check if uid is valid
@@ -130,15 +131,19 @@ router.post('/bio', async (req, res) => {
         await admin.auth().getUser(worker) // check if worker is valid
         workerProfileModel.findOneAndUpdate({ worker }, {
             bio
-        }, (err, worker) => {
+        }, (err, result) => {
             if (err) {
                 return commonError(res, err.message)
             }
+            workerCache.set(`worker-profile/${worker}`, {
+                ...result,
+                bio
+            })
             return res.status(200).json({
                 msg: 'Worker Profile Updated',
                 status: 200,
                 success: true,
-                worker
+                worker: result
             })
         })
     }
@@ -160,15 +165,19 @@ router.post('/instagram', async (req, res) => {
             $set: {
                 'links.instagram': ig
             }
-        }, (err, worker) => {
+        }, (err, result) => {
             if (err) {
                 return commonError(res, err.message)
             }
+            workerCache.set(`worker-profile/${worker}`, {
+                ...result,
+                ig
+            })
             return res.status(200).json({
                 msg: 'Worker Profile Updated',
                 status: 200,
                 success: true,
-                worker
+                worker: result
             })
         })
     }
@@ -192,15 +201,19 @@ router.post('/twitter', async (req, res) => {
                     twitter
 
             }
-        }, (err, worker) => {
+        }, (err, result) => {
             if (err) {
                 return commonError(res, err.message)
             }
+            workerCache.set(`worker-profile/${worker}`, {
+                ...result,
+                twitter
+            })
             return res.status(200).json({
                 msg: 'Worker Profile Updated',
                 status: 200,
                 success: true,
-                worker
+                worker: result
             })
         })
     }
@@ -240,6 +253,10 @@ router.post('/portfolio', async (req, res) => {
                         console.log(err)
                         return commonError(res, err.message)
                     }
+                    // workerCache.set(`worker-profile/${worker}`, {
+                    //     ...result,
+                    //     twitter
+                    // })
                     return res.status(200).json({
                         msg: 'Worker Profile Updated',
                         status: 200,

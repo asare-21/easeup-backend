@@ -20,7 +20,9 @@ const options = {
     hostname: "https://api.smsonlinegh.com/v4/message/sms/send",
 
 }
-
+const NodeCache = require("node-cache");
+const { getUserCache } = require('../../cache/user_cache');
+const userCache = new NodeCache();
 function returnUnAuthUserError(res, msg) {
     console.log(msg)
 
@@ -83,13 +85,12 @@ async function createNotification(user_id, title, body, type, token) {
 router.use(bodyParser.urlencoded({ extended: false }));
 router.use(express.json());
 
-router.get('/profile/:user_id', async (req, res) => {
+router.get('/profile/:user_id', getUserCache, async (req, res) => {
     try {    // required field : user_id
         const user_id = req.params.user_id;
         if (!user_id) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID is required
         //check firebase if uid exists
         await admin.auth().getUser(user_id)
-
         // Find the user
         userModel.findById(user_id, (err, user) => {
             if (err) {
@@ -97,6 +98,7 @@ router.get('/profile/:user_id', async (req, res) => {
                 return res.status(500).json({ msg: err.message, status: 500, success: false }) // Internal Server Error
             }
             if (!user) return res.status(404).json({ msg: 'User Not Found', status: 404, success: false }) // User Not Found
+            userCache.set(`user/${user_id}`, user);
             return res.status(200).json({
                 msg: 'User Found', status: 200, success: true, user
             }) // User Found and returned
@@ -106,7 +108,6 @@ router.get('/profile/:user_id', async (req, res) => {
         if (e.errorInfo) { // User Not Found firebase error
             // User Not Found
             log.warn(e.message)
-
             return returnUnAuthUserError(res, e.message)
         }
         return commonError(res, e.message)
@@ -123,17 +124,16 @@ router.post('/update/image', (req, res) => {
         if (!profile_picture) return res.status(400).json({ msg: 'Bad Request. Missing fields', status: 400, success: false }) // At least one field is required
         // Find the user
         userModel.findByIdAndUpdate
-
             (user_id, {
-
                 profile_picture: profile_picture
-
             }, (err, user) => {
                 if (err) {
                     log.warn(err.message)
                     return res.status(500).json({ msg: err.message, status: 500, success: false }) // Internal Server Error
                 }
                 if (!user) return res.status(404).json({ msg: 'User Not Found', status: 404, success: false }) // User Not Found
+                // load user from cache and update
+                userCache.set(`user/${user_id}`, { ...user, profile_picture: profile_picture });
                 return res.status(200).json({
                     msg: 'Profile updated', status: 200, success: true, user
                 }) // User Found and returned
@@ -160,20 +160,18 @@ router.post('/update/address', (req, res) => {
         if (!address) return res.status(400).json({ msg: 'Bad Request. Missing fields', status: 400, success: false }) // At least one field is required
         // Find the user
         userModel.findByIdAndUpdate
-
             (user_id, {
-
                 address: {
                     address,
                     latlng
                 }
-
             }, (err, user) => {
                 if (err) {
                     log.warn(err.message)
                     return res.status(500).json({ msg: err.message, status: 500, success: false }) // Internal Server Error
                 }
                 if (!user) return res.status(404).json({ msg: 'User Not Found', status: 404, success: false }) // User Not Found
+                userCache.set(`user/${user_id}`, { ...user, address: { address, latlng } });
                 return res.status(200).json({
                     msg: 'Profile updated', status: 200, success: true, user
                 }) // User Found and returned
@@ -184,7 +182,6 @@ router.post('/update/address', (req, res) => {
         if (e.errorInfo) {
             // User Not Found
             log.warn(e.message)
-
             return returnUnAuthUserError(res, e.message)
         }
         return commonError(res, e.message)
@@ -200,17 +197,15 @@ router.post('/update/gender', (req, res) => {
         if (!gender) return res.status(400).json({ msg: 'Bad Request. Missing fields', status: 400, success: false }) // At least one field is required
         // Find the user
         userModel.findByIdAndUpdate
-
             (user_id, {
-
                 gender: gender
-
             }, (err, user) => {
                 if (err) {
                     log.warn(err.message)
                     return res.status(500).json({ msg: err.message, status: 500, success: false }) // Internal Server Error
                 }
                 if (!user) return res.status(404).json({ msg: 'User Not Found', status: 404, success: false }) // User Not Found
+                userCache.set(`user/${user_id}`, { ...user, gender });
                 return res.status(200).json({
                     msg: 'Profile updated', status: 200, success: true, user
                 }) // User Found and returned
@@ -221,12 +216,12 @@ router.post('/update/gender', (req, res) => {
         if (e.errorInfo) {
             // User Not Found
             log.warn(e.message)
-
             return returnUnAuthUserError(res, e.message)
         }
         return commonError(res, e.message)
     }
 })
+
 router.post('/update/phone', (req, res) => {
     try {  // required field : user_id
         const { user_id, phone } = req.body;
@@ -237,17 +232,15 @@ router.post('/update/phone', (req, res) => {
         if (!phone) return res.status(400).json({ msg: 'Bad Request. Missing fields', status: 400, success: false }) // At least one field is required
         // Find the user
         userModel.findByIdAndUpdate
-
             (user_id, {
-
                 phone: phone
-
             }, (err, user) => {
                 if (err) {
                     log.warn(err.message)
                     return res.status(500).json({ msg: err.message, status: 500, success: false }) // Internal Server Error
                 }
                 if (!user) return res.status(404).json({ msg: 'User Not Found', status: 404, success: false }) // User Not Found
+                userCache.set(`user/${user_id}`, { ...user, phone });
                 return res.status(200).json({
                     msg: 'Profile updated', status: 200, success: true, user
                 }) // User Found and returned
