@@ -20,6 +20,7 @@ router.get('/:worker', getWorkerProfileCache, async (req, res) => {
             if (err) {
                 return commonError(res, err.message)
             }
+            workerCache.set(`worker-profile/${worker}`, worker)
             return res.status(200).json({
                 msg: 'Worker Profile',
                 status: 200,

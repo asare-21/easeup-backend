@@ -20,7 +20,6 @@ const options = {
     hostname: "https://api.smsonlinegh.com/v4/message/sms/send",
 
 }
-const NodeCache = require("node-cache");
 const { getUserCache, cache } = require('../../cache/user_cache');
 const userCache = cache;
 function returnUnAuthUserError(res, msg) {
