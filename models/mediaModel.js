@@ -44,7 +44,6 @@ const mediaModelSchema = new Schema({
     media: [media],
     worker: {
         type: String,
-        ref: 'Worker',
         required: true
     }
 })
