@@ -23,7 +23,7 @@ module.exports.getWorkerPortfolioCache = async function getWorkerPortfolioCache(
 
     if (worker !== null && worker !== undefined) {
         return res.status(200).json({
-            msg: 'worker portfolio Found', status: 200, success: true, worker: JSON.parse(worker)
+            msg: 'worker portfolio Found', status: 200, success: true, worker
         })
     }
     console.log('Worker portfolio not found in cache');
