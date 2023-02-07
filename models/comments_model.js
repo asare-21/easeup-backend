@@ -13,14 +13,13 @@ const {
  */
 
 const commentSchema = new Schema({
-    worker: {
+
+    post: {
         type: String,
-        ref: 'Worker',
         required: true
     },
     from: {
         type: String,
-        ref: 'User',
         required: true
     },
     comment: {

@@ -66,22 +66,63 @@ router.get('/reviews/:worker', async (req, res) => {
     }
 })
 
-router.get('/comments/:worker', async (req, res) => {
+router.get('/comments/:worker/:post', async (req, res) => {
 
-    const { worker } = req.params
+    const { worker, post } = req.params
+
 
     // check if user is authenticated
     try {
+
         await admin.auth().getUser(worker) // check if uid is valid
-        commentModel.findOne({ worker }, (err, worker) => {
+        commentModel.find({ post }, (err, posts) => {
             if (err) {
                 return commonError(res, err.message)
             }
             return res.status(200).json({
-                msg: 'Worker Profile',
+                msg: 'Comments fetched',
                 status: 200,
                 success: true,
-                worker
+                posts
+            })
+        })
+    }
+    catch (e) {
+        if (e.errorInfo) {
+            // User Not Found
+            log.warn(e.message)
+            return returnUnAuthUserError(res, e.message)
+        }
+        return commonError(res, e.message)
+    }
+})
+router.post('/comments/:worker', async (req, res) => {
+
+    const { worker } = req.params
+    const { comment, post, from } = req.body
+
+    // check if user is authenticated
+    try {
+        if (!comment) return commonError(res, 'No comment provided')
+        if (!post) return commonError(res, 'No post provided')
+        if (!from) return commonError(res, 'No from provided')
+
+        await admin.auth().getUser(worker) // check if uid is valid
+        const newComment = new commentModel({
+            comment,
+            post,
+            from
+        })
+
+        newComment.save((err, comment) => {
+            if (err) {
+                return commonError(res, err.message)
+            }
+            return res.status(200).json({
+                msg: 'Comment Added',
+                status: 200,
+                success: true,
+                comment
             })
         })
     }
