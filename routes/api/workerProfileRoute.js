@@ -354,6 +354,7 @@ router.get('/portfolio/:worker', getWorkerPortfolioCache, async (req, res) => {
                 return commonError(res, err.message)
             }
             workerCache.set(`portfolio/${worker}`, JSON.stringify(posts))
+
             return res.status(200).json({
                 msg: 'Worker Profile Fetched Successfully',
                 status: 200,
