@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const admin = require("firebase-admin");
 const log = require('npmlog');
-const { getWorkerProfileCache } = require('../../cache/worker_profile');
+const { getWorkerProfileCache, getWorkerPortfolioCache } = require('../../cache/worker_profile');
 const { bookmarkModel } = require('../../models/bookmark_model');
 const { commentModel } = require('../../models/comments_model');
 const { mediaModel } = require('../../models/mediaModel');
@@ -343,20 +343,21 @@ router.post('/portfolio', async (req, res) => {
     }
 })
 
-router.get('/portfolio/:worker', async (req, res) => {
+router.get('/portfolio/:worker', getWorkerPortfolioCache, async (req, res) => {
     const { worker } = req.params
     try {
         await admin.auth().getUser(worker) // check if worker is valid
-        mediaModel.findOne({ worker }, (err, worker) => {
+        mediaModel.findOne({ worker }, (err, posts) => {
             if (err) {
                 console.log(err)
                 return commonError(res, err.message)
             }
+            workerCache.set(`portfolio/${worker}`, posts)
             return res.status(200).json({
                 msg: 'Worker Profile Fetched Successfully',
                 status: 200,
                 success: true,
-                worker
+                worker: posts
             })
         })
     }

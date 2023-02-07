@@ -55,6 +55,14 @@ const chatMessageSchema = new Schema({
     media: {
         type: [imageSchema],
         default: []
+    },
+    deleted: {
+        type: Boolean,
+        default: false
+    },
+    expiry: {
+        type: Date,
+        default: null
     }
 });
 
