@@ -363,7 +363,7 @@ router.get('/portfolio/:worker', getWorkerPortfolioCache, async (req, res) => {
             msg: 'Worker Profile Fetched Successfully',
             status: 200,
             success: true,
-            worker: []
+            worker: posts
         })
     }
     catch (e) {
