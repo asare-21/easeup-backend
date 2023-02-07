@@ -194,17 +194,32 @@ io.on('connection', (socket) => {
         console.log(`Clients in room '${chat.room}':`, clientIds);
         console.log(`Room data sent'${chat.room}':`, chat);
     })
-
     socket.on('message', async (chat) => {
-
         // io.to(chat.room).emit('message', chat); // broadcast message to all users except sender
         socket.broadcast.to(chat.room).emit('message', chat);
+        const worker = await workerModel.findOne({ _id: chat.worker })
+        const user = await workerModel.findOne({ _id: chat.user })
+        // send notification to user or worker
+        await admin.messaging().send({
+            notification: {
+                title: 'New Message',
+                body: chat.message
+            },
+            data: {
+                room: chat.room,
+                user: chat.user,
+                worker: chat.worker,
+                from: chat.from,
+                message: chat.message,
+                media: chat.media
+            },
+            token: chat.from === chat.user ? worker.token : user.token
+        })
         // broadcast message to all users 
         // socket.broadcast.emit('message', chat, (msg) => {
         //     console.log('message sent', chat)
         // })
         // socket.emit(chat.from === chat.user ? chat.worker : chat.user, chat)
-
         await saveChat(chat)
 
     })
