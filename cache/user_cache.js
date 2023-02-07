@@ -9,7 +9,7 @@ const myCache = new NodeCache(
 module.exports.getUserCache = async function getUserCache(req, res, next) {
     // use user id to get user cache
     const user = myCache.get(`user/${req.params.user_id}`);
-    if (user !== null && user !== undefined) {
+    if (user !== null || user !== undefined) {
         console.log('User found in cache');
         return res.status(200).json({
             msg: 'User Found', status: 200, success: true, user
