@@ -7,27 +7,27 @@ const {
 const locationLogsSchema = new Schema({
 
     "heading": Number,
-    "lat": Number ,
+    "lat": Number,
     'lng': Number,
     'speed': Number,
     'accuracy': Number,
     'timestamp': {
-        type:Date,
-        default:Date.now
+        type: Date,
+        default: Date.now
     }
 })
 
 const locationSchema = new Schema({
-    logs:{
-        type:[locationLogsSchema],
-        default:[]
+    logs: {
+        type: [locationLogsSchema],
+        default: []
     },
-    "worker": {
-        type:String,
-        required:true
+    worker: {
+        type: String,
+        required: true
     },
 })
 
 
-module.exports.locationModel = model('Location Log',locationSchema)
+module.exports.locationModel = model('Location Log', locationSchema)
 

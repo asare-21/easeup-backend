@@ -54,7 +54,7 @@ const workRadius = new Schema({
 const workerProfileSchema = new Schema({
     worker: {
         type: String,
-        // ref: 'Worker',
+        ref: 'Worker',
         required: true
     },
     profile_url: {

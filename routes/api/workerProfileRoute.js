@@ -20,7 +20,7 @@ router.get('/:worker', getWorkerProfileCache, async (req, res) => {
             if (err) {
                 return commonError(res, err.message)
             }
-            workerCache.set(`worker-profile/${worker}`, result)
+            workerCache.set(`worker-profile/${worker}`, JSON.stringify(result))
             return res.status(200).json({
                 msg: 'Worker Profile',
                 status: 200,
@@ -30,6 +30,8 @@ router.get('/:worker', getWorkerProfileCache, async (req, res) => {
         })
     }
     catch (e) {
+        log.warn(e.message)
+
         if (e.errorInfo) {
             // User Not Found
             log.warn(e.message)
@@ -212,10 +214,10 @@ router.post('/instagram', async (req, res) => {
             if (err) {
                 return commonError(res, err.message)
             }
-            workerCache.set(`worker-profile/${worker}`, {
-                ...result,
-                ig
-            })
+            // workerCache.set(`worker-profile/${worker}`, {
+            //     ...result,
+            //     ig
+            // })
             return res.status(200).json({
                 msg: 'Worker Profile Updated',
                 status: 200,
@@ -249,10 +251,10 @@ router.post('/twitter', async (req, res) => {
             if (err) {
                 return commonError(res, err.message)
             }
-            workerCache.set(`worker-profile/${worker}`, {
-                ...result,
-                twitter
-            })
+            // workerCache.set(`worker-profile/${worker}`, {
+            //     ...result,
+            //     twitter
+            // })
             return res.status(200).json({
                 msg: 'Worker Profile Updated',
                 status: 200,
@@ -346,7 +348,7 @@ router.post('/portfolio', async (req, res) => {
     }
 })
 
-router.get('/portfolio/:worker', async (req, res) => {
+router.get('/portfolio/:worker', getWorkerPortfolioCache, async (req, res) => {
     const { worker } = req.params
     try {
         await admin.auth().getUser(worker) // check if worker is valid
@@ -356,7 +358,7 @@ router.get('/portfolio/:worker', async (req, res) => {
 
         console.log(posts)
 
-        workerCache.set(`portfolio/${worker}`, posts)
+        workerCache.set(`portfolio/${worker}`, JSON.stringify(posts))
         return res.status(200).json({
             msg: 'Worker Profile Fetched Successfully',
             status: 200,
