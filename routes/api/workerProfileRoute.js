@@ -16,16 +16,16 @@ router.get('/:worker', getWorkerProfileCache, async (req, res) => {
     // check if user is authenticated
     try {
         await admin.auth().getUser(worker) // check if uid is valid
-        workerProfileModel.findOne({ worker }, (err, worker) => {
+        workerProfileModel.findOne({ worker }, (err, result) => {
             if (err) {
                 return commonError(res, err.message)
             }
-            workerCache.set(`worker-profile/${worker}`, worker)
+            workerCache.set(`worker-profile/${worker}`, result)
             return res.status(200).json({
                 msg: 'Worker Profile',
                 status: 200,
                 success: true,
-                worker
+                worker: result
             })
         })
     }
@@ -353,7 +353,7 @@ router.get('/portfolio/:worker', getWorkerPortfolioCache, async (req, res) => {
                 console.log(err)
                 return commonError(res, err.message)
             }
-            // workerCache.set(`portfolio/${worker}`, JSON.stringify(posts))
+            workerCache.set(`portfolio/${worker}`, JSON.stringify(posts))
             return res.status(200).json({
                 msg: 'Worker Profile Fetched Successfully',
                 status: 200,
