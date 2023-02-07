@@ -347,16 +347,16 @@ router.post('/portfolio', async (req, res) => {
 })
 
 router.get('/portfolio/:worker', async (req, res) => {
-    // const { worker } = req.params
+    const { worker } = req.params
     try {
-        // await admin.auth().getUser(worker) // check if worker is valid
-        // const posts = await mediaModel.findOne({ worker })
+        await admin.auth().getUser(worker) // check if worker is valid
+        const posts = await mediaModel.findOne({ worker })
 
-        // if (!posts) return commonError(res, 'No portfolio found')
+        if (!posts) return commonError(res, 'No portfolio found')
 
-        // console.log(posts)
+        console.log(posts)
 
-        // workerCache.set(`portfolio/${worker}`, posts)
+        workerCache.set(`portfolio/${worker}`, posts)
         return res.status(200).json({
             msg: 'Worker Profile Fetched Successfully',
             status: 200,
