@@ -344,7 +344,7 @@ router.post('/portfolio', async (req, res) => {
     }
 })
 
-router.get('/portfolio/:worker', getWorkerPortfolioCache, async (req, res) => {
+router.get('/portfolio/:worker', async (req, res) => {
     const { worker } = req.params
     try {
         await admin.auth().getUser(worker) // check if worker is valid
