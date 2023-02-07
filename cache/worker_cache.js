@@ -1,10 +1,6 @@
 const NodeCache = require("node-cache");
-const myCache = new NodeCache(
-    {
-        stdTTL: 900,
-        checkperiod: 120,
-    }
-);
+const { cache } = require("./user_cache");
+const myCache = cache
 module.exports.getWorkerCache = async function getWorkerCache(req, res, next) {
     // use user id to get user cache
     const worker = myCache.get(`worker/${req.params.worker}`);
