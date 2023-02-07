@@ -4,6 +4,7 @@ const log = require('npmlog');
 const { chatRoomModel } = require('../../models/chatRoomModel');
 const { chatModel } = require('../../models/chat_message_model');
 const { userModel } = require('../../models/user_model');
+const { workerModel } = require('../../models/worker_models');
 const { commonError, returnUnAuthUserError } = require('./user_route')
 
 router.get('/get-chat-room/:id', async (req, res) => {
@@ -142,5 +143,46 @@ router.get('/messages/:id', async (req, res) => {
     }
 })
 
+router.delete('/delete-room/:id', async (req, res) => {
+    // delete chat room
+    // delete room from worker and user
+    const { id } = req.params;
+    const { room, user, worker } = req.query;
+
+    try {
+        if (!id) {
+            return res.status(400).json({ msg: 'No user id provided', status: 400, success: false })
+        }
+        if (!room) {
+            return res.status(400).json({ msg: 'No room provided', status: 400, success: false })
+        }
+        if (!user) {
+            return res.status(400).json({ msg: 'No user provided', status: 400, success: false })
+        }
+        if (!worker) {
+            return res.status(400).json({ msg: 'No worker provided', status: 400, success: false })
+        }
+        // check if user is authenticated
+        await admin.auth().getUser(id)
+        chatRoomModel.findOneAndDelete({ room }, async (err, doc) => {
+            if (err) {
+                return res.status(400).json({ msg: 'Error deleting chat room', status: 400, success: false })
+            }
+            if (!doc) {
+                return res.status(400).json({ msg: 'No chat room found', status: 400, success: false })
+            }
+            await userModel.findOneAndUpdate({ _id: user }, { $pull: { rooms: room } })
+            await workerModel.findOneAndUpdate({ _id: worker }, { $pull: { rooms: room } })
+            return res.status(200).json({ msg: 'Chat room deleted', status: 200, success: true })
+        })
+    } catch (error) {
+        if (e.errorInfo) {
+            // User Not Found
+            log.warn(e.message)
+            return returnUnAuthUserError(res, e.message)
+        }
+        return commonError(res, e.message)
+    }
+})
 
 module.exports.chatRoute = router;
