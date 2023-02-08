@@ -99,24 +99,21 @@ router.get('/comments/:worker/:post', async (req, res) => {
         return commonError(res, e.message)
     }
 })
-router.post('/comments/:worker', async (req, res) => {
 
+router.post('/comments/:worker', async (req, res) => {
     const { worker } = req.params
     const { comment, post, from } = req.body
-
     // check if user is authenticated
     try {
         if (!comment) return commonError(res, 'No comment provided')
         if (!post) return commonError(res, 'No post provided')
         if (!from) return commonError(res, 'No from provided')
-
         await admin.auth().getUser(worker) // check if uid is valid
         const newComment = new commentModel({
             comment,
             post,
             from
         })
-
         newComment.save((err, comment) => {
             if (err) {
                 return commonError(res, err.message)
@@ -138,6 +135,8 @@ router.post('/comments/:worker', async (req, res) => {
         return commonError(res, e.message)
     }
 })
+
+
 
 router.post('/skills', async (req, res) => {
     const { worker, skills } = req.body

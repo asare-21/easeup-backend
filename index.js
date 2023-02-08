@@ -30,6 +30,7 @@ const { chatRoomModel } = require('./models/chatRoomModel');
 const { chatModel } = require('./models/chat_message_model');
 const { workerModel } = require('./models/worker_models');
 const { userModel } = require('./models/user_model');
+const { getAndCacheUsers, getAndCacheWorkerMedia, getAndCacheWorkerProfiles, getAndCacheWorkers } = require('./utils');
 const limiter = rateLimit({
     windowMs: 30 * 60 * 1000, // 30 minutes
     max: 1000, // Limit each IP to 1000 requests per `window` (here, per 15 minutes)
@@ -132,17 +133,29 @@ else {
 http.listen(PORT, async () => {
     try {
         log.info(`Listening on port ${PORT}`);
-        await connect(`mongodb+srv://${process.env.easeup_admin_founder_email}:${process.env.easeup_admin_founder_pass}@easeup-cluster.pfxvast.mongodb.net/?retryWrites=true&w=majority`, {
+        connect(`mongodb+srv://${process.env.easeup_admin_founder_email}:${process.env.easeup_admin_founder_pass}@easeup-cluster.pfxvast.mongodb.net/?retryWrites=true&w=majority`, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
             dbName: 'easeup'
         })
-        await FBadmin.initializeApp({
+        FBadmin.initializeApp({
             credential: FBadmin.credential.cert(serviceAccount)
         });
-        log.info('Connected to MongoDB')
+        setInterval(async () => {
+            Promise.all(
+                [
+                    // Load and cached data
+                    await getAndCacheUsers(),
+                    await getAndCacheWorkers(),
+                    await getAndCacheWorkerProfiles(),
+                    await getAndCacheWorkerMedia(),
+                ]
+            );
+            console.log('Connected to MongoDB');
+        }, 5 * 1000 * 60);// 5 minutes
+        // }, 6000);// 5 minutes
     } catch (err) {
-        log.error(err)
+        console.error(err)
     }
 })
 
@@ -154,18 +167,10 @@ io.on('connection', (socket) => {
     socket.on('disconnected', (msg) => {
         console.log('message: ', msg);
     });
-    // log any event
-    // socket.onAny((event, ...args) => {
-    //     console.log("Socket events ", event, args);
-    // })
+
     socket.on('connected', (msg) => {
         console.log('message: ', msg);
     });
-
-    // socket.on('typing', (room) => {
-    //     socket.to(room).emit(from === user ? worker : user, chat)
-
-    // });
 
     // create chat room
     socket.on('new-room', async (room) => {
@@ -215,11 +220,7 @@ io.on('connection', (socket) => {
             },
             token: chat.from === chat.user ? worker.token : user.token
         })
-        // broadcast message to all users 
-        // socket.broadcast.emit('message', chat, (msg) => {
-        //     console.log('message sent', chat)
-        // })
-        // socket.emit(chat.from === chat.user ? chat.worker : chat.user, chat)
+
         await saveChat(chat)
 
     })
@@ -288,3 +289,4 @@ async function createNewRoom(_room) {
         console.log('Something went room ', e)
     }
 }
+

@@ -65,16 +65,16 @@ router.get('/:worker', getWorkerCache, async (req, res) => {
     // check if user is authenticated
     try {
         await admin.auth().getUser(worker) // check if worker is valid
-        workerModel.findById(worker, (err, worker) => {
+        workerModel.findById(worker, (err, result) => {
             if (err) {
                 return commonError(res, err.message)
             }
-            workerCache.set(`worker/${worker._id}`, worker);
+            workerCache.set(`worker/${worker._id}`, result);
             return res.status(200).json({
                 msg: 'Worker Profile',
                 status: 200,
                 success: true,
-                worker
+                worker: result
             })
         })
     }
