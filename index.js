@@ -141,18 +141,23 @@ http.listen(PORT, async () => {
         FBadmin.initializeApp({
             credential: FBadmin.credential.cert(serviceAccount)
         });
-        setInterval(async () => {
-            Promise.all(
-                [
-                    // Load and cached data
-                    await getAndCacheUsers(),
-                    await getAndCacheWorkers(),
-                    await getAndCacheWorkerProfiles(),
-                    await getAndCacheWorkerMedia(),
-                ]
-            );
-            console.log('Connected to MongoDB');
-        }, 5 * 1000 * 60);// 5 minutes
+        // initial cache
+        await getAndCacheUsers(),
+            await getAndCacheWorkers(),
+            await getAndCacheWorkerProfiles(),
+            await getAndCacheWorkerMedia(),
+            setInterval(async () => {
+                Promise.all(
+                    [
+                        // Load and cached data
+                        await getAndCacheUsers(),
+                        await getAndCacheWorkers(),
+                        await getAndCacheWorkerProfiles(),
+                        await getAndCacheWorkerMedia(),
+                    ]
+                );
+                console.log('Connected to MongoDB');
+            }, 15 * 1000 * 60);// 5 minutes
         // }, 6000);// 5 minutes
     } catch (err) {
         console.error(err)
