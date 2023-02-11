@@ -132,7 +132,7 @@ router.post('/update/image', (req, res) => {
                 }
                 if (!user) return res.status(404).json({ msg: 'User Not Found', status: 404, success: false }) // User Not Found
                 // load user from cache and update
-                userCache.set(`user/${user_id}`, { ...user, profile_picture });
+                userCache.del(`user/${user_id}`);
                 return res.status(200).json({
                     msg: 'Profile updated', status: 200, success: true, user
                 }) // User Found and returned
@@ -170,7 +170,8 @@ router.post('/update/address', (req, res) => {
                     return res.status(500).json({ msg: err.message, status: 500, success: false }) // Internal Server Error
                 }
                 if (!user) return res.status(404).json({ msg: 'User Not Found', status: 404, success: false }) // User Not Found
-                userCache.set(`user/${user_id}`, { ...user, address: { address, latlng } });
+                userCache.del(`user/${user_id}`);
+
                 return res.status(200).json({
                     msg: 'Profile updated', status: 200, success: true, user
                 }) // User Found and returned
@@ -204,7 +205,8 @@ router.post('/update/gender', (req, res) => {
                     return res.status(500).json({ msg: err.message, status: 500, success: false }) // Internal Server Error
                 }
                 if (!user) return res.status(404).json({ msg: 'User Not Found', status: 404, success: false }) // User Not Found
-                userCache.set(`user/${user_id}`, { ...user, gender });
+                userCache.del(`user/${user_id}`);
+
                 return res.status(200).json({
                     msg: 'Profile updated', status: 200, success: true, user
                 }) // User Found and returned
@@ -239,7 +241,8 @@ router.post('/update/phone', (req, res) => {
                     return res.status(500).json({ msg: err.message, status: 500, success: false }) // Internal Server Error
                 }
                 if (!user) return res.status(404).json({ msg: 'User Not Found', status: 404, success: false }) // User Not Found
-                userCache.set(`user/${user_id}`, { ...user, phone });
+                userCache.del(`user/${user_id}`);
+
                 return res.status(200).json({
                     msg: 'Profile updated', status: 200, success: true, user
                 }) // User Found and returned
@@ -337,10 +340,8 @@ router.post('/phone/send-code', async (req, res) => {
         }, async (err, user) => {
             if (err) return res.status(500).json({ msg: 'Internal Server Error', status: 500, success: false }) // Internal Server Error
             if (!user) return res.status(404).json({ msg: 'User Not Found', status: 404, success: false }) // User Not Found
-            cache.set(`user/${user_id}`, {
-                ...user,
-                code
-            })
+            userCache.del(`user/${user_id}`);
+
             // Update the user
             return res.status(200).json({ msg: `Verification code has been sent to ${phone}`, status: 200, success: true }) // User Updated
         })
@@ -373,10 +374,8 @@ router.post('/phone/verify-code', async (req, res) => {
             if (user.code.toString() !== code.toString()) return res.status(400).json({ msg: 'Verification code is incorrect', status: 400, success: false }) // Verification code is incorrect
             // Update the user if code matched
             await userModel.findByIdAndUpdate(user_id, { code: "", phone },)
-            cache.set(`user/${user_id}`, {
-                ...user,
-                phone
-            })
+            userCache.del(`user/${user_id}`);
+
             return res.status(200).json({ msg: `Code has been verified successfully.`, status: 200, success: true }) // User Updated
         })
     }
