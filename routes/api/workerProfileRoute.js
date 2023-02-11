@@ -11,7 +11,7 @@ const { commonError, returnUnAuthUserError } = require('./user_route')
 const { cache } = require('../../cache/user_cache');
 const workerCache = cache;
 
-router.get('/:worker', getWorkerProfileCache, async (req, res) => {
+router.get('/:worker', async (req, res) => {
     const { worker } = req.params
     // check if user is authenticated
     try {
