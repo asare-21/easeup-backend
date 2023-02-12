@@ -415,13 +415,37 @@ router.get('/booking-slot/:worker', async (req, res) => {
     try {
         await admin.auth().getUser(worker) // check if worker is valid
         const timeslots = await workerSlotModel.findOne({ worker })
-        const bookings = await bookingModel.find({ worker })
+
 
         return res.status(200).json({
             msg: 'Worker Profile Fetched Successfully',
             status: 200,
             success: true,
             timeslots,
+
+        })
+    } catch (e) {
+        if (e.errorInfo) {
+            // User Not Found
+            log.warn(e.message)
+            return returnUnAuthUserError(res, e.message)
+        }
+        return commonError(res, e.message)
+    }
+})
+
+router.get('/booking/:worker', async (req, res) => {
+    const { worker } = req.params
+    try {
+        await admin.auth().getUser(worker) // check if worker is valid
+
+        const bookings = await bookingModel.find({ worker })
+
+        return res.status(200).json({
+            msg: 'Worker Profile Fetched Successfully',
+            status: 200,
+            success: true,
+
             bookings
         })
     } catch (e) {
@@ -433,6 +457,7 @@ router.get('/booking-slot/:worker', async (req, res) => {
         return commonError(res, e.message)
     }
 })
+
 router.post('/book-slot', async (req, res) => {
     const { worker, client, skills, start, end } = req.body
     try {
