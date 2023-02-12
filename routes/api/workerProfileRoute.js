@@ -415,8 +415,6 @@ router.get('/booking-slot/:worker', async (req, res) => {
     try {
         await admin.auth().getUser(worker) // check if worker is valid
         const timeslots = await workerSlotModel.findOne({ worker })
-
-
         return res.status(200).json({
             msg: 'Worker Profile Fetched Successfully',
             status: 200,
@@ -438,9 +436,7 @@ router.get('/booking/:worker', async (req, res) => {
     const { worker } = req.params
     try {
         await admin.auth().getUser(worker) // check if worker is valid
-
         const bookings = await bookingModel.find({ worker })
-
         return res.status(200).json({
             msg: 'Worker Profile Fetched Successfully',
             status: 200,
@@ -458,8 +454,74 @@ router.get('/booking/:worker', async (req, res) => {
     }
 })
 
+// upcoming
+router.get('/booking-upcoming/:worker', async (req, res) => {
+    const { worker } = req.params
+    try {
+        await admin.auth().getUser(worker) // check if worker is valid
+        const bookings = await bookingModel.find({ worker, $eq: { completed: false, cancelled: false } })
+        return res.status(200).json({
+            msg: 'Worker Profile Fetched Successfully',
+            status: 200,
+            success: true,
+            bookings
+        })
+    } catch (e) {
+        if (e.errorInfo) {
+            // User Not Found
+            log.warn(e.message)
+            return returnUnAuthUserError(res, e.message)
+        }
+        return commonError(res, e.message)
+    }
+})
+
+//cancelled
+router.get('/booking-cancelled/:worker', async (req, res) => {
+    const { worker } = req.params
+    try {
+        await admin.auth().getUser(worker) // check if worker is valid
+        const bookings = await bookingModel.find({ worker, $eq: { cancelled: true, completed: false } })
+        return res.status(200).json({
+            msg: 'Worker Profile Fetched Successfully',
+            status: 200,
+            success: true,
+            bookings
+        })
+    } catch (e) {
+        if (e.errorInfo) {
+            // User Not Found
+            log.warn(e.message)
+            return returnUnAuthUserError(res, e.message)
+        }
+        return commonError(res, e.message)
+    }
+})
+// completed
+router.get('/booking-completed/:worker', async (req, res) => {
+    const { worker } = req.params
+    try {
+        await admin.auth().getUser(worker) // check if worker is valid
+        const bookings = await bookingModel.find({ worker, $eq: { completed: true } })
+        return res.status(200).json({
+            msg: 'Worker Profile Fetched Successfully',
+            status: 200,
+            success: true,
+            bookings
+        })
+    } catch (e) {
+        if (e.errorInfo) {
+            // User Not Found
+            log.warn(e.message)
+            return returnUnAuthUserError(res, e.message)
+        }
+        return commonError(res, e.message)
+    }
+})
+
+
 router.post('/book-slot', async (req, res) => {
-    const { worker, client, skills, start, end } = req.body
+    const { worker, client, skills, start, end, name } = req.body
     try {
         if (!start || !end) return commonError(res, 'Please provide all required fields. Start and End times are required.')
         //code to check if start and end date are valid
@@ -468,7 +530,7 @@ router.post('/book-slot', async (req, res) => {
                 return commonError(res, 'Please provide valid dates. ' + (i === 0 ? 'Start' : 'End') + ' date is invalid.')
             }
         }
-        if (!worker || !client || !skills) return commonError(res, 'Please provide all required fields. Worker, Client, Skills')
+        if (!worker || !client || !skills || !name) return commonError(res, 'Please provide all required fields. Worker, Client, Skills')
         await admin.auth().getUser(worker) // check if worker is valid
         await admin.auth().getUser(client) // check if client is valid
         const workerSlot = await workerSlotModel.findOne({ worker })
@@ -489,6 +551,7 @@ router.post('/book-slot', async (req, res) => {
                 client,
                 skills,
                 start,
+                name
             })
             await newWorkerSlot.save()
             await bookingSlot.save();
@@ -500,7 +563,7 @@ router.post('/book-slot', async (req, res) => {
             })
         }
         console.log("Does not exist")
-        const result = workerSlot.bookSlot(start, start, end, worker, client, skills)
+        const result = workerSlot.bookSlot(start, start, end, worker, client, skills, name)
         if (result) {
             return res.status(200).json({
                 msg: 'Worker Profile Updated',
