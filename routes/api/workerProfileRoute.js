@@ -9,7 +9,9 @@ const { reviewModel } = require('../../models/reviews_model');
 const { workerProfileModel } = require('../../models/worker_profile_model');
 const { commonError, returnUnAuthUserError } = require('./user_route')
 const { cache } = require('../../cache/user_cache');
+const { workerSlotModel, bookingModel } = require('../../models/bookingModel');
 const workerCache = cache;
+const { isValidDate } = require('../../utils');
 
 router.get('/:worker', getWorkerProfileCache, async (req, res) => {
     const { worker } = req.params
@@ -135,7 +137,6 @@ router.post('/comments/:worker', async (req, res) => {
         return commonError(res, e.message)
     }
 })
-
 
 
 router.post('/skills', async (req, res) => {
@@ -398,6 +399,95 @@ router.post('/work-radius', async (req, res) => {
         })
     }
     catch (e) {
+        if (e.errorInfo) {
+            // User Not Found
+            log.warn(e.message)
+            return returnUnAuthUserError(res, e.message)
+        }
+        return commonError(res, e.message)
+    }
+})
+
+
+// get timeslots and bookings
+router.get('/booking-slot/:worker', async (req, res) => {
+    const { worker } = req.params
+    try {
+        await admin.auth().getUser(worker) // check if worker is valid
+        const timeslots = await workerSlotModel.findOne({ worker })
+        const bookings = await bookingModel.find({ worker })
+
+        return res.status(200).json({
+            msg: 'Worker Profile Fetched Successfully',
+            status: 200,
+            success: true,
+            timeslots,
+            bookings
+        })
+    } catch (e) {
+        if (e.errorInfo) {
+            // User Not Found
+            log.warn(e.message)
+            return returnUnAuthUserError(res, e.message)
+        }
+        return commonError(res, e.message)
+    }
+})
+router.post('/book-slot', async (req, res) => {
+    const { worker, client, skills, start, end } = req.body
+    try {
+        if (!start || !end) return commonError(res, 'Please provide all required fields. Start and End times are required.')
+        //code to check if start and end date are valid
+        for (let i = 0; i < 2; i++) {
+            if (!isValidDate(new Date(i === 0 ? start : end))) {
+                return commonError(res, 'Please provide valid dates. ' + (i === 0 ? 'Start' : 'End') + ' date is invalid.')
+            }
+        }
+        if (!worker || !client || !skills) return commonError(res, 'Please provide all required fields. Worker, Client, Skills')
+        await admin.auth().getUser(worker) // check if worker is valid
+        await admin.auth().getUser(client) // check if client is valid
+        const workerSlot = await workerSlotModel.findOne({ worker })
+        console.log(workerSlot === null)
+        if (workerSlot === null || workerSlot === undefined) {
+            // create new worker slot
+            const newWorkerSlot = new workerSlotModel({
+                worker,
+                slots: [
+                    {
+                        date: start,
+                        startTime: start,
+                        endTime: end,
+                    }]
+            })
+            const bookingSlot = bookingModel({
+                worker,
+                client,
+                skills,
+                start,
+            })
+            await newWorkerSlot.save()
+            await bookingSlot.save();
+            return res.status(200).json({
+                msg: 'Worker Profile Updated',
+                status: 200,
+                success: true,
+                worker
+            })
+        }
+        console.log("Does not exist")
+        const result = workerSlot.bookSlot(start, start, end, worker, client, skills)
+        if (result) {
+            return res.status(200).json({
+                msg: 'Worker Profile Updated',
+                status: 200,
+                success: true,
+                worker: result
+            })
+        }
+        return commonError(res, 'Slot not available')
+    }
+    catch (e) {
+
         if (e.errorInfo) {
             // User Not Found
             log.warn(e.message)

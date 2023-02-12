@@ -12,6 +12,8 @@ async function getAndCacheUsers() {
         }
         if (docs) {
             docs.forEach(doc => {
+                console.log("user ", doc._id, doc.profile_name)
+
                 cache.set(`user/${doc._id}`, doc)
             })
         }
@@ -26,6 +28,8 @@ async function getAndCacheWorkers() {
         }
         if (docs) {
             docs.forEach(doc => {
+                console.log("worker ", doc._id, doc.worker)
+
                 cache.set(`worker/${doc._id}`, doc)
             })
         }
@@ -41,7 +45,7 @@ async function getAndCacheWorkerProfiles() {
         }
         if (docs) {
             docs.forEach(doc => {
-                console.log(doc)
+                console.log("worker profile ", doc.name, doc.worker)
                 cache.set(`worker-profile/${doc.worker}`, JSON.stringify(doc))
             })
         }
@@ -57,16 +61,24 @@ async function getAndCacheWorkerMedia() {
         }
         if (docs) {
             docs.forEach(doc => {
+                console.log("worker profile media", doc._id, doc.worker)
+
                 cache.set(`portfolio/${doc.worker}`, JSON.stringify(doc))
             })
         }
     })
 }
 
-
+const isValidDate = (date) => {
+    if (Object.prototype.toString.call(date) !== "[object Date]") {
+        return false;
+    }
+    return !isNaN(date.getTime());
+};
 
 //export
 module.exports.getAndCacheUsers = getAndCacheUsers;
 module.exports.getAndCacheWorkers = getAndCacheWorkers;
 module.exports.getAndCacheWorkerProfiles = getAndCacheWorkerProfiles;
 module.exports.getAndCacheWorkerMedia = getAndCacheWorkerMedia;
+module.exports.isValidDate = isValidDate;
