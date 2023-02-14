@@ -531,7 +531,7 @@ router.post('/book-slot', async (req, res) => {
                 return commonError(res, 'Please provide valid dates. ' + (i === 0 ? 'Start' : 'End') + ' date is invalid.')
             }
         }
-        if (!worker || !client || !skills || !name || fee) return commonError(res, 'Please provide all required fields. Worker, Client, Skills, Fee...')
+        if (!worker || !client || !skills || !name || !fee) return commonError(res, 'Please provide all required fields. Worker, Client, Skills, Fee...')
         await admin.auth().getUser(worker) // check if worker is valid
         await admin.auth().getUser(client) // check if client is valid
         const workerSlot = await workerSlotModel.findOne({ worker })
