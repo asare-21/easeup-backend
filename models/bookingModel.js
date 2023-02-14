@@ -80,7 +80,10 @@ workerSlotSchema.methods.bookSlot = function (date, startTime, endTime, worker, 
     // Check if the slot is 3 hours in advance
     const threeHoursInAdvance = new Date(Date.now() + 1000 * 60 * 60 * 3);
     if (startTime < threeHoursInAdvance) {
-        return 'Booking must be made 3 hours in advance';
+        return {
+            success: false,
+            message: 'Slot must be 3 hours in advance'
+        };
     }
 
     // Check if the worker already has 15 slots for the day
@@ -92,13 +95,20 @@ workerSlotSchema.methods.bookSlot = function (date, startTime, endTime, worker, 
             slotsCount++;
         }
     }
-    if (slotsCount >= 15) {
-        return 'Worker has reached the maximum number of slots for the day';
+    if (slotsCount >= 4) {
+        return {
+            success: false,
+            message: 'Worker already has 4 slots for the day'
+        };
     }
 
     // Check if the slot is available
     if (!this.checkSlotAvailability(startTime, endTime)) {
-        return 'Slot is not available';
+        return {
+            success: false,
+            message: 'Slot not available'
+
+        };
     }
 
     // Book the slot
@@ -111,9 +121,23 @@ workerSlotSchema.methods.bookSlot = function (date, startTime, endTime, worker, 
         date,
         skills,
         name,
+    }).save(
+        (err, doc) => {
+            if (err) {
+                console.log(err);
+                return {
+                    success: false,
+                    message: 'Error booking slot'
+                };
+            }
+            return {
+                success: true,
+                message: 'Slot booked successfully',
+                doc
+            };
 
-    }).save()
-    return 'Slot and booking successfully booked';
+        }
+    )
 };
 
 const workerSlot = model('Worker Slot', workerSlotSchema);

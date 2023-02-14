@@ -119,7 +119,6 @@ const workerProfileSchema = new Schema({
         type: Number,
         default: 150 // GG¢ 150.00
     },
-
     work_radius: {
         type: workRadius,
         default: {
