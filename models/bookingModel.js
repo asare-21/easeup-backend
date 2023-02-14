@@ -91,7 +91,8 @@ workerSlotSchema.methods.bookSlot = function (date, startTime, endTime, worker, 
 
 
     for (let i = 0; i < this.slots.length; i++) {
-        if (date.toDateString() === this.slots[i].date.toDateString()) {
+
+        if (Date(date) === Date(this.slots[i].date)) {
             slotsCount++;
         }
     }
