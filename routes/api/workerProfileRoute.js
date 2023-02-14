@@ -522,6 +522,7 @@ router.get('/booking-completed/:worker', async (req, res) => {
 
 router.post('/book-slot', async (req, res) => {
     const { worker, client, skills, start, end, name } = req.body
+    console.log(req.body)
     try {
         if (!start || !end) return commonError(res, 'Please provide all required fields. Start and End times are required.')
         //code to check if start and end date are valid
