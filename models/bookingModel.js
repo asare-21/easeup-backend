@@ -84,7 +84,27 @@ const workerSlotSchema = new Schema({
 
 workerSlotSchema.methods.checkSlotAvailability = function (startTime, endTime) {
     // Check if the slot is not less than 30 minutes apart from existing slots
-    for (let i = 0; i < this.slots.length; i++) {
+    // Check the slots for the day and check if the slot is available
+    //create an object with the date as the key and the value as an array of slots
+
+    let slots = {
+
+    };
+    this.slots.forEach(slot => {
+        const first = new Date(slot.startTime);
+        let firstStringDate = first.getMonth() + first.getDate() + first.getFullYear()
+        if (slots[firstStringDate]) {
+            slots[firstStringDate].push(slot)
+        } else {
+            slots[firstStringDate] = [slot]
+        }
+    })
+    const selectedt = new Date(startTime);
+    let selectedtStringDate = selectedt.getMonth() + selectedt.getDate() + selectedt.getFullYear()
+
+    if (slots[selectedtStringDate].length) return false;
+
+    for (let i = 0; i < slots[selectedtStringDate].length; i++) {
         if (startTime <= this.slots[i].endTime && endTime >= this.slots[i].startTime) {
             return false;
         }

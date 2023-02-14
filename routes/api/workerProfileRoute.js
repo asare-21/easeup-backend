@@ -538,7 +538,7 @@ router.post('/book-slot', async (req, res) => {
         if (!worker || !client || !skills || !name || !fee || !ref || !image || !workerImage) return commonError(res, 'Please provide all required fields. Worker, Client, Skills, Fee...')
         await admin.auth().getUser(worker) // check if worker is valid
         await admin.auth().getUser(client) // check if client is valid
-        const workerSlot = await workerSlotModel.findOne({ worker })
+        const workerSlot = await workerSlotModel.findOne({ worker, })
         console.log(workerSlot === null)
         console.log(workerSlot)
         console.log(new Date(start), new Date(end))
