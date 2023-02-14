@@ -616,7 +616,7 @@ router.post('/verify-payment', async (req, res) => {
                 const workerToken = await workerModel.find(booking.worker)
                 const userToken = await workerModel.find(booking.client)
                 await admin.messaging().sendToDevice(
-                    userToken,
+                    userToken.token,
                     {
                         notification: {
                             title: 'Payment Verified',
@@ -627,7 +627,7 @@ router.post('/verify-payment', async (req, res) => {
                 const date = new Date(workerToken.date)
                 const parseDate = date.toDateString()
                 await admin.messaging().sendToDevice(
-                    userToken,
+                    workerToken.token,
                     {
                         notification: {
                             title: 'Appointment Confirmed',
