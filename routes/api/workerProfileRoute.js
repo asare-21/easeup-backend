@@ -521,7 +521,7 @@ router.get('/booking-completed/:worker', async (req, res) => {
 
 
 router.post('/book-slot', async (req, res) => {
-    const { worker, client, skills, start, end, name } = req.body
+    const { worker, client, skills, start, end, name, fee } = req.body
     console.log(req.body)
     try {
         if (!start || !end) return commonError(res, 'Please provide all required fields. Start and End times are required.')
@@ -556,7 +556,8 @@ router.post('/book-slot', async (req, res) => {
                 client,
                 skills,
                 start: new Date(start),
-                name
+                name,
+                commitmentFee: fee,
             })
             await newWorkerSlot.save()
             await bookingSlot.save();
@@ -567,7 +568,7 @@ router.post('/book-slot', async (req, res) => {
                 worker
             })
         }
-        const result = workerSlot.bookSlot(start, start, end, worker, client, skills, name)
+        const result = workerSlot.bookSlot(start, start, end, worker, client, skills, name, fee)
         if (result) {
             return res.status(200).json({
                 msg: 'Worker Profile Updated',

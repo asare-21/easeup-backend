@@ -76,7 +76,7 @@ workerSlotSchema.methods.checkSlotAvailability = function (startTime, endTime) {
     return true;
 };
 
-workerSlotSchema.methods.bookSlot = function (date, startTime, endTime, worker, client, skills, name) {
+workerSlotSchema.methods.bookSlot = function (date, startTime, endTime, worker, client, skills, name, fee) {
     // Check if the slot is 3 hours in advance
     const threeHoursInAdvance = new Date(Date.now() + 1000 * 60 * 60 * 3);
     if (startTime < threeHoursInAdvance) {
@@ -122,6 +122,7 @@ workerSlotSchema.methods.bookSlot = function (date, startTime, endTime, worker, 
         date: new Date(date),
         skills,
         name,
+        commitmentFee: fee
     }).save(
         (err, doc) => {
             if (err) {
