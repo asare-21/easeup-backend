@@ -82,7 +82,7 @@ workerSlotSchema.methods.bookSlot = function (date, startTime, endTime, worker, 
     if (startTime < threeHoursInAdvance) {
         return {
             success: false,
-            message: 'Slot must be 3 hours in advance'
+            msg: 'Slot must be 3 hours in advance'
         };
     }
 
@@ -99,7 +99,7 @@ workerSlotSchema.methods.bookSlot = function (date, startTime, endTime, worker, 
     if (slotsCount >= 4) {
         return {
             success: false,
-            message: 'Worker already has 4 slots for the day'
+            msg: 'Worker already has 4 slots for the day'
         };
     }
 
@@ -107,7 +107,7 @@ workerSlotSchema.methods.bookSlot = function (date, startTime, endTime, worker, 
     if (!this.checkSlotAvailability(startTime, endTime)) {
         return {
             success: false,
-            message: 'Slot not available'
+            msg: 'Slot not available'
 
         };
     }
@@ -129,13 +129,13 @@ workerSlotSchema.methods.bookSlot = function (date, startTime, endTime, worker, 
                 console.log(err);
                 return {
                     success: false,
-                    message: 'Error booking slot'
+                    msg: 'Error booking slot'
                 };
             }
             return {
                 success: true,
-                message: 'Slot booked successfully',
-                doc
+                msg: 'Slot booked successfully',
+                worker: doc
             };
 
         }
