@@ -536,7 +536,11 @@ router.post('/book-slot', async (req, res) => {
         await admin.auth().getUser(client) // check if client is valid
         const workerSlot = await workerSlotModel.findOne({ worker })
         console.log(workerSlot === null)
+        console.log(workerSlot)
+        console.log(new Date(start), new Date(end))
         if (workerSlot === null || workerSlot === undefined) {
+            console.log("Does not exist")
+
             // create new worker slot
             const newWorkerSlot = new workerSlotModel({
                 worker,
@@ -563,7 +567,6 @@ router.post('/book-slot', async (req, res) => {
                 worker
             })
         }
-        console.log("Does not exist")
         const result = workerSlot.bookSlot(start, start, end, worker, client, skills, name)
         if (result) {
             return res.status(200).json({
