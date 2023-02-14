@@ -112,13 +112,13 @@ workerSlotSchema.methods.bookSlot = function (date, startTime, endTime, worker, 
     }
 
     // Book the slot
-    this.slots.push({ date, startTime, endTime });
+    this.slots.push({ date: new Date(date), startTime: new Date(startTime), endTime: new Date(endTime) });
     this.save();
     // save the booking to the database
     bookingModel({
         worker,
         client,
-        date,
+        date: new Date(date),
         skills,
         name,
     }).save(
