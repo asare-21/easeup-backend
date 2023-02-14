@@ -541,16 +541,16 @@ router.post('/book-slot', async (req, res) => {
                 worker,
                 slots: [
                     {
-                        date: start,
-                        startTime: start,
-                        endTime: end,
+                        date: new Date(start),
+                        startTime: new Date(start),
+                        endTime: new Date(end),
                     }]
             })
             const bookingSlot = bookingModel({
                 worker,
                 client,
                 skills,
-                start,
+                start: new Date(start),
                 name
             })
             await newWorkerSlot.save()
