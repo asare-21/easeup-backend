@@ -102,7 +102,7 @@ workerSlotSchema.methods.checkSlotAvailability = function (startTime, endTime) {
     const selectedt = new Date(startTime);
     let selectedtStringDate = selectedt.getMonth() + selectedt.getDate() + selectedt.getFullYear()
     if (!slots[selectedtStringDate]) return true;
-    if (slots[selectedtStringDate].length === 0) return false;
+    if (slots[selectedtStringDate].length === 0) return true;
 
     for (let i = 0; i < slots[selectedtStringDate].length; i++) {
         if (startTime <= this.slots[i].endTime && endTime >= this.slots[i].startTime) {
