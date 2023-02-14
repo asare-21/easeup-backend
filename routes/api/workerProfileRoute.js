@@ -12,6 +12,8 @@ const { cache } = require('../../cache/user_cache');
 const { workerSlotModel, bookingModel } = require('../../models/bookingModel');
 const workerCache = cache;
 const { isValidDate } = require('../../utils');
+const crypto = require('crypto');
+const secret = process.env.PAYSTACK_SECRET;
 
 router.get('/:worker', getWorkerProfileCache, async (req, res) => {
     const { worker } = req.params
@@ -587,6 +589,23 @@ router.post('/book-slot', async (req, res) => {
             log.warn(e.message)
             return returnUnAuthUserError(res, e.message)
         }
+        return commonError(res, e.message)
+    }
+})
+
+// webhook to verify payment
+router.post('/verify-payment', async (req, res) => {
+    const { event, data } = req.body
+    try {
+        const hash = crypto.createHmac('sha512', secret).update(JSON.stringify(req.body)).digest('hex');
+        if (hash == req.headers['x-paystack-signature']) {
+            // Retrieve the request's body
+            console.log(event, data)
+            // Do something with event  
+
+        }
+        res.send(200);
+    } catch (e) {
         return commonError(res, e.message)
     }
 })
