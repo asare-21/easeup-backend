@@ -70,10 +70,10 @@ async function getAndCacheWorkerMedia() {
 }
 
 const isValidDate = (date) => {
-    if (Object.prototype.toString.call(date) !== "[object Date]") {
+    if (Object.prototype.toString.call(new Date(date)) !== "[object Date]") {
         return false;
     }
-    return !isNaN(date.getTime());
+    return !isNaN(new Date(date).getTime());
 };
 
 //export
