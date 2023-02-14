@@ -463,7 +463,7 @@ router.get('/booking-upcoming/:worker', async (req, res) => {
     const { user } = req.query
     try {
         await admin.auth().getUser(worker) // check if worker is valid
-        const bookings = user ? await bookingModel.find({ client: worker, $eq: { completed: false, cancelled: false } }) : await bookingModel.find({ worker, $eq: { completed: false, cancelled: false } })
+        const bookings = user ? await bookingModel.find({ client: worker, $eq: { completed: false, cancelled: false, isPaid: true } }) : await bookingModel.find({ worker, $eq: { completed: false, cancelled: false } })
         return res.status(200).json({
             msg: 'Worker Profile Fetched Successfully',
             status: 200,
@@ -485,7 +485,7 @@ router.get('/booking-cancelled/:worker', async (req, res) => {
     const { worker } = req.params
     try {
         await admin.auth().getUser(worker) // check if worker is valid
-        const bookings = await bookingModel.find({ worker, $eq: { cancelled: true, completed: false } })
+        const bookings = await bookingModel.find({ worker, $eq: { cancelled: true, completed: false, isPaid: true } })
         return res.status(200).json({
             msg: 'Worker Profile Fetched Successfully',
             status: 200,
@@ -506,7 +506,7 @@ router.get('/booking-completed/:worker', async (req, res) => {
     const { worker } = req.params
     try {
         await admin.auth().getUser(worker) // check if worker is valid
-        const bookings = await bookingModel.find({ worker, $eq: { completed: true } })
+        const bookings = await bookingModel.find({ worker, $eq: { completed: true, isPaid: true } })
         return res.status(200).json({
             msg: 'Worker Profile Fetched Successfully',
             status: 200,
