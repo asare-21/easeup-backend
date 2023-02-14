@@ -13,6 +13,7 @@ const { workerSlotModel, bookingModel } = require('../../models/bookingModel');
 const workerCache = cache;
 const { isValidDate } = require('../../utils');
 const crypto = require('crypto');
+const { workerModel } = require('../../models/worker_models');
 const secret = process.env.PAYSTACK_SECRET;
 
 router.get('/:worker', getWorkerProfileCache, async (req, res) => {
@@ -600,17 +601,40 @@ router.post('/verify-payment', async (req, res) => {
         const hash = crypto.createHmac('sha512', secret).update(JSON.stringify(req.body)).digest('hex');
         if (hash == req.headers['x-paystack-signature']) {
             // Retrieve the request's body
-            console.log(event, data)
+            // console.log(event, data)
             const success = data.gateway_response === 'Approved' && event === 'charge.success'
             const ref = data.reference
             if (success) {
-                await bookingModel.findOneAndUpdate({
+                const booking = await bookingModel.findOneAndUpdate({
                     ref
                 }, {
                     $set: {
                         isPaid: true
                     }
                 })
+                // send notification to device of worker and client
+                const workerToken = await workerModel.find(booking.worker)
+                const userToken = await workerModel.find(booking.client)
+                await admin.messaging().sendToDevice(
+                    userToken,
+                    {
+                        notification: {
+                            title: 'Payment Verified',
+                            body: 'Payment for your booking has been verified'
+                        }
+                    }
+                )
+                const date = new Date(workerToken.date)
+                const parseDate = date.toDateString()
+                await admin.messaging().sendToDevice(
+                    userToken,
+                    {
+                        notification: {
+                            title: 'Appointment Confirmed',
+                            body: workerToken.name + 'has just booked you for ' + parseDate + ' Payment for your booking has been verified. Please check your dashboard for more details'
+                        }
+                    }
+                )
                 return res.status(200).json({
                     msg: 'Payment Verified',
                     status: 200,
