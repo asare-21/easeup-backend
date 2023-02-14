@@ -601,10 +601,23 @@ router.post('/verify-payment', async (req, res) => {
         if (hash == req.headers['x-paystack-signature']) {
             // Retrieve the request's body
             console.log(event, data)
-            // Do something with event  
-
+            const success = data.gateway_response === 'Approved' && event === 'charge.success'
+            const ref = data.reference
+            if (success) {
+                await bookingModel.findOneAndUpdate({
+                    ref
+                }, {
+                    $set: {
+                        isPaid: true
+                    }
+                })
+                return res.status(200).json({
+                    msg: 'Payment Verified',
+                    status: 200,
+                })
+            }
         }
-        res.send(200);
+        return res.send(200);
     } catch (e) {
         return commonError(res, e.message)
     }
