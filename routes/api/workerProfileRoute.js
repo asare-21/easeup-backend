@@ -525,7 +525,7 @@ router.get('/booking-completed/:worker', async (req, res) => {
 
 
 router.post('/book-slot', async (req, res) => {
-    const { worker, client, skills, start, end, name, fee, ref, latlng } = req.body
+    const { worker, client, skills, start, end, name, fee, ref, latlng, image } = req.body
     console.log(req.body)
     try {
         if (!start || !end) return commonError(res, 'Please provide all required fields. Start and End times are required.')
@@ -535,7 +535,7 @@ router.post('/book-slot', async (req, res) => {
                 return commonError(res, 'Please provide valid dates. ' + (i === 0 ? 'Start' : 'End') + ' date is invalid.')
             }
         }
-        if (!worker || !client || !skills || !name || !fee || !ref) return commonError(res, 'Please provide all required fields. Worker, Client, Skills, Fee...')
+        if (!worker || !client || !skills || !name || !fee || !ref || !image) return commonError(res, 'Please provide all required fields. Worker, Client, Skills, Fee...')
         await admin.auth().getUser(worker) // check if worker is valid
         await admin.auth().getUser(client) // check if client is valid
         const workerSlot = await workerSlotModel.findOne({ worker })
@@ -563,7 +563,7 @@ router.post('/book-slot', async (req, res) => {
                 name,
                 commitmentFee: fee,
                 ref,
-                latlng
+                latlng, image
             })
             await newWorkerSlot.save()
             await bookingSlot.save();
@@ -574,7 +574,7 @@ router.post('/book-slot', async (req, res) => {
                 worker
             })
         }
-        const result = workerSlot.bookSlot(start, start, end, worker, client, skills, name, fee, ref, latlng)
+        const result = workerSlot.bookSlot(start, start, end, worker, client, skills, name, fee, ref, latlng, image)
         if (result) {
             return res.status(200).json({
                 msg: 'Worker Profile Updated',
