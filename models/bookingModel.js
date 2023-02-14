@@ -99,6 +99,7 @@ workerSlotSchema.methods.checkSlotAvailability = function (startTime, endTime) {
             slots[firstStringDate] = [slot]
         }
     })
+    console.log("Availbale slots", slots)
     const selectedt = new Date(startTime);
     let selectedtStringDate = selectedt.getMonth() + selectedt.getDate() + selectedt.getFullYear()
     if (!slots[selectedtStringDate]) return true;
