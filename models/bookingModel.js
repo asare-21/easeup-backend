@@ -142,6 +142,6 @@ workerSlotSchema.methods.bookSlot = function (date, startTime, endTime, worker, 
 };
 
 const workerSlot = model('Worker Slot', workerSlotSchema);
-
+const bookingModel = model('Booking Model', bookingSchema);
 module.exports.workerSlotModel = workerSlot;
-module.exports.bookingModel = model('Booking Model', bookingSchema);
+module.exports.bookingModel = bookingModel;
