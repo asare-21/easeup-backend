@@ -524,6 +524,28 @@ router.get('/booking-completed/:worker', async (req, res) => {
 })
 
 
+router.get('/available-slots/:worker', async (req, res) => {
+    try {
+        const { worker } = req.params
+        await admin.auth().getUser(worker) // check if worker is valid
+        const timeslots = await bookingModel.find({ worker, $eq: { isPaid: true, cancelled: false } }).sort({ date: -1 }).limit(50)
+        return res.status(200).json({
+            msg: 'Worker Profile Fetched Successfully',
+            status: 200,
+            success: true,
+            timeslots
+        })
+    }
+    catch (e) {
+        if (e.errorInfo) {
+            // User Not Found
+            log.warn(e.message)
+            return returnUnAuthUserError(res, e.message)
+        }
+        return commonError(res, e.message)
+    }
+})
+
 router.post('/book-slot', async (req, res) => {
     const { worker, client, skills, start, end, name, fee, ref, latlng, image, workerImage } = req.body
     console.log(req.body)

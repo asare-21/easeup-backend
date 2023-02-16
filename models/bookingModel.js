@@ -82,6 +82,27 @@ const workerSlotSchema = new Schema({
     }]
 });
 
+/**
+ * 
+ * Algorithm requirements
+ * 
+ * 
+ */
+// break everything into small functions
+
+workerSlotSchema.methods.checkCurrentDayAvailability = function (date) { 
+    // Check the availability of the worker for the day
+};
+
+workerSlotSchema.methods.filterPaidSlots = function (date) { 
+    // Use this to return only the slots that have been paid for and not cancelled
+
+
+    this.checkCurrentDayAvailability(date);
+};
+
+
+
 workerSlotSchema.methods.checkSlotAvailability = function (startTime, endTime) {
     // Check if the slot is not less than 30 minutes apart from existing slots
     // Check the slots for the day and check if the slot is available
