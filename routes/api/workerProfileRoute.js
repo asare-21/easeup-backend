@@ -690,12 +690,13 @@ router.post('/verify-payment', async (req, res) => {
             // console.log(event, data)
             const success = data.gateway_response === 'Approved' && event === 'charge.success'
             const ref = data.reference
+            console.log(ref)
             if (success) {
                 const booking = await bookingModel.findOneAndUpdate({
                     "booking.ref": ref
                 }, {
                     $set: {
-                        isPaid: true
+                        "booking.$": { isPaid: true }
                     }
                 })
                 // send notification to device of worker and client
