@@ -696,7 +696,7 @@ router.post('/verify-payment', async (req, res) => {
                     "booking.ref": ref
                 }, {
                     $set: {
-                        "booking.ref": { isPaid: true }
+                        isPaid: true
                     }
                 })
                 console.log(booking)
