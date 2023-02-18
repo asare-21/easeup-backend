@@ -666,14 +666,13 @@ router.post('/verify-payment', async (req, res) => {
             // console.log(event, data)
             const success = data.gateway_response === 'Approved' && event === 'charge.success'
             const ref = data.reference
-            // console.log(data)
+            console.log(data)
             // console.log(ref, typeof ref)
             if (success) {
                 const booking = await bookingModel.find({
-                    // "booking.ref": {
-                    //     $eq: ref
-                    // },
-                    $where: this.booking.ref === ref
+
+
+
                 },
                     //     {
                     //     $set: {
@@ -714,7 +713,9 @@ router.post('/verify-payment', async (req, res) => {
         }
     } catch (e) {
         return commonError(res, e.message)
-    }
+    } // "booking.ref": {
+    //     $eq: ref
+    // },
 })
 
 module.exports.workerProfileRoute = router
