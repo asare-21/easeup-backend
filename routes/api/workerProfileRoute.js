@@ -671,7 +671,7 @@ router.post('/verify-payment', async (req, res) => {
             if (success) {
                 const booking = await bookingModel.findOneAndUpdate({
                     "booking": {
-                        $elemMatch: {
+                        $eq: {
                             ref
                         }
                     }
