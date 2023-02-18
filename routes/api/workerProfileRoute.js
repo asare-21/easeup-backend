@@ -666,13 +666,12 @@ router.post('/verify-payment', async (req, res) => {
             // console.log(event, data)
             const success = data.gateway_response === 'Approved' && event === 'charge.success'
             const ref = data.reference
-            console.log(data.metadata.custom_fields)
+            console.log(data.metadata.custom_fields[4].value)
             // console.log(ref, typeof ref)
             if (success) {
                 const booking = await bookingModel.find({
-
-
-
+                    _id: data.metadata.custom_fields[4].value,
+                    'booking.ref': ref
                 },
                     //     {
                     //     $set: {
@@ -680,7 +679,7 @@ router.post('/verify-payment', async (req, res) => {
                     //     }
                     // }
                 )
-                console.log(booking)
+                console.log("Found booking ", booking)
                 if (!booking) return commonError(res, 'Booking not found')
                 // send notification to device of worker and client
                 const workerToken = await workerModel.find(booking.worker)
