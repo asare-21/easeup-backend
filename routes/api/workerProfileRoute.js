@@ -643,7 +643,7 @@ router.post('/book-slot', async (req, res) => {
                     $exists: true,
                 }
             }, {
-                $set: {
+                $push: {
                     [queryString]: {
                         client,
                         skills,
@@ -658,6 +658,7 @@ router.post('/book-slot', async (req, res) => {
                     }
                 }
             })
+
             console.log(booking)
 
         }
