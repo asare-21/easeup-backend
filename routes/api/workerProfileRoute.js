@@ -663,21 +663,23 @@ router.post('/verify-payment', async (req, res) => {
         const hash = crypto.createHmac('sha512', secret).update(JSON.stringify(req.body)).digest('hex');
         if (hash == req.headers['x-paystack-signature']) {
             // Retrieve the request's body
-            // console.log(event, data)
             const success = data.gateway_response === 'Approved' && event === 'charge.success'
             const ref = data.reference
             console.log(data.metadata.custom_fields[4].value)
-            // console.log(ref, typeof ref)
             if (success) {
-                const booking = await bookingModel.find({
+                const booking = await bookingModel.findOneAndUpdate({
                     _id: data.metadata.custom_fields[4].value,
-                    'booking.ref': ref
+                    // select ref from booking array
+                    "booking.ref": {
+                        $eq: ref
+                    }
+
                 },
-                    //     {
-                    //     $set: {
-                    //         "booking.$.isPaid": true
-                    //     }
-                    // }
+                    {
+                        $set: {
+                            "booking.$.isPaid": true
+                        }
+                    }
                 )
                 console.log("Found booking ", booking)
                 if (!booking) return commonError(res, 'Booking not found')
