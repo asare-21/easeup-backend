@@ -677,7 +677,7 @@ router.post('/verify-payment', async (req, res) => {
                 },
                     {
                         $set: {
-                            "booking.$.isPaid": true
+                            "booking.isPaid": true
                         }
                     }
                 )
