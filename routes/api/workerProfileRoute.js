@@ -527,7 +527,16 @@ router.get('/booking-completed/:worker', async (req, res) => {
 router.get('/available-slots/:worker', async (req, res) => {
     try {
         const { worker } = req.params
+
         await admin.auth().getUser(worker) // check if worker is valid
+        const date = new Date(req.query.start)
+        if (!isValidDate(new Date(start))) {
+            return commonError(res, 'Please provide valid dates. date is invalid.')
+        }
+        let day = date.getDate() // returns day of the month
+        let month = date.getMonth() + 1 //returns the month
+        let year = date.getFullYear() // returns the year. January gives 0
+        let queryString = `booking.${year}-${month}-${day}` //query the exact day for readings
         const timeslots = await bookingModel.findOne({
             _id: worker,
             [queryString]: {
