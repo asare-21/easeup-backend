@@ -602,9 +602,11 @@ router.post('/book-slot', async (req, res) => {
         })
         console.log(booking)
         const newBookingKey = `${year}-${month}-${day}`
-        if (booking === null || booking === undefined) {
+        // check if the document exists
+        const exists = bookingModel.find(worker)
+        if (!exists && !booking) {
+            // create new document
             console.log("Does not exist")
-
             const bookingSlot = bookingModel({
                 _id: worker,
                 booking:
@@ -632,6 +634,31 @@ router.post('/book-slot', async (req, res) => {
                 success: true,
                 worker
             })
+        } else {
+            // update existing document
+            console.log("Exists")
+            const booking = await bookingModel.findOneAndUpdate({
+                _id: worker,
+                [queryString]: {
+                    $exists: true,
+                }
+            }, {
+                $set: {
+                    [queryString]: {
+                        client,
+                        skills,
+                        worker,
+                        start: new Date(start),
+                        name,
+                        commitmentFee: fee,
+                        ref,
+                        latlng, image,
+                        endTime: new Date(end),
+                        workerImage
+                    }
+                }
+            })
+
         }
         return res.status(200).json({
             msg: 'Worker Profile Updated',
