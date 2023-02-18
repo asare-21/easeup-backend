@@ -676,11 +676,11 @@ router.post('/verify-payment', async (req, res) => {
                     [query]:
                         ref
                 },
-                    // {
-                    //     $set: {
-                    //         [queryPaid]: true
-                    //     }
-                    // }
+                    {
+                        $set: {
+                            [queryPaid]: true
+                        }
+                    }
                 )
                 console.log("Found booking ", booking)
                 if (!booking) return commonError(res, 'Booking not found')
