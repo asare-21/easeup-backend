@@ -669,17 +669,19 @@ router.post('/verify-payment', async (req, res) => {
             // console.log(data)
             // console.log(ref, typeof ref)
             if (success) {
-                const booking = await bookingModel.findOneAndUpdate({
+                const booking = await bookingModel.find({
                     "booking.ref": {
 
                         $eq: ref
 
                     }
-                }, {
-                    $set: {
-                        "booking.$.isPaid": true
-                    }
-                })
+                },
+                    //     {
+                    //     $set: {
+                    //         "booking.$.isPaid": true
+                    //     }
+                    // }
+                )
                 console.log(booking)
                 if (!booking) return commonError(res, 'Booking not found')
                 // send notification to device of worker and client
