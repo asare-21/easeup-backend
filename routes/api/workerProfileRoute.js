@@ -670,9 +670,13 @@ router.post('/verify-payment', async (req, res) => {
             // console.log(ref, typeof ref)
             if (success) {
                 const booking = await bookingModel.findOneAndUpdate({
-                    "booking.$.ref": ref
-                },)
-                // console.log(booking)
+                    "booking.ref": ref
+                }, {
+                    $set: {
+                        "booking.$.isPaid": true
+                    }
+                })
+                console.log(booking)
                 // send notification to device of worker and client
                 const workerToken = await workerModel.find(booking.worker)
                 const userToken = await workerModel.find(booking.client)
