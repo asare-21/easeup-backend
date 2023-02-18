@@ -671,10 +671,9 @@ router.post('/verify-payment', async (req, res) => {
             if (success) {
                 const booking = await bookingModel.find({
                     "booking.ref": {
-
                         $eq: ref
-
-                    }
+                    },
+                    $where: this.booking.ref === ref
                 },
                     //     {
                     //     $set: {
