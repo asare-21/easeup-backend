@@ -690,10 +690,10 @@ router.post('/verify-payment', async (req, res) => {
             // console.log(event, data)
             const success = data.gateway_response === 'Approved' && event === 'charge.success'
             const ref = data.reference
-            console.log(ref)
+            console.log(ref, typeof ref)
             if (success) {
                 const booking = await bookingModel.findOneAndUpdate({
-                    "booking.ref": ref
+                    "booking.$.ref": ref
                 }, {
                     $set: {
                         isPaid: true
