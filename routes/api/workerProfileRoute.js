@@ -603,7 +603,7 @@ router.post('/book-slot', async (req, res) => {
         console.log(booking)
         const newBookingKey = `${year}-${month}-${day}`
         // check if the document exists
-        const exists = bookingModel.find(worker)
+        const exists = bookingModel.findById(worker)
         console.log(exists)
         if (!exists) {
             // create new document
