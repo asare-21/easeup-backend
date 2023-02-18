@@ -666,19 +666,19 @@ router.post('/verify-payment', async (req, res) => {
             const success = data.gateway_response === 'Approved' && event === 'charge.success'
             const ref = data.reference
             console.log(data.metadata.custom_fields[4].value)
+            const query = `booking.${data.metadata.custom_fields[5].value}.ref`
+            const queryPaid = `booking.${data.metadata.custom_fields[5].value}.isPaid`
             if (success) {
                 const booking = await bookingModel.findOneAndUpdate({
                     _id: data.metadata.custom_fields[4].value,
                     // select ref from booking array
-                    "booking.$.ref":
+                    [query]:
                         ref
-
-
                 },
                     {
-                        // $set: {
-                        //     "booking.isPaid": true
-                        // }
+                        $set: {
+                            [queryPaid]: true
+                        }
                     }
                 )
                 console.log("Found booking ", booking)
