@@ -604,7 +604,7 @@ router.post('/book-slot', async (req, res) => {
         // check if the document exists
         const exists = bookingModel.findById(worker)
         console.log(exists)
-        if (!exists) {
+        if (!exists && !booking) {
             // create new document
             console.log("Does not exist")
             const bookingSlot = bookingModel({
