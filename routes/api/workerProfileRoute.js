@@ -635,33 +635,6 @@ router.post('/book-slot', async (req, res) => {
                 success: true,
                 worker
             })
-        } else {
-            // update existing document
-            console.log("Exists")
-            const booking = await bookingModel.findOneAndUpdate({
-                _id: worker,
-                [queryString]: {
-                    $exists: true,
-                }
-            }, {
-                $push: {
-                    [queryString]: {
-                        client,
-                        skills,
-                        worker,
-                        start: new Date(start),
-                        name,
-                        commitmentFee: fee,
-                        ref,
-                        latlng, image,
-                        endTime: new Date(end),
-                        workerImage
-                    }
-                }
-            })
-
-            console.log(booking)
-
         }
         return res.status(200).json({
             msg: 'Worker Profile Updated',
