@@ -670,10 +670,10 @@ router.post('/verify-payment', async (req, res) => {
             // console.log(ref, typeof ref)
             if (success) {
                 const booking = await bookingModel.findOneAndUpdate({
-                    "booking": {
-                        ref: {
-                            $eq: ref
-                        }
+                    "booking.ref": {
+
+                        $eq: ref
+
                     }
                 }, {
                     $set: {
@@ -681,6 +681,7 @@ router.post('/verify-payment', async (req, res) => {
                     }
                 })
                 console.log(booking)
+                if (!booking) return commonError(res, 'Booking not found')
                 // send notification to device of worker and client
                 const workerToken = await workerModel.find(booking.worker)
                 const userToken = await workerModel.find(booking.client)
@@ -710,7 +711,6 @@ router.post('/verify-payment', async (req, res) => {
                 })
             }
         }
-        return res.send(200);
     } catch (e) {
         return commonError(res, e.message)
     }
