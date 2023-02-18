@@ -665,7 +665,7 @@ router.post('/verify-payment', async (req, res) => {
             // Retrieve the request's body
             const success = data.gateway_response === 'Approved' && event === 'charge.success'
             const ref = data.reference
-            console.log(data.metadata.custom_fields[4].value)
+            console.log(data.metadata.custom_fields[5].value)
             const query = `booking.${data.metadata.custom_fields[5].value}.ref`
             const queryPaid = `booking.${data.metadata.custom_fields[5].value}.isPaid`
             if (success) {
