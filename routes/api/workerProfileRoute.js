@@ -670,9 +670,9 @@ router.post('/verify-payment', async (req, res) => {
                 const booking = await bookingModel.findOneAndUpdate({
                     _id: data.metadata.custom_fields[4].value,
                     // select ref from booking array
-                    "booking": {
+                    "booking.$.ref":
                         ref
-                    }
+
 
                 },
                     {
