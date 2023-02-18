@@ -599,11 +599,12 @@ router.post('/book-slot', async (req, res) => {
                 }
             }
         })
-        console.log(booking)
+        // console.log(booking)
         const newBookingKey = `${year}-${month}-${day}`
         // check if the document exists
-        const exists = bookingModel.findById(worker)
-        console.log(exists)
+        const exists = await bookingModel.findById(worker)
+        console.log("Existing model", exists)
+        console.log("Fetched model", exists)
         if (!exists && !booking) {
             // create new document
             console.log("Does not exist")
