@@ -658,9 +658,9 @@ router.post('/book-slot', async (req, res) => {
                     }
                 }
             })
+            console.log(booking)
 
         }
-        console.log(booking)
         return res.status(200).json({
             msg: 'Worker Profile Updated',
             status: 200,
