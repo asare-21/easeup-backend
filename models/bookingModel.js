@@ -69,139 +69,19 @@ const bookingSchema = new Schema({
     },
 })
 
+const bookingModel = Schema({
+    _id: {
+        type: String,
+        required: true
+    },
+    booking: {
+        type: Map,
+        of: [bookingSchema],
+        // max 3 bookings per day
 
-
-const workerSlotSchema = new Schema({
-
-    worker: { type: String, required: true },
-    slots: [{
-        date: { type: Date, required: true },
-        startTime: { type: Date, required: true },
-        endTime: { type: Date, required: true },
-        completed: { type: Boolean, default: false }
-    }]
-});
-
-/**
- * 
- * Algorithm requirements
- * 
- * 
- */
-// break everything into small functions
-
-workerSlotSchema.methods.checkCurrentDayAvailability = function (date) { 
-    // Check the availability of the worker for the day
-};
-
-workerSlotSchema.methods.filterPaidSlots = function (date) { 
-    // Use this to return only the slots that have been paid for and not cancelled
-
-
-    this.checkCurrentDayAvailability(date);
-};
-
-
-
-workerSlotSchema.methods.checkSlotAvailability = function (startTime, endTime) {
-    // Check if the slot is not less than 30 minutes apart from existing slots
-    // Check the slots for the day and check if the slot is available
-    //create an object with the date as the key and the value as an array of slots
-
-    let slots = {
-
-    };
-    this.slots.forEach(slot => {
-        const first = new Date(slot.startTime);
-        let firstStringDate = first.getMonth() + first.getDate() + first.getFullYear()
-        if (slots[firstStringDate]) {
-            slots[firstStringDate].push(slot)
-        } else {
-            slots[firstStringDate] = [slot]
-        }
-    })
-    console.log("Availbale slots", slots)
-    const selectedt = new Date(startTime);
-    let selectedtStringDate = selectedt.getMonth() + selectedt.getDate() + selectedt.getFullYear()
-    if (!slots[selectedtStringDate]) return true;
-    if (slots[selectedtStringDate].length === 0) return true;
-
-    for (let i = 0; i < slots[selectedtStringDate].length; i++) {
-        if (startTime <= this.slots[i].endTime && endTime >= this.slots[i].startTime) {
-            return false;
-        }
     }
-    return true;
-};
-
-workerSlotSchema.methods.bookSlot = function (date, startTime, endTime, worker, client, skills, name, fee, ref, latlng, image, workerImage) {
-    // Check if the slot is 3 hours in advance
-    const threeHoursInAdvance = new Date(Date.now() + 1000 * 60 * 60 * 3);
-    if (startTime < threeHoursInAdvance) {
-        return {
-            success: false,
-            msg: 'Slot must be 3 hours in advance'
-        };
-    }
-
-    // Check if the worker already has 15 slots for the day
-    let slotsCount = 0;
+})
 
 
-    for (let i = 0; i < this.slots.length; i++) {
 
-        if (Date(date) === Date(this.slots[i].date)) {
-            slotsCount++;
-        }
-    }
-    if (slotsCount >= 4) {
-        return {
-            success: false,
-            msg: 'Worker already has 4 slots for the day'
-        };
-    }
-
-    // Check if the slot is available
-    if (!this.checkSlotAvailability(startTime, endTime)) {
-        return {
-            success: false,
-            msg: 'Slot not available'
-
-        };
-    }
-
-    // Book the slot
-    this.slots.push({ date: new Date(date), startTime: new Date(startTime), endTime: new Date(endTime) });
-    this.save();
-    // save the booking to the database
-    bookingModel({
-        worker,
-        client,
-        date: new Date(date),
-        skills,
-        name,
-        commitmentFee: fee,
-        ref, latlng, image, workerImage
-    }).save(
-        (err, doc) => {
-            if (err) {
-                console.log(err);
-                return {
-                    success: false,
-                    msg: 'Error booking slot'
-                };
-            }
-            return {
-                success: true,
-                msg: 'Slot booked successfully',
-                worker: doc
-            };
-
-        }
-    )
-};
-
-const workerSlot = model('Worker Slot', workerSlotSchema);
-const bookingModel = model('Booking Model', bookingSchema);
-module.exports.workerSlotModel = workerSlot;
-module.exports.bookingModel = bookingModel;
+module.exports.bookingModel = model('Booking Model', bookingModel);

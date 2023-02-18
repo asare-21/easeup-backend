@@ -9,7 +9,7 @@ const { reviewModel } = require('../../models/reviews_model');
 const { workerProfileModel } = require('../../models/worker_profile_model');
 const { commonError, returnUnAuthUserError } = require('./user_route')
 const { cache } = require('../../cache/user_cache');
-const { workerSlotModel, bookingModel } = require('../../models/bookingModel');
+const { bookingModel } = require('../../models/bookingModel');
 const workerCache = cache;
 const { isValidDate } = require('../../utils');
 const crypto = require('crypto');
@@ -528,7 +528,12 @@ router.get('/available-slots/:worker', async (req, res) => {
     try {
         const { worker } = req.params
         await admin.auth().getUser(worker) // check if worker is valid
-        const timeslots = await bookingModel.find({ worker, $eq: { isPaid: true, cancelled: false } }).sort({ date: -1 }).limit(50)
+        const timeslots = await bookingModel.findOne({
+            _id: worker,
+            [queryString]: {
+                $exists: true,
+            }
+        },)
         return res.status(200).json({
             msg: 'Worker Profile Fetched Successfully',
             status: 200,
@@ -560,36 +565,58 @@ router.post('/book-slot', async (req, res) => {
         if (!worker || !client || !skills || !name || !fee || !ref || !image || !workerImage) return commonError(res, 'Please provide all required fields. Worker, Client, Skills, Fee...')
         await admin.auth().getUser(worker) // check if worker is valid
         await admin.auth().getUser(client) // check if client is valid
-        const workerSlot = await workerSlotModel.findOne({ worker, })
-        console.log(workerSlot === null)
-        console.log(workerSlot)
-        console.log(new Date(start), new Date(end))
-        if (workerSlot === null || workerSlot === undefined) {
+        const date = new Date(start)
+        let day = date.getDate() // returns day of the month
+        let month = date.getMonth() + 1 //returns the month
+        let year = date.getFullYear() // returns the year. January gives 0
+        let queryString = `booking.${year}-${month}-${day}` //query the exact day for readings
+        const booking = await bookingModel.findOneAndUpdate({
+            _id: worker,
+            [queryString]: {
+                $exists: true,
+            }
+        }, {
+            $push: {
+                [queryString]: {
+                    client,
+                    skills,
+                    worker,
+                    start: new Date(start),
+                    name,
+                    commitmentFee: fee,
+                    ref,
+                    latlng, image,
+                    endTime: new Date(end),
+                    workerImage
+                }
+            }
+        })
+        console.log(booking)
+        const newBookingKey = `${year}-${month}-${day}`
+        if (booking === null || booking === undefined) {
             console.log("Does not exist")
 
-            // create new worker slot
-            const newWorkerSlot = new workerSlotModel({
-                worker,
-                slots: [
-                    {
-                        date: new Date(start),
-                        startTime: new Date(start),
-                        endTime: new Date(end),
-                    }]
-            })
             const bookingSlot = bookingModel({
-                worker,
-                client,
-                skills,
-                start: new Date(start),
-                name,
-                commitmentFee: fee,
-                ref,
-                latlng, image,
-                workerImage
+                _id: worker,
+                booking:
+                {
+                    [newBookingKey]: [{
+                        client,
+                        skills,
+                        worker,
+                        start: new Date(start),
+                        name,
+                        commitmentFee: fee,
+                        ref,
+                        latlng, image,
+                        endTime: new Date(end),
+                        workerImage
+                    }]
+                }
+
             })
-            await newWorkerSlot.save()
             await bookingSlot.save();
+
             return res.status(200).json({
                 msg: 'Worker Profile Updated',
                 status: 200,
@@ -597,16 +624,14 @@ router.post('/book-slot', async (req, res) => {
                 worker
             })
         }
-        const result = workerSlot.bookSlot(start, start, end, worker, client, skills, name, fee, ref, latlng, image, workerImage)
-        if (result) {
-            return res.status(200).json({
-                msg: 'Worker Profile Updated',
-                status: 200,
-                success: true,
-                worker: result
-            })
-        }
-        return commonError(res, 'Slot not available')
+        return res.status(200).json({
+            msg: 'Worker Profile Updated',
+            status: 200,
+            success: true,
+            worker
+        })
+
+
     }
     catch (e) {
 
