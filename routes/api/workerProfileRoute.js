@@ -670,7 +670,11 @@ router.post('/verify-payment', async (req, res) => {
             // console.log(ref, typeof ref)
             if (success) {
                 const booking = await bookingModel.findOneAndUpdate({
-                    "booking.ref": ref
+                    "booking": {
+                        $elemMatch: {
+                            ref
+                        }
+                    }
                 }, {
                     $set: {
                         "booking.$.isPaid": true
