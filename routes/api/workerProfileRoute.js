@@ -527,9 +527,9 @@ router.get('/booking-completed/:worker', async (req, res) => {
 router.get('/available-slots/:worker', async (req, res) => {
     try {
         const { worker } = req.params
-
+        const { start } = req.query
         await admin.auth().getUser(worker) // check if worker is valid
-        const date = new Date(req.query.start)
+        const date = new Date(start)
         if (!isValidDate(new Date(start))) {
             return commonError(res, 'Please provide valid dates. date is invalid.')
         }
