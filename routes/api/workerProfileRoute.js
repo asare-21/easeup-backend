@@ -603,8 +603,10 @@ router.post('/book-slot', async (req, res) => {
         const newBookingKey = `${year}-${month}-${day}`
         // check if the document exists
         const exists = await bookingModel.findById(worker)
+
         console.log("Existing model", exists)
         console.log("Fetched model", exists)
+
         if (!exists && !booking) {
             // create new document
             console.log("Does not exist")
@@ -634,6 +636,26 @@ router.post('/book-slot', async (req, res) => {
                 status: 200,
                 success: true,
                 worker
+            })
+        }
+        if (!booking.booking.get(queryString)) {
+            await bookingModel.findOneAndUpdate({
+                _id: worker,
+            }, {
+                $set: {
+                    [queryString]: [{
+                        client,
+                        skills,
+                        worker,
+                        start: new Date(start),
+                        name,
+                        commitmentFee: fee,
+                        ref,
+                        latlng, image,
+                        endTime: new Date(end),
+                        workerImage
+                    }]
+                }
             })
         }
         return res.status(200).json({
