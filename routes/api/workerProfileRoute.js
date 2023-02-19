@@ -689,7 +689,7 @@ router.post('/verify-payment', async (req, res) => {
             const ref = data.reference
             console.log(data.metadata.custom_fields[5].value)
             const query = `booking.${data.metadata.custom_fields[5].value}.ref`
-            const queryPaid = `booking.${data.metadata.custom_fields[5].value}.isPaid`
+            const queryPaid = `booking.${data.metadata.custom_fields[5].value}.$.isPaid`
             console.log("Query ", query)
             if (success) {
                 const booking = await bookingModel.findOneAndUpdate({
