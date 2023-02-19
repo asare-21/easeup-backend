@@ -638,7 +638,7 @@ router.post('/book-slot', async (req, res) => {
                 worker
             })
         }
-        if (!booking.booking.get(queryString)) {
+        if (!exists.booking.get(queryString)) {
             await bookingModel.findOneAndUpdate({
                 _id: worker,
             }, {
