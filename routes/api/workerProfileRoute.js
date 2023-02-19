@@ -702,9 +702,9 @@ router.post('/verify-payment', async (req, res) => {
                     }
                 },
                     {
-                        $set: {
-                            [queryPaid]: true
-                        }
+
+                        [queryPaid]: true
+
                     }
                 )
                 console.log("Found booking ", booking)
