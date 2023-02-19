@@ -674,13 +674,16 @@ router.post('/verify-payment', async (req, res) => {
                     _id: data.metadata.custom_fields[4].value,
                     // select ref from booking array
                     [query]:
-                        ref
-                },
                     {
-                        $set: {
-                            [queryPaid]: true
-                        }
+                        $exists: true,
+                        $eq: ref
                     }
+                },
+                    // {
+                    //     $set: {
+                    //         [queryPaid]: true
+                    //     }
+                    // }
                 )
                 console.log("Found booking ", booking)
                 if (!booking) return commonError(res, 'Booking not found')
