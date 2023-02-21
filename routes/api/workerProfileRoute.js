@@ -142,6 +142,34 @@ router.post('/comments/:worker', async (req, res) => {
 })
 
 
+router.post('/charge', async (req, res) => {
+    const { worker, charge } = req.body
+    try {
+        if (!skills) return commonError(res, 'No skills provided')
+        await admin.auth().getUser(worker) // check if worker is valid
+        workerProfileModel.findOneAndUpdate({ worker }, {
+            base_price: charge
+        }, (err, worker) => {
+            if (err) {
+                return commonError(res, err.message)
+            }
+            return res.status(200).json({
+                msg: 'Worker Profile Updated',
+                status: 200,
+                success: true,
+                worker
+            })
+        })
+    }
+    catch (e) {
+        if (e.errorInfo) {
+            // User Not Found
+            log.warn(e.message)
+            return returnUnAuthUserError(res, e.message)
+        }
+        return commonError(res, e.message)
+    }
+})
 router.post('/skills', async (req, res) => {
     const { worker, skills } = req.body
     try {
