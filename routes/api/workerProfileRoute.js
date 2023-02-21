@@ -145,7 +145,7 @@ router.post('/comments/:worker', async (req, res) => {
 router.post('/charge', async (req, res) => {
     const { worker, charge } = req.body
     try {
-        if (!skills) return commonError(res, 'No skills provided')
+        if (!charge) return commonError(res, 'No skills provided')
         await admin.auth().getUser(worker) // check if worker is valid
         workerProfileModel.findOneAndUpdate({ worker }, {
             base_price: charge
