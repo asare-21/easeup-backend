@@ -622,7 +622,7 @@ router.post('/book-slot', async (req, res) => {
                 _id: worker,
                 booking:
                 {
-                    [newBookingKey]: [{
+                    [queryString]: [{
                         client,
                         skills,
                         worker,
