@@ -614,6 +614,7 @@ router.post('/book-slot', async (req, res) => {
         let month = date.getMonth() + 1 //returns the month
         let year = date.getFullYear() // returns the year. January gives 0
         let queryString = `booking.${year}-${month}-${day}` //query the exact day for readings
+        let newqueryString = `${year}-${month}-${day}` //query the exact day for readings
 
         const fetchBookings = await bookingModel.findOne({ _id: worker })
         if (!fetchBookings) {
@@ -622,7 +623,7 @@ router.post('/book-slot', async (req, res) => {
                 _id: worker,
                 booking:
                 {
-                    [queryString]: [{
+                    [newqueryString]: [{
                         client,
                         skills,
                         worker,
