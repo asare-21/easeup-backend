@@ -568,6 +568,12 @@ router.get('/available-slots/:worker', async (req, res) => {
         const timeslots = await bookingModel.findOne({
             _id: worker,
         },)
+        if (!timeslots) return res.status(200).json({
+            msg: 'Worker Profile Fetched Successfully',
+            status: 200,
+            success: true,
+            timeslots: []
+        })
 
         return res.status(200).json({
             msg: 'Worker Profile Fetched Successfully',
