@@ -123,7 +123,7 @@ router.post('/comments/:worker', async (req, res) => {
         // get worker 
         const workerData = workerModel.findById(worker)
         // send notification to worker
-        await admin.messaging().sendToDevice(workerData.device_token, {
+        await admin.messaging().sendToDevice(workerData.token, {
             notification: {
                 title: 'New Comment',
                 body: `${name} commented on your post`
