@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { admin } = require('../../index');
+const admin = require("firebase-admin");
 const log = require('npmlog');
 const { getWorkerProfileCache, getWorkerPortfolioCache } = require('../../cache/worker_profile');
 const { bookmarkModel } = require('../../models/bookmark_model');
