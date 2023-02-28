@@ -120,6 +120,15 @@ router.post('/comments/:worker', async (req, res) => {
             post,
             name
         })
+        // get worker 
+        const workerData = workerModel.findById(worker)
+        // send notification to worker
+        await admin.messaging().sendToDevice(workerData.device_token, {
+            notification: {
+                title: 'New Comment',
+                body: `${name} commented on your post`
+            }
+        })
         newComment.save((err, comment) => {
             if (err) {
                 return commonError(res, err.message)
