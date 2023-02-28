@@ -121,7 +121,7 @@ router.post('/comments/:worker', async (req, res) => {
             name
         })
         // get worker 
-        const workerData = workerModel.findById(worker)
+        const workerData = await workerModel.findById(worker)
         // send notification to worker
         await admin.messaging().sendToDevice(workerData.token, {
             notification: {
