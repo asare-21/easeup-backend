@@ -77,11 +77,8 @@ router.get('/reviews/:worker', async (req, res) => {
 router.get('/comments/:worker/:post', async (req, res) => {
 
     const { worker, post } = req.params
-
-
     // check if user is authenticated
     try {
-
         await admin.auth().getUser(worker) // check if uid is valid
         commentModel.find({ post }, (err, posts) => {
             if (err) {
@@ -107,17 +104,19 @@ router.get('/comments/:worker/:post', async (req, res) => {
 
 router.post('/comments/:worker', async (req, res) => {
     const { worker } = req.params
-    const { comment, post, from } = req.body
+    const { comment, image, from, post } = req.body
     // check if user is authenticated
     try {
         if (!comment) return commonError(res, 'No comment provided')
         if (!post) return commonError(res, 'No post provided')
         if (!from) return commonError(res, 'No from provided')
+        if (!image) return commonError(res, 'No image provided')
         await admin.auth().getUser(worker) // check if uid is valid
         const newComment = new commentModel({
             comment,
-            post,
-            from
+            image,
+            from,
+            post
         })
         newComment.save((err, comment) => {
             if (err) {
@@ -491,7 +490,8 @@ router.get('/booking-upcoming/:worker', async (req, res) => {
     const { user } = req.query
     try {
         await admin.auth().getUser(worker) // check if worker is valid
-        const bookings = user ? await bookingModel.find({ client: worker, $eq: { completed: false, cancelled: false, isPaid: true } }) : await bookingModel.find({ worker, $eq: { completed: false, cancelled: false } })
+        const bookings = user ? await bookingModel.find().where('booking.$*.worker').equals(worker) : await bookingModel.find({ "booking.client": worker, $eq: { completed: false, cancelled: false } })
+
         return res.status(200).json({
             msg: 'Worker Profile Fetched Successfully',
             status: 200,

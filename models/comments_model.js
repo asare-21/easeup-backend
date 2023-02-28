@@ -26,6 +26,10 @@ const commentSchema = new Schema({
         type: String,
         default: ''
     },
+    image: {
+        type: String,
+        required: true
+    },
     date: {
         type: Date,
         default: Date.now
