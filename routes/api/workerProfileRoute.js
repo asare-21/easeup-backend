@@ -505,7 +505,7 @@ router.get('/booking-upcoming/:worker', async (req, res) => {
     const { user } = req.query
     try {
         await admin.auth().getUser(worker) // check if worker is valid
-        const bookings = user ? await bookingModel.find().where('booking.$*.worker').equals(worker) : await bookingModel.find({ "booking.client": worker, $eq: { completed: false, cancelled: false } })
+        const bookings = bookingModel.find()
 
         return res.status(200).json({
             msg: 'Worker Profile Fetched Successfully',
