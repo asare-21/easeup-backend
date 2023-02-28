@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const admin = require("firebase-admin");
+const { admin } = require('../../index');
 const log = require('npmlog');
 const { getWorkerProfileCache, getWorkerPortfolioCache } = require('../../cache/worker_profile');
 const { bookmarkModel } = require('../../models/bookmark_model');
@@ -125,8 +125,12 @@ router.post('/comments/:worker', async (req, res) => {
         // send notification to worker
         await admin.messaging().sendToDevice(workerData.token, {
             notification: {
-                title: 'New Comment',
+                title: 'New comment',
                 body: `${name} commented on your post`
+            },
+            data: {
+                type: 'comment',
+                post
             }
         })
         newComment.save((err, comment) => {

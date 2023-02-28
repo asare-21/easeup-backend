@@ -295,3 +295,4 @@ async function createNewRoom(_room) {
     }
 }
 
+module.exports.admin = FBadmin
