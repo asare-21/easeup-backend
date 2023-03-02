@@ -742,14 +742,14 @@ router.post('/book-slot', async (req, res) => {
 
         const paidBookings = bookingsFetched.filter(booking => booking.isPaid === true && booking.completed === false) //filter paid bookings that are not completed
         // sort paid bookings according to start time
-        const sortedACTime = paidBookings.sort((a, b) => a.start - b.start)
+        const sortedACTime = paidBookings.sort((a, b) => a.date - b.date)
 
         console.log("Sorted According To Time", sortedACTime)
 
         const result = sortedACTime.filter(booking => {
             // check that booking endtime is at least 30 minutes before the new booking start time
             const end = new Date(booking.endTime)
-            const newDate = new Date(start)
+            const newDate = new Date(date)
 
             console.log('Booking End Time', end.getHours(), end.getMinutes())
             console.log('New Booking Start Time', newDate.getHours(), newDate.getMinutes())
@@ -772,7 +772,7 @@ router.post('/book-slot', async (req, res) => {
                         client,
                         skills,
                         worker,
-                        start: new Date(start),
+                        date: new Date(date),
                         name,
                         commitmentFee: fee,
                         ref,
