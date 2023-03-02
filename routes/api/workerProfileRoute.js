@@ -649,10 +649,10 @@ router.get('/available-slots/:worker', async (req, res) => {
 })
 
 router.post('/book-slot', async (req, res) => {
-    const { worker, client, skills, end, name, fee, ref, latlng, image, workerImage } = req.body
-    const d = req.body.date
+    const { worker, client, start, skills, end, name, fee, ref, latlng, image, workerImage } = req.body
+    // const d = req.body.date
     try {
-        const date = new Date(d)
+        const date = new Date(start)
 
         if (!date || !end) return commonError(res, 'Please provide all required fields. Start and End times are required.')
         //code to check if start and end date are valid
