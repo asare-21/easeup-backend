@@ -649,8 +649,11 @@ router.get('/available-slots/:worker', async (req, res) => {
 })
 
 router.post('/book-slot', async (req, res) => {
-    const { worker, client, skills, date, end, name, fee, ref, latlng, image, workerImage } = req.body
+    const { worker, client, skills, end, name, fee, ref, latlng, image, workerImage } = req.body
+    const d = req.body.date
     try {
+        const date = new Date(d)
+
         if (!date || !end) return commonError(res, 'Please provide all required fields. Start and End times are required.')
         //code to check if start and end date are valid
         if (!isValidDate(new Date(date))) {
@@ -663,7 +666,6 @@ router.post('/book-slot', async (req, res) => {
         await admin.auth().getUser(worker) // check if worker is valid
         await admin.auth().getUser(client) // check if client is valid
         const today = Date.now()
-        const date = new Date(date)
 
         // return error if date is in the past
         if (today > new Date(date)) return commonError(res, 'Please provide a valid date. Date cannot be in the past.')
