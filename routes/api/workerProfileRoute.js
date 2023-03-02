@@ -663,9 +663,10 @@ router.post('/book-slot', async (req, res) => {
         await admin.auth().getUser(worker) // check if worker is valid
         await admin.auth().getUser(client) // check if client is valid
         const today = Date.now()
+        const date = new Date(date)
+
         // return error if date is in the past
         if (today > new Date(date)) return commonError(res, 'Please provide a valid date. Date cannot be in the past.')
-        const date = new Date(date)
         let day = date.getDate() // returns day of the month
         let month = date.getMonth() + 1 //returns the month
         let year = date.getFullYear() // returns the year. January gives 0
