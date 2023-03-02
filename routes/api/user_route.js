@@ -409,7 +409,7 @@ router.post('/create', async (req, res) => {
         const existingWorker = await workerModel.findById(user_id).exec()
         if (existingWorker) {
             // Worker Already Exists
-            return res.status(200).json({ user: existingWorker, msg: 'Worker exists. Account not created', status: 200, success: false })
+            return res.status(400).json({ user: existingWorker, msg: 'Worker exists. Account not created', status: 400, success: false })
         }
         // check if user already exists
         const userExists = await userModel
