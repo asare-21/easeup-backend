@@ -21,6 +21,7 @@ const options = {
 
 }
 const { getUserCache, cache } = require('../../cache/user_cache');
+const { workerModel } = require('../../models/worker_models');
 const userCache = cache;
 function returnUnAuthUserError(res, msg) {
     console.log(msg)
@@ -405,6 +406,11 @@ router.post('/create', async (req, res) => {
             }
         }
         if (missing_fields.length > 0) return res.status(400).json({ msg: 'Bad Request. Missing fields', status: 400, success: false, missing_fields }) // At least one field is required
+        const existingWorker = await workerModel.findById(user_id).exec()
+        if (existingWorker) {
+            // Worker Already Exists
+            return res.status(200).json({ user: existingWorker, msg: 'Worker exists. Account not created', status: 200, success: true })
+        }
         // check if user already exists
         const userExists = await userModel
             .findOne({ _id: user_id })

@@ -535,6 +535,7 @@ router.post('/booking-status', async (req, res) => {
         const month = date.getMonth() + 1
         const year = date.getFullYear()
         const query = `booking.${year}-${month}-${day}.ref`
+        const queryUpdate = `booking.${year}-${month}-${day}.$.completed`
         console.log(query)
         const booking = await bookingModel.findOneAndUpdate({
             _id: worker,
@@ -542,7 +543,7 @@ router.post('/booking-status', async (req, res) => {
             [query]: ref
 
         }, {
-            completed: true
+            [queryUpdate]: true
         },)
         console.log(booking)
         if (!booking) return commonError(res, 'Booking not found')
@@ -551,7 +552,6 @@ router.post('/booking-status', async (req, res) => {
             status: 200,
             success: true,
             booking,
-            body: req.body
         })
 
     } catch (e) {
