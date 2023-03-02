@@ -523,6 +523,47 @@ router.get('/booking-upcoming/:worker', async (req, res) => {
     }
 })
 
+// update booking status
+router.post('/booking-status', async (req, res) => {
+    const { worker, client, ref } = req.body
+    const bookedDate = req.body.date
+    try {
+        await admin.auth().getUser(worker) // check if worker is valid
+        await admin.auth().getUser(client) // check if user is valid
+        const date = new Date(bookedDate)
+        const day = date.getDate()
+        const month = date.getMonth() + 1
+        const year = date.getFullYear()
+        const query = `booking.${year}-${month}-${day}.ref`
+        console.log(query)
+        const booking = await bookingModel.findOneAndUpdate({
+            _id: worker,
+            // [query]: ref
+            [query]: ref
+
+        }, {
+            completed: true
+        },)
+        console.log(booking)
+        if (!booking) return commonError(res, 'Booking not found')
+        return res.status(200).json({
+            msg: 'Booking Updated Successfully',
+            status: 200,
+            success: true,
+            booking,
+            body: req.body
+        })
+
+    } catch (e) {
+        if (e.errorInfo) {
+            // User Not Found
+            log.warn(e.message)
+            return returnUnAuthUserError(res, e.message)
+        }
+
+        return commonError(res, e.message)
+    }
+})
 //cancelled
 router.get('/booking-cancelled/:worker', async (req, res) => {
     const { worker } = req.params
@@ -608,11 +649,11 @@ router.get('/available-slots/:worker', async (req, res) => {
 })
 
 router.post('/book-slot', async (req, res) => {
-    const { worker, client, skills, start, end, name, fee, ref, latlng, image, workerImage } = req.body
+    const { worker, client, skills, date, end, name, fee, ref, latlng, image, workerImage } = req.body
     try {
-        if (!start || !end) return commonError(res, 'Please provide all required fields. Start and End times are required.')
+        if (!date || !end) return commonError(res, 'Please provide all required fields. Start and End times are required.')
         //code to check if start and end date are valid
-        if (!isValidDate(new Date(start))) {
+        if (!isValidDate(new Date(date))) {
             return commonError(res, 'Please provide valid dates. ' + (i === 0 ? 'Start' : 'End') + ' date is invalid.')
         }
         if (!isValidDate(new Date(end))) {
@@ -623,8 +664,8 @@ router.post('/book-slot', async (req, res) => {
         await admin.auth().getUser(client) // check if client is valid
         const today = Date.now()
         // return error if date is in the past
-        if (today > new Date(start)) return commonError(res, 'Please provide a valid date. Date cannot be in the past.')
-        const date = new Date(start)
+        if (today > new Date(date)) return commonError(res, 'Please provide a valid date. Date cannot be in the past.')
+        const date = new Date(date)
         let day = date.getDate() // returns day of the month
         let month = date.getMonth() + 1 //returns the month
         let year = date.getFullYear() // returns the year. January gives 0
@@ -642,7 +683,7 @@ router.post('/book-slot', async (req, res) => {
                         client,
                         skills,
                         worker,
-                        start: new Date(start),
+                        date: new Date(date),
                         name,
                         commitmentFee: fee,
                         ref,
@@ -673,7 +714,7 @@ router.post('/book-slot', async (req, res) => {
                         client,
                         skills,
                         worker,
-                        start: new Date(start),
+                        date: new Date(date),
                         name,
                         commitmentFee: fee,
                         ref,
