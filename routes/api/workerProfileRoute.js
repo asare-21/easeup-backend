@@ -167,6 +167,10 @@ router.post('/charge', async (req, res) => {
             if (err) {
                 return commonError(res, err.message)
             }
+
+            workerCache.del(`worker-profile/${worker}`)
+
+
             return res.status(200).json({
                 msg: 'Worker Profile Updated',
                 status: 200,
@@ -184,6 +188,7 @@ router.post('/charge', async (req, res) => {
         return commonError(res, e.message)
     }
 })
+
 router.post('/skills', async (req, res) => {
     const { worker, skills } = req.body
     try {
@@ -195,6 +200,9 @@ router.post('/skills', async (req, res) => {
             if (err) {
                 return commonError(res, err.message)
             }
+
+            workerCache.del(`worker-profile/${worker}`)
+
             return res.status(200).json({
                 msg: 'Worker Profile Updated',
                 status: 200,
@@ -224,10 +232,9 @@ router.post('/bio', async (req, res) => {
             if (err) {
                 return commonError(res, err.message)
             }
-            workerCache.set(`worker-profile/${worker}`, {
-                ...result,
-                bio
-            })
+
+            workerCache.del(`worker-profile/${worker}`)
+
             return res.status(200).json({
                 msg: 'Worker Profile Updated',
                 status: 200,
@@ -259,10 +266,8 @@ router.post('/instagram', async (req, res) => {
             if (err) {
                 return commonError(res, err.message)
             }
-            // workerCache.set(`worker-profile/${worker}`, {
-            //     ...result,
-            //     ig
-            // })
+            workerCache.del(`worker-profile/${worker}`)
+
             return res.status(200).json({
                 msg: 'Worker Profile Updated',
                 status: 200,
@@ -344,10 +349,7 @@ router.post('/portfolio', async (req, res) => {
                         console.log(err)
                         return commonError(res, err.message)
                     }
-                    // workerCache.set(`worker-profile/${worker}`, {
-                    //     ...result,
-                    //     twitter
-                    // })
+                    workerCache.del(`portfolio/${worker}`)
                     return res.status(200).json({
                         msg: 'Worker Profile Updated',
                         status: 200,
@@ -370,6 +372,8 @@ router.post('/portfolio', async (req, res) => {
                         console.log(err)
                         return commonError(res, err.message)
                     }
+
+                    workerCache.del(`portfolio/${worker}`)
 
                     return res.status(200).json({
                         msg: 'Worker Profile Updated',
