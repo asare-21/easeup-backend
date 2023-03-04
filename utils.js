@@ -71,6 +71,7 @@ async function getAndCacheWorkerMedia() {
 
 const isValidDate = (date) => {
     console.log(Object.prototype.toString.call(new Date(date)))
+    console.log(new Date(date).getTime())
     if (Object.prototype.toString.call(new Date(date)) !== "[object Date]") {
         return false;
     }
