@@ -110,12 +110,12 @@ router.post('/comments/:worker', async (req, res) => {
         if (!comment) return commonError(res, 'No comment provided')
         if (!post) return commonError(res, 'No post provided')
         if (!from) return commonError(res, 'No from provided')
-        // if (!image) return commonError(res, 'No image provided')
+        if (!image) return commonError(res, 'No image provided')
         if (!name) return commonError(res, 'No name provided')
         await admin.auth().getUser(worker) // check if uid is valid
         const newComment = new commentModel({
             comment,
-            // image,
+            image,
             from,
             post,
             name

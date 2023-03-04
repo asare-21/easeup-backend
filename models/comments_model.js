@@ -26,10 +26,10 @@ const commentSchema = new Schema({
         type: String,
         default: ''
     },
-    // image: {
-    //     type: String,
-    //     required: true
-    // },
+    image: {
+        type: String,
+        required: true
+    },
     name: {
         type: String,
         required: true
