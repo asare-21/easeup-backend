@@ -661,12 +661,12 @@ router.post('/book-slot', async (req, res) => {
 
         if (!date || !end) return commonError(res, 'Please provide all required fields. Start and End times are required.')
         //code to check if start and end date are valid
-        if (!isValidDate(start)) {
-            return commonError(res, 'Please provide valid dates. a  date is invalid.')
-        }
-        if (!isValidDate(end)) {
-            return commonError(res, 'Please provide valid dates. b date is invalid.')
-        }
+        // if (!isValidDate(start)) {
+        //     return commonError(res, 'Please provide valid dates. a  date is invalid.')
+        // }
+        // if (!isValidDate(end)) {
+        //     return commonError(res, 'Please provide valid dates. b date is invalid.')
+        // }
         if (!worker || !client || !skills || !name || !fee || !ref || !image || !workerImage) return commonError(res, 'Please provide all required fields. Worker, Client, Skills, Fee...')
         await admin.auth().getUser(worker) // check if worker is valid
         await admin.auth().getUser(client) // check if client is valid

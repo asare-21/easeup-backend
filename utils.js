@@ -69,18 +69,10 @@ async function getAndCacheWorkerMedia() {
     })
 }
 
-const isValidDate = (date) => {
-    console.log(Object.prototype.toString.call(new Date(date)))
-    console.log(new Date(date).getTime())
-    if (Object.prototype.toString.call(new Date(date)) !== "[object Date]") {
-        return false;
-    }
-    return !isNaN(new Date(date).getTime());
-};
+
 
 //export
 module.exports.getAndCacheUsers = getAndCacheUsers;
 module.exports.getAndCacheWorkers = getAndCacheWorkers;
 module.exports.getAndCacheWorkerProfiles = getAndCacheWorkerProfiles;
 module.exports.getAndCacheWorkerMedia = getAndCacheWorkerMedia;
-module.exports.isValidDate = isValidDate;
