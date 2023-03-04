@@ -301,10 +301,8 @@ router.post('/twitter', async (req, res) => {
             if (err) {
                 return commonError(res, err.message)
             }
-            // workerCache.set(`worker-profile/${worker}`, {
-            //     ...result,
-            //     twitter
-            // })
+            workerCache.del(`worker-profile/${worker}`)
+
             return res.status(200).json({
                 msg: 'Worker Profile Updated',
                 status: 200,
