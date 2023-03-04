@@ -658,6 +658,8 @@ router.post('/book-slot', async (req, res) => {
     try {
         const date = new Date(start)
         console.log(req.body)
+        console.log(typeof (date))
+        console.log(typeof start)
 
         if (!date || !end) return commonError(res, 'Please provide all required fields. Start and End times are required.')
 
@@ -686,7 +688,7 @@ router.post('/book-slot', async (req, res) => {
                         client,
                         skills,
                         worker,
-                        date: new Date(date),
+                        date: new Date(start),
                         name,
                         commitmentFee: fee,
                         ref,
@@ -717,7 +719,8 @@ router.post('/book-slot', async (req, res) => {
                         client,
                         skills,
                         worker,
-                        date: new Date(date),
+                        date: new Date(start),
+
 
                         name,
                         commitmentFee: fee,
@@ -772,7 +775,8 @@ router.post('/book-slot', async (req, res) => {
                         client,
                         skills,
                         worker,
-                        date: new Date(date),
+                        date: new Date(start),
+
 
                         name,
                         commitmentFee: fee,
