@@ -661,7 +661,7 @@ router.post('/book-slot', async (req, res) => {
 
         if (!date || !end) return commonError(res, 'Please provide all required fields. Start and End times are required.')
         //code to check if start and end date are valid
-        if (!isValidDate(date)) {
+        if (!isValidDate(start)) {
             return commonError(res, 'Please provide valid dates.  date is invalid.')
         }
         if (!isValidDate(end)) {
