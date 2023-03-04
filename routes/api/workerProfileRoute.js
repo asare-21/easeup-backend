@@ -660,20 +660,15 @@ router.post('/book-slot', async (req, res) => {
         console.log(req.body)
 
         if (!date || !end) return commonError(res, 'Please provide all required fields. Start and End times are required.')
-        //code to check if start and end date are valid
-        // if (!isValidDate(start)) {
-        //     return commonError(res, 'Please provide valid dates. a  date is invalid.')
-        // }
-        // if (!isValidDate(end)) {
-        //     return commonError(res, 'Please provide valid dates. b date is invalid.')
-        // }
+
         if (!worker || !client || !skills || !name || !fee || !ref || !image || !workerImage) return commonError(res, 'Please provide all required fields. Worker, Client, Skills, Fee...')
         await admin.auth().getUser(worker) // check if worker is valid
         await admin.auth().getUser(client) // check if client is valid
         const today = Date.now()
 
+        console.log(today, date.getTime())
         // return error if date is in the past
-        if (today > new Date(date)) return commonError(res, 'Please provide a valid date. Date cannot be in the past.')
+        if (today > date.getTime()) return commonError(res, 'Please provide a valid date. Date cannot be in the past.')
         let day = date.getDate() // returns day of the month
         let month = date.getMonth() + 1 //returns the month
         let year = date.getFullYear() // returns the year. January gives 0
