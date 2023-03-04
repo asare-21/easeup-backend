@@ -686,7 +686,7 @@ router.post('/book-slot', async (req, res) => {
                         client,
                         skills,
                         worker,
-                        date,
+                        date: new Date(date),
                         name,
                         commitmentFee: fee,
                         ref,
@@ -695,8 +695,8 @@ router.post('/book-slot', async (req, res) => {
                         workerImage
                     }]
                 }
-
             })
+            //
             await bookingSlot.save();
             // return response
             return res.status(200).json({
@@ -717,7 +717,8 @@ router.post('/book-slot', async (req, res) => {
                         client,
                         skills,
                         worker,
-                        date,
+                        date: new Date(date),
+
                         name,
                         commitmentFee: fee,
                         ref,
@@ -743,7 +744,6 @@ router.post('/book-slot', async (req, res) => {
         const paidBookings = bookingsFetched.filter(booking => booking.isPaid === true && booking.completed === false) //filter paid bookings that are not completed
         // sort paid bookings according to start time
         const sortedACTime = paidBookings.sort((a, b) => a.date - b.date)
-
         console.log("Sorted According To Time", sortedACTime)
 
         const result = sortedACTime.filter(booking => {
@@ -772,7 +772,8 @@ router.post('/book-slot', async (req, res) => {
                         client,
                         skills,
                         worker,
-                        date,
+                        date: new Date(date),
+
                         name,
                         commitmentFee: fee,
                         ref,
@@ -793,10 +794,6 @@ router.post('/book-slot', async (req, res) => {
             console.log("This slot is not available. Please choose another slot.")
             return commonError(res, 'This slot is not available. Please choose another slot.')
         }
-
-
-
-
     }
     catch (e) {
 
