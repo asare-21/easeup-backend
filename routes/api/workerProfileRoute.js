@@ -110,12 +110,12 @@ router.post('/comments/:worker', async (req, res) => {
         if (!comment) return commonError(res, 'No comment provided')
         if (!post) return commonError(res, 'No post provided')
         if (!from) return commonError(res, 'No from provided')
-        if (!image) return commonError(res, 'No image provided')
+        // if (!image) return commonError(res, 'No image provided')
         if (!name) return commonError(res, 'No name provided')
         await admin.auth().getUser(worker) // check if uid is valid
         const newComment = new commentModel({
             comment,
-            image,
+            // image,
             from,
             post,
             name
@@ -342,12 +342,14 @@ router.post('/portfolio', async (req, res) => {
                         thumbnail
                     },
                 })
+
+                workerCache.del(`portfolio/${worker}`)
+
                 newMedia.save((err, worker) => {
                     if (err) {
                         console.log(err)
                         return commonError(res, err.message)
                     }
-                    workerCache.del(`portfolio/${worker}`)
                     return res.status(200).json({
                         msg: 'Worker Profile Updated',
                         status: 200,
