@@ -530,15 +530,16 @@ router.get('/booking-upcoming/:worker', async (req, res) => {
 // update booking status
 router.post('/booking-status', async (req, res) => {
     const { worker, client, ref } = req.body
-    const bookedDate = req.body.date
     try {
         await admin.auth().getUser(worker) // check if worker is valid
         await admin.auth().getUser(client) // check if user is valid
         console.log(query)
-        const booking = await bookingModel.findOneAndUpdate({            // [query]: ref
+        const booking = await bookingModel.findOneAndUpdate({
+            worker,
+            client,
             ref
         }, {
-            isPaid: true
+            completed: true
         },)
         console.log(booking)
         if (!booking) return commonError(res, 'Booking not found')
@@ -743,23 +744,12 @@ router.post('/verify-payment', async (req, res) => {
             const success = data.gateway_response === 'Approved' && event === 'charge.success'
             const ref = data.reference
             console.log(data.metadata.custom_fields[5].value)
-            const query = `booking.${data.metadata.custom_fields[5].value}.ref`
-            const queryPaid = `booking.${data.metadata.custom_fields[5].value}.$.isPaid`
-            console.log("Query ", query)
             if (success) {
                 const booking = await bookingModel.findOneAndUpdate({
-                    _id: data.metadata.custom_fields[4].value,
-                    // select ref from booking array
-                    [query]:
-                    {
-                        $exists: true,
-                        $eq: ref
-                    }
+                    ref
                 },
                     {
-
-                        [queryPaid]: true
-
+                        isPaid: true
                     }
                 )
                 console.log("Found booking ", booking)
@@ -799,9 +789,7 @@ router.post('/verify-payment', async (req, res) => {
         }
     } catch (e) {
         return commonError(res, e.message)
-    } // "booking.ref": {
-    //     $eq: ref
-    // },
+    }
 })
 
 module.exports.workerProfileRoute = router
