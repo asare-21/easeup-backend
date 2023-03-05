@@ -509,6 +509,7 @@ router.get('/booking-upcoming/:worker', async (req, res) => {
     const { user } = req.query
     try {
         await admin.auth().getUser(worker) // check if worker is valid
+        console.log("User variable ", user)
         const bookings = await bookingModel.find({ [user ? 'client' : 'worker']: worker, isPaid: true, completed: false })
 
 
