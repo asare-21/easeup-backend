@@ -509,7 +509,7 @@ router.get('/booking-upcoming/:worker', async (req, res) => {
     const { user } = req.query
     try {
         await admin.auth().getUser(worker) // check if worker is valid
-        const bookings = await bookingModel.find({ [user ? 'client' : 'worker']: worker, })
+        const bookings = await bookingModel.find({ [user ? 'client' : 'worker']: worker, isPaid: true, completed: false })
 
         return res.status(200).json({
             msg: 'Worker Profile Fetched Successfully',
