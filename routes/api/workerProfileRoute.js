@@ -527,6 +527,32 @@ router.get('/booking-upcoming/:worker', async (req, res) => {
     }
 })
 
+// completed
+router.get('/booking-completed/:worker', async (req, res) => {
+    const { worker } = req.params
+    const { user } = req.query
+    try {
+        await admin.auth().getUser(worker) // check if worker is valid
+        const bookings = await bookingModel.find({ [user ? 'client' : 'worker']: worker, isPaid: true, completed: true })
+
+
+        return res.status(200).json({
+            msg: 'Worker Profile Fetched Successfully',
+            status: 200,
+            success: true,
+            bookings
+        })
+    } catch (e) {
+        if (e.errorInfo) {
+            // User Not Found
+            log.warn(e.message)
+            return returnUnAuthUserError(res, e.message)
+        }
+        return commonError(res, e.message)
+    }
+})
+
+
 // update booking status
 router.put('/booking-status', async (req, res) => {
     const { worker, client, ref } = req.body
@@ -566,7 +592,6 @@ router.post('/worker-review', async (req, res) => {
     try {
         await admin.auth().getUser(worker) // check if worker is valid
         await admin.auth().getUser(user) // check if user is valid
-        console.log(query)
         const reviewM = new reviewModel({
             worker,
             user,
@@ -596,7 +621,6 @@ router.get('/worker-review/:worker', async (req, res) => {
     try {
         const worker = req.params.worker
         await admin.auth().getUser(worker) // check if worker is valid
-        console.log(query)
 
         const reviews = await reviewModel.find({ worker }).limit(80).sort({ date: -1 })
         const avgRating = await reviewModel.aggregate([
