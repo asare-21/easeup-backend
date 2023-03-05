@@ -31,6 +31,7 @@ const { chatModel } = require('./models/chat_message_model');
 const { workerModel } = require('./models/worker_models');
 const { userModel } = require('./models/user_model');
 const { getAndCacheUsers, getAndCacheWorkerMedia, getAndCacheWorkerProfiles, getAndCacheWorkers } = require('./utils');
+const { dashboard } = require('./routes/api/dashboard');
 const limiter = rateLimit({
     windowMs: 30 * 60 * 1000, // 30 minutes
     max: 1000, // Limit each IP to 1000 requests per `window` (here, per 15 minutes)
@@ -88,6 +89,7 @@ if (process.env.NODE_ENV === 'production') {
     api.use('/worker', workerRoute)
     api.use('/worker-profile', workerProfileRoute)
     api.use('/room', chatRoute)
+    api.use('/dashboard', dashboard)
     // handle 404
     api.use((req, res, next) => {
         return res.status(404).json({
