@@ -534,20 +534,12 @@ router.post('/booking-status', async (req, res) => {
     try {
         await admin.auth().getUser(worker) // check if worker is valid
         await admin.auth().getUser(client) // check if user is valid
-        const date = new Date(bookedDate)
-        const day = date.getDate()
-        const month = date.getMonth() + 1
-        const year = date.getFullYear()
-        const query = `booking.${year}-${month}-${day}.ref`
-        const queryUpdate = `booking.${year}-${month}-${day}.$.completed`
         console.log(query)
-        const booking = await bookingModel.findOneAndUpdate({
-            _id: worker,
-            // [query]: ref
-            [query]: ref
+        const booking = await bookingModel.findOneAndUpdate({            // [query]: ref
+            ref
 
         }, {
-            [queryUpdate]: true
+            isPaid: true
         },)
         console.log(booking)
         if (!booking) return commonError(res, 'Booking not found')
