@@ -533,7 +533,6 @@ router.put('/booking-status', async (req, res) => {
     try {
         await admin.auth().getUser(worker) // check if worker is valid
         await admin.auth().getUser(client) // check if user is valid
-        console.log(query)
         const booking = await bookingModel.findOneAndUpdate({
             worker,
             client,
