@@ -675,27 +675,6 @@ router.get('/booking-cancelled/:worker', async (req, res) => {
         return commonError(res, e.message)
     }
 })
-// completed
-router.get('/booking-completed/:worker', async (req, res) => {
-    const { worker } = req.params
-    try {
-        await admin.auth().getUser(worker) // check if worker is valid
-        const bookings = await bookingModel.find({ worker, $eq: { completed: true, isPaid: true } })
-        return res.status(200).json({
-            msg: 'Worker Profile Fetched Successfully',
-            status: 200,
-            success: true,
-            bookings
-        })
-    } catch (e) {
-        if (e.errorInfo) {
-            // User Not Found
-            log.warn(e.message)
-            return returnUnAuthUserError(res, e.message)
-        }
-        return commonError(res, e.message)
-    }
-})
 
 
 router.get('/available-slots/:worker', async (req, res) => {
