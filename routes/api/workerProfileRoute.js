@@ -576,7 +576,6 @@ router.post('/worker-review', async (req, res) => {
         },)
         // save review
         await reviewM.save()
-
         return res.status(200).json({
             msg: 'Reveiw saved',
             status: 200,
@@ -598,7 +597,6 @@ router.get('/worker-review/:worker', async (req, res) => {
     try {
         const worker = req.params.worker
         await admin.auth().getUser(worker) // check if worker is valid
-        await admin.auth().getUser(user) // check if user is valid
         console.log(query)
 
         const reviews = await reviewModel.find({ worker }).limit(80).sort({ date: -1 })
