@@ -528,7 +528,7 @@ router.get('/booking-upcoming/:worker', async (req, res) => {
 })
 
 // update booking status
-router.post('/booking-status', async (req, res) => {
+router.put('/booking-status', async (req, res) => {
     const { worker, client, ref } = req.body
     try {
         await admin.auth().getUser(worker) // check if worker is valid
@@ -550,6 +550,79 @@ router.post('/booking-status', async (req, res) => {
             booking,
         })
 
+    } catch (e) {
+        if (e.errorInfo) {
+            // User Not Found
+            log.warn(e.message)
+            return returnUnAuthUserError(res, e.message)
+        }
+
+        return commonError(res, e.message)
+    }
+})
+
+// receive worker review
+router.post('/worker-review', async (req, res) => {
+    const { worker, user, rating, review, } = req.body
+    try {
+        await admin.auth().getUser(worker) // check if worker is valid
+        await admin.auth().getUser(user) // check if user is valid
+        console.log(query)
+        const reviewM = new reviewModel({
+            worker,
+            user,
+            rating,
+            review,
+        },)
+        // save review
+        await reviewM.save()
+
+        return res.status(200).json({
+            msg: 'Reveiw saved',
+            status: 200,
+            success: true,
+        })
+
+    } catch (e) {
+        if (e.errorInfo) {
+            // User Not Found
+            log.warn(e.message)
+            return returnUnAuthUserError(res, e.message)
+        }
+
+        return commonError(res, e.message)
+    }
+})
+// get worker reviews
+router.get('/worker-review/:worker', async (req, res) => {
+    try {
+        const worker = req.params.worker
+        await admin.auth().getUser(worker) // check if worker is valid
+        await admin.auth().getUser(user) // check if user is valid
+        console.log(query)
+
+        const reviews = await reviewModel.find({ worker }).limit(80).sort({ date: -1 })
+        const avgRating = await reviewModel.aggregate([
+            {
+                $match: { worker }
+            },
+            {
+                $group: {
+                    _id: null,
+                    avgRating: { $avg: "$rating" }
+                }
+            }
+        ]).exec()
+        const totalReviews = await reviewModel.countDocuments({ worker })
+        console.log(avgRating)
+        return res.status(200).json({
+            msg: 'Reveiw saved',
+            status: 200,
+            success: true,
+            reviews,
+            avgRating: avgRating[0].avgRating,
+            total: totalReviews
+        })
     } catch (e) {
         if (e.errorInfo) {
             // User Not Found
