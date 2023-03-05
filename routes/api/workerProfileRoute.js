@@ -542,6 +542,7 @@ router.get('/booking-completed/:worker', async (req, res) => {
             success: true,
             bookings
         })
+
     } catch (e) {
         if (e.errorInfo) {
             // User Not Found
