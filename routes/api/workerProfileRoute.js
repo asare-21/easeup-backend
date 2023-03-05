@@ -517,7 +517,6 @@ router.get('/booking-upcoming/:worker', async (req, res) => {
             status: 200,
             success: true,
             bookings,
-            body: req.body
         })
     } catch (e) {
         if (e.errorInfo) {
