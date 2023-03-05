@@ -67,21 +67,14 @@ const bookingSchema = new Schema({
         type: String,
         required: true
     },
-})
-
-const bookingModel = Schema({
-    _id: {
+    day: {
         type: String,
         required: true
-    },
-    booking: {
-        type: Map,
-        of: [bookingSchema],
-        // max 3 bookings per day
-
     }
 })
 
 
 
-module.exports.bookingModel = model('Booking Model', bookingModel);
+
+
+module.exports.bookingModel = model('Booking Model', bookingSchema);

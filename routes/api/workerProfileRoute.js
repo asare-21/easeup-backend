@@ -615,19 +615,15 @@ router.get('/booking-completed/:worker', async (req, res) => {
 router.get('/available-slots/:worker', async (req, res) => {
     try {
         const { worker } = req.params
-        const { start } = req.query
+        const { start, day, user } = req.query
         await admin.auth().getUser(worker) // check if worker is valid
         const date = new Date(start)
-        if (!isValidDate(new Date(start))) {
-            return commonError(res, 'Please provide valid dates. date is invalid.')
-        }
-        let day = date.getDate() // returns day of the month
-        let month = date.getMonth() + 1 //returns the month
-        let year = date.getFullYear() // returns the year. January gives 0
-        // let queryString = `booking.${year}-${month}-${day}` //query the exact day for readings
-        const timeslots = await bookingModel.findOne({
-            _id: worker,
+
+        const timeslots = await bookingModel.find({
+            [user ? 'client' : 'worker']: worker,
+            day
         },)
+
         if (!timeslots) return res.status(200).json({
             msg: 'Worker Profile Fetched Successfully',
             status: 200,
@@ -639,7 +635,7 @@ router.get('/available-slots/:worker', async (req, res) => {
             msg: 'Worker Profile Fetched Successfully',
             status: 200,
             success: true,
-            timeslots: timeslots.booking.get(`${year}-${month}-${day}`) || []
+            timeslots
         })
     }
     catch (e) {
@@ -653,7 +649,7 @@ router.get('/available-slots/:worker', async (req, res) => {
 })
 
 router.post('/book-slot', async (req, res) => {
-    const { worker, client, start, skills, end, name, fee, ref, latlng, image, workerImage } = req.body
+    const { worker, client, start, skills, end, name, fee, ref, latlng, image, workerImage, day } = req.body
     // const d = req.body.date
     try {
         const date = new Date(start)
@@ -666,137 +662,73 @@ router.post('/book-slot', async (req, res) => {
         if (!worker || !client || !skills || !name || !fee || !ref || !image || !workerImage) return commonError(res, 'Please provide all required fields. Worker, Client, Skills, Fee...')
         await admin.auth().getUser(worker) // check if worker is valid
         await admin.auth().getUser(client) // check if client is valid
-        const today = Date.now()
-
-        console.log(today, date.getTime())
         // return error if date is in the past
-        if (today > date.getTime()) return commonError(res, 'Please provide a valid date. Date cannot be in the past.')
-        let day = date.getDate() // returns day of the month
-        let month = date.getMonth() + 1 //returns the month
-        let year = date.getFullYear() // returns the year. January gives 0
-        let queryString = `booking.${year}-${month}-${day}` //query the exact day for readings
-        let newqueryString = `${year}-${month}-${day}` //query the exact day for readings
+        const foundBookings = await bookingModel.find({ worker: worker, isPaid: true, completed: false, cancelled: false, day })
+        console.log(foundBookings)
 
-        const fetchBookings = await bookingModel.findOne({ _id: worker })
-        if (!fetchBookings) {
-            // Does not exist. Go ahead and create
-            const bookingSlot = bookingModel({
-                _id: worker,
-                booking:
-                {
-                    [newqueryString]: [{
-                        client,
-                        skills,
-                        worker,
-                        date: new Date(start),
-                        name,
-                        commitmentFee: fee,
-                        ref,
-                        latlng, image,
-                        endTime: new Date(end),
-                        workerImage
-                    }]
-                }
-            })
-            //
-            await bookingSlot.save();
-            // return response
-            return res.status(200).json({
-                msg: 'Slot has been booked successfully',
-                status: 200,
-                success: true,
-                worker
-            })
+        if (foundBookings.length === 3) {
+            return commonError(res, 'All slots for the day have been booked. Please select another day.')
         }
-        const bookingsFetched = fetchBookings.booking.get(`${year}-${month}-${day}`)
-        if (!bookingsFetched) {
-            // Does not exist. Go ahead and create
-            const bookingSlot = await bookingModel.findOneAndUpdate({
-                _id: worker,
-            }, {
-                $set: {
-                    [queryString]: [{
-                        client,
-                        skills,
-                        worker,
-                        date: new Date(start),
+        // check time difference between last booking and current booking
+        const lastBooking = foundBookings[foundBookings.length - 1]
+        if (lastBooking) {
+            const lastBookingEnd = new Date(lastBooking.end)
+            const currentBookingStart = new Date(start)
+            const timeDifference = currentBookingStart.getTime() - lastBookingEnd.getTime()
+            if (timeDifference < 3600000) {
+                return commonError(res, 'Please book at least an hour apart from the last booking.')
+            }
+            // time is okay, now check if the time is within the working hours
+            const currentBookingStartHour = currentBookingStart.getHours()
+            if (currentBookingStartHour < 8 || currentBookingStartHour > 16) {
+                return commonError(res, 'Please book within the working hours of 8am - 4pm.')
+            }
 
-
-                        name,
-                        commitmentFee: fee,
-                        ref,
-                        latlng, image,
-                        endTime: new Date(end),
-                        workerImage
-                    }]
-                }
+            // save booking
+            const newBooking = new bookingModel({
+                worker,
+                client,
+                start,
+                end,
+                skills,
+                name,
+                fee,
+                ref,
+                latlng,
+                image,
+                workerImage,
+                day
             })
-            await bookingSlot.save();
-            // return response
+
+            await newBooking.save() // save booking
             return res.status(200).json({
-                msg: 'Slot has been booked successfully',
+                msg: 'Booking Successful',
                 status: 200,
                 success: true,
-                worker
-            })
-        }
-        /////////////////////
-
-        // sort the bookings according to paid
-
-        const paidBookings = bookingsFetched.filter(booking => booking.isPaid === true && booking.completed === false) //filter paid bookings that are not completed
-        // sort paid bookings according to start time
-        const sortedACTime = paidBookings.sort((a, b) => a.date - b.date)
-        console.log("Sorted According To Time", sortedACTime)
-
-        const result = sortedACTime.filter(booking => {
-            // check that booking endtime is at least 30 minutes before the new booking start time
-            const end = new Date(booking.endTime)
-            const newDate = new Date(date)
-
-            console.log('Booking End Time', end.getHours(), end.getMinutes())
-            console.log('New Booking Start Time', newDate.getHours(), newDate.getMinutes())
-            console.log("Difference", end.getTime() + 1800000 >= newDate.getTime())
-
-            return end.getTime() + 1800000 < newDate.getTime()
-            // console.log("This slot is not available. Please choose another slot.")
-            // return commonError(res, 'This slot is not available. Please choose another slot.')
-        })
-        if (result.length === 0) {
-            // Slot available
-            await bookingModel.findOneAndUpdate({
-                _id: worker,
-                [queryString]: {
-                    $exists: true,
-                }
-            }, {
-                $push: {
-                    [queryString]: {
-                        client,
-                        skills,
-                        worker,
-                        date: new Date(start),
-
-
-                        name,
-                        commitmentFee: fee,
-                        ref,
-                        latlng, image,
-                        endTime: new Date(end),
-                        workerImage
-                    }
-                }
-            })
-            return res.status(200).json({
-                msg: 'Worker Profile Updated',
-                status: 200,
-                success: true,
-                worker
             })
         } else {
-            // Slot not available
-            console.log("This slot is not available. Please choose another slot.")
-            return commonError(res, 'This slot is not available. Please choose another slot.')
+            // save booking
+            const newBooking = new bookingModel({
+                worker,
+                client,
+                start,
+                end,
+                skills,
+                name,
+                fee,
+                ref,
+                latlng,
+                image,
+                workerImage,
+                day
+            })
+
+            await newBooking.save() // save booking
+            return res.status(200).json({
+                msg: 'Booking Successful',
+                status: 200,
+                success: true,
+            })
         }
     }
     catch (e) {
