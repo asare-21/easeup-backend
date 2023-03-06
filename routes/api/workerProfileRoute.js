@@ -558,6 +558,7 @@ router.get('/booking-completed/:worker', async (req, res) => {
 // update booking status
 router.put('/booking-status', async (req, res) => {
     const { worker, client, ref } = req.body
+    const { started, completed } = req.query;
     try {
         await admin.auth().getUser(worker) // check if worker is valid
         await admin.auth().getUser(client) // check if user is valid
@@ -566,7 +567,8 @@ router.put('/booking-status', async (req, res) => {
             client,
             ref
         }, {
-            completed: true,
+            completed: completed ? true : false,
+            started: started ? true : false,
             end: Date.now()
         },)
         console.log(booking)

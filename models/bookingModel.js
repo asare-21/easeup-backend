@@ -51,11 +51,19 @@ const bookingSchema = new Schema({
         type: Boolean,
         default: false
     },
+    cancelledReason: {
+        type: String,
+        default: ''
+    },
     latlng: {
         type: [Number],
         required: false
     },
     completed: {
+        type: Boolean,
+        default: false
+    },
+    started: {
         type: Boolean,
         default: false
     },
