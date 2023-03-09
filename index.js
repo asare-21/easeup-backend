@@ -89,7 +89,7 @@ if (process.env.NODE_ENV === 'production') {
     api.use('/worker', workerRoute)
     api.use('/worker-profile', workerProfileRoute)
     api.use('/room', chatRoute)
-    api.use('/dashboard', dashboard)
+    // api.use('/dashboard', dashboard)
     // handle 404
     api.use((req, res, next) => {
         return res.status(404).json({
