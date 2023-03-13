@@ -791,7 +791,8 @@ router.post('/book-slot', async (req, res) => {
                 latlng,
                 image,
                 workerImage,
-                day
+                day,
+                photos
             })
 
             await newBooking.save() // save booking
@@ -814,7 +815,8 @@ router.post('/book-slot', async (req, res) => {
                 latlng,
                 image,
                 workerImage,
-                day
+                day,
+                photos
             })
 
             await newBooking.save() // save booking

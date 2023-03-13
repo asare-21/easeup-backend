@@ -78,6 +78,10 @@ const bookingSchema = new Schema({
     day: {
         type: String,
         required: true
+    },
+    photos: {
+        type: Array,
+        required: true,
     }
 })
 
