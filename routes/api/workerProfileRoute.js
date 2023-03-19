@@ -750,9 +750,9 @@ router.post('/book-slot', async (req, res) => {
     // const d = req.body.date
     try {
         const date = new Date(start)
-        console.log(req.body)
-        console.log(typeof (date))
-        console.log(typeof start)
+        // console.log(req.body)
+        // console.log(typeof (date))
+        // console.log(typeof start)
 
         if (!date || !end) return commonError(res, 'Please provide all required fields. Start and End times are required.')
 
@@ -782,7 +782,6 @@ router.post('/book-slot', async (req, res) => {
             if (currentBookingStartHour < 8 || currentBookingStartHour > 16) {
                 return commonError(res, 'Please book within the working hours of 8am - 4pm.')
             }
-
             // save booking
             const newBooking = new bookingModel({
                 worker,
