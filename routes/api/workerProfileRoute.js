@@ -942,31 +942,31 @@ router.post('/refund/:ref', async (req, res) => {
                 }
             }
         )
-        const refundRequest = await https.request(options, (res) => {
-            let data = ''
+        const refundRequest = https.request(options, (res) => {
+            let data = '';
             res.on('data', (chunk) => {
-                data += chunk
+                data += chunk;
             }
-            )
-            res.on('end', async () => {
-                console.log(JSON.parse(data))
-                await bookingModel.findOneAndUpdate({ ref }, {
-                    cancelled: true,
-                }) // find and delete bookng
-                refundRequest.end()
-                return res.status(200).json({
-                    msg: 'Refund Processed',
-                    status: 200,
-                    success: true,
-                })
+            );
+            res.on('end', () => {
+                console.log(JSON.parse(data));
             }
-            )
+            );
         })
         refundRequest.write(refundDetails)
+        refundRequest.end()
 
+        await bookingModel.findOneAndUpdate({ ref }, {
+            cancelled: true,
+        }) // find and delete bookng
+        return res.status(200).json({
+            msg: 'Refund Processed',
+            status: 200,
+            success: true,
+        })
     }
     catch (e) {
-        console.log("Something went wrong ", e.message)
+        console.log("Something went wrong ", e);
         return commonError(res, e.message)
     }
 })
