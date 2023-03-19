@@ -849,7 +849,7 @@ router.post('/verify-payment', async (req, res) => {
             // Retrieve the request's body
             const success = data.gateway_response === 'Approved' && event === 'charge.success'
             const ref = data.reference
-            console.log(data.metadata.custom_fields[5].value)
+            console.log(data)
             if (success) {
                 const booking = await bookingModel.findOneAndUpdate({
                     ref
