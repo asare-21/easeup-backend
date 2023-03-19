@@ -982,23 +982,25 @@ router.post('/refund/:ref', async (req, res) => {
                 data += chunk;
             }
             );
-            res.on('end', () => {
+            res.on('end', async () => {
                 console.log(JSON.parse(data));
+                await bookingModel.findOneAndUpdate({ ref }, {
+                    cancelled: true,
+                    endTime: Date.now()
+                })
+                return res.status(200).json({
+                    msg: 'Refund Processed',
+                    status: 200,
+                    success: true,
+                })
             }
             );
         })
         refundRequest.write(refundDetails)
         refundRequest.end()
 
-        await bookingModel.findOneAndUpdate({ ref }, {
-            cancelled: true,
-            endTime: Date.now()
-        }) // find and delete bookng
-        return res.status(200).json({
-            msg: 'Refund Processed',
-            status: 200,
-            success: true,
-        })
+        // find and delete bookng
+
     }
     catch (e) {
         console.log("Something went wrong ", e);
