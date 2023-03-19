@@ -960,6 +960,7 @@ router.post('/refund/:ref', async (req, res) => {
 
         await bookingModel.findOneAndUpdate({ ref }, {
             cancelled: true,
+            endTime: Date.now()
         }) // find and delete bookng
         return res.status(200).json({
             msg: 'Refund Processed',
