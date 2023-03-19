@@ -760,6 +760,8 @@ router.post('/book-slot', async (req, res) => {
         await admin.auth().getUser(worker) // check if worker is valid
         await admin.auth().getUser(client) // check if client is valid
         // return error if date is in the past
+        const workerToken = await workerModel.findById(worker)
+        const userToken = await userModel.findById(client)
         const foundBookings = await bookingModel.find({ worker: worker, isPaid: true, completed: false, cancelled: false, day })
         console.log(foundBookings)
 
@@ -805,14 +807,14 @@ router.post('/book-slot', async (req, res) => {
                     title: 'New Booking',
                     body: 'You have a new booking. Please check your dashboard for more details.'
                 },
-                token: worker
+                token: workerToken.token
             })
             await admin.messaging().send({
                 notification: {
                     title: 'New Booking',
                     body: 'Your booking was successful. Awaiting payment.'
                 },
-                token: client
+                token: userToken.token
             })
             return res.status(200).json({
                 msg: 'Booking Successful',
@@ -845,14 +847,14 @@ router.post('/book-slot', async (req, res) => {
                     title: 'New Booking',
                     body: 'You have a new booking. Please check your dashboard for more details.'
                 },
-                token: worker
+                token: workerToken.token
             })
             await admin.messaging().send({
                 notification: {
                     title: 'New Booking',
                     body: 'Your booking was successful. Awaiting payment.'
                 },
-                token: client
+                token: userToken.token
             })
 
             return res.status(200).json({
