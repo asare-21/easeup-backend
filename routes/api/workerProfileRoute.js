@@ -16,7 +16,7 @@ const crypto = require('crypto');
 const { workerModel } = require('../../models/worker_models');
 const { userModel } = require('../../models/user_model');
 const secret = process.env.PAYSTACK_SECRET;
-
+const https = require('https');
 router.get('/:worker', getWorkerProfileCache, async (req, res) => {
     const { worker } = req.params
     // check if user is authenticated
