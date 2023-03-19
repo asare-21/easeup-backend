@@ -802,20 +802,20 @@ router.post('/book-slot', async (req, res) => {
             })
 
             await newBooking.save() // save booking
-            if (workerToken) await admin.messaging().send({
-                notification: {
-                    title: 'New Booking',
-                    body: 'You have a new booking. Please check your dashboard for more details.'
-                },
-                token: workerToken.token
-            })
-            if (userToken) await admin.messaging().send({
-                notification: {
-                    title: 'New Booking',
-                    body: 'Your booking was successful. Awaiting payment.'
-                },
-                token: userToken.token
-            })
+            // if (workerToken) await admin.messaging().send({
+            //     notification: {
+            //         title: 'New Booking',
+            //         body: 'You have a new booking. Please check your dashboard for more details.'
+            //     },
+            //     token: workerToken.token
+            // })
+            // if (userToken) await admin.messaging().send({
+            //     notification: {
+            //         title: 'New Booking',
+            //         body: 'Your booking was successful. Awaiting payment.'
+            //     },
+            //     token: userToken.token
+            // })
             return res.status(200).json({
                 msg: 'Booking Successful',
                 status: 200,
@@ -842,20 +842,20 @@ router.post('/book-slot', async (req, res) => {
 
             await newBooking.save() // save booking
             // send notification to worker
-            await admin.messaging().send({
-                notification: {
-                    title: 'New Booking',
-                    body: 'You have a new booking. Please check your dashboard for more details.'
-                },
-                token: workerToken.token
-            })
-            await admin.messaging().send({
-                notification: {
-                    title: 'New Booking',
-                    body: 'Your booking was successful. Awaiting payment.'
-                },
-                token: userToken.token
-            })
+            // await admin.messaging().send({
+            //     notification: {
+            //         title: 'New Booking',
+            //         body: 'You have a new booking. Please check your dashboard for more details.'
+            //     },
+            //     token: workerToken.token
+            // })
+            // await admin.messaging().send({
+            //     notification: {
+            //         title: 'New Booking',
+            //         body: 'Your booking was successful. Awaiting payment.'
+            //     },
+            //     token: userToken.token
+            // })
 
             return res.status(200).json({
                 msg: 'Booking Successful',
