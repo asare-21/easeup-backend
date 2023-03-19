@@ -976,13 +976,13 @@ router.post('/refund/:ref', async (req, res) => {
                 }
             }
         )
-        const refundRequest = https.request(options, (res) => {
+        const refundRequest = https.request(options, (response) => {
             let data = '';
-            res.on('data', (chunk) => {
+            response.on('data', (chunk) => {
                 data += chunk;
             }
             );
-            res.on('end', async () => {
+            response.on('end', async () => {
                 console.log(JSON.parse(data));
                 await bookingModel.findOneAndUpdate({ ref }, {
                     cancelled: true,
