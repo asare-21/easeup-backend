@@ -743,7 +743,7 @@ router.get('/available-slots/:worker', async (req, res) => {
 })
 
 router.post('/book-slot', async (req, res) => {
-    const { worker, client, start, skills, end, name, fee, ref, latlng, image, workerImage, day, photos } = req.body
+    const { worker, client, start, skills, end, name, fee, ref, latlng, image, workerImage, day, photos, } = req.body
     // const d = req.body.date
     try {
         const date = new Date(start)
@@ -786,11 +786,12 @@ router.post('/book-slot', async (req, res) => {
                 end,
                 skills,
                 name,
-                fee,
+                // fee,
                 ref,
                 latlng,
                 image,
                 workerImage,
+                commitmentFee: fee,
                 day,
                 photos
             })
@@ -815,6 +816,7 @@ router.post('/book-slot', async (req, res) => {
                 latlng,
                 image,
                 workerImage,
+                commitmentFee: fee,
                 day,
                 photos
             })
