@@ -942,27 +942,28 @@ router.post('/refund/:ref', async (req, res) => {
                 }
             }
         )
-        const refundRequest = https.request(options, (res) => {
+        const refundRequest = await https.request(options, (res) => {
             let data = ''
             res.on('data', (chunk) => {
                 data += chunk
             }
             )
-            res.on('end', () => {
+            res.on('end', async () => {
                 console.log(JSON.parse(data))
+                await bookingModel.findOneAndUpdate({ ref }, {
+                    cancelled: true,
+                }) // find and delete bookng
+                refundRequest.end()
+                return res.status(200).json({
+                    msg: 'Refund Processed',
+                    status: 200,
+                    success: true,
+                })
             }
             )
         })
         refundRequest.write(refundDetails)
-        bookingModel.findOneAndUpdate({ ref }, {
-            cancelled: true,
-        }) // find and delete bookng
-        refundRequest.end()
-        return res.status(200).json({
-            msg: 'Refund Processed',
-            status: 200,
-            success: true,
-        })
+
     }
     catch (e) {
 
