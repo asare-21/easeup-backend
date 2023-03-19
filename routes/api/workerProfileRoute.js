@@ -800,6 +800,20 @@ router.post('/book-slot', async (req, res) => {
             })
 
             await newBooking.save() // save booking
+            await admin.messaging().send({
+                notification: {
+                    title: 'New Booking',
+                    body: 'You have a new booking. Please check your dashboard for more details.'
+                },
+                token: worker
+            })
+            await admin.messaging().send({
+                notification: {
+                    title: 'New Booking',
+                    body: 'Your booking was successful. Awaiting payment.'
+                },
+                token: client
+            })
             return res.status(200).json({
                 msg: 'Booking Successful',
                 status: 200,
@@ -898,7 +912,7 @@ router.post('/verify-payment', async (req, res) => {
                     workerToken.token,
                     {
                         notification: {
-                            title: 'Appointment Confirmed',
+                            title: 'Booking Confirmed',
                             body: workerToken.name + 'has just booked you for ' + parseDate + ' Payment for your booking has been verified. Please check your dashboard for more details'
                         }
                     }
