@@ -687,6 +687,7 @@ router.get('/worker-review/:worker', async (req, res) => {
 //cancelled
 router.get('/booking-cancelled/:worker', async (req, res) => {
     const { worker } = req.params
+    const { user } = req.query
     try {
         await admin.auth().getUser(worker) // check if worker is valid
         const bookings = await bookingModel.find({ [user ? 'client' : 'worker']: worker, isPaid: true, completed: false, cancelled: true })
