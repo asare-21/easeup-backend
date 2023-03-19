@@ -847,9 +847,10 @@ router.post('/verify-payment', async (req, res) => {
         const hash = crypto.createHmac('sha512', secret).update(JSON.stringify(req.body)).digest('hex');
         if (hash == req.headers['x-paystack-signature']) {
             // Retrieve the request's body
-            const success = data.gateway_response === 'Approved' && event === 'charge.success'
+            const success = data.gateway_response === 'Approved' || "Successful" && event === 'charge.success'
             const ref = data.reference
             console.log(data)
+            console.log(event)
             if (success) {
                 const booking = await bookingModel.findOneAndUpdate({
                     ref
