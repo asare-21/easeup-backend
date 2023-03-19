@@ -865,7 +865,7 @@ router.post('/book-slot', async (req, res) => {
         }
     }
     catch (e) {
-
+        console.log("booking error ", e)
         if (e.errorInfo) {
             // User Not Found
             log.warn(e.message)
