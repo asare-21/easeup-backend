@@ -960,6 +960,7 @@ router.post('refund/:ref', async (req, res) => {
         return res.status(200).json({
             msg: 'Refund Processed',
             status: 200,
+            success: true,
         })
     }
     catch (e) {
