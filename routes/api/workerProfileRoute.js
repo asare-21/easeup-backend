@@ -920,7 +920,7 @@ router.post('refund/:ref', async (req, res) => {
         // Set refund details
         const refundDetails = JSON.stringify({
             'transaction': foundBooking.ref,
-            'amount': foundBooking.commitmentFee * 0.6,
+            'amount': foundBooking.commitmentFee * 0.8,
         })
         // send notification to device of worker and client
         await admin.messaging().sendToDevice(
@@ -963,6 +963,7 @@ router.post('refund/:ref', async (req, res) => {
         })
     }
     catch (e) {
+
         return commonError(res, e.message)
     }
 })
