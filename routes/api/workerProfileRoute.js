@@ -966,7 +966,7 @@ router.post('/refund/:ref', async (req, res) => {
 
     }
     catch (e) {
-
+        console.log("Something went wrong ", e.message)
         return commonError(res, e.message)
     }
 })
