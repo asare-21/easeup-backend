@@ -899,4 +899,72 @@ router.post('/verify-payment', async (req, res) => {
     }
 })
 
+router.post('refund/:ref', async (req, res) => {
+    // refund payment and cancel booking.
+    // Only refund 60% of the commitment fee
+    const options = {
+        method: 'POST',
+        hostname: 'api.paystack.co',
+        path: '/refund',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${secret}`
+        },
+    }
+    const { ref } = req.params
+    try {
+        const foundBooking = await bookingModel.findOne({ ref }) // find booking
+        // user and worker device tokens to send an alert that the refund has been process and booking cancelled
+        const workerToken = await workerModel.find(foundBooking.worker)
+        const userToken = await workerModel.find(foundBooking.client)
+        // Set refund details
+        const refundDetails = JSON.stringify({
+            'transaction': foundBooking.ref,
+            'amount': foundBooking.commitmentFee * 0.6,
+        })
+        // send notification to device of worker and client
+        await admin.messaging().sendToDevice(
+            userToken.token,
+            {
+                notification: {
+                    title: 'Refund Processed',
+                    body: 'Your booking has been cancelled and refund processed'
+                }
+            }
+        )
+        await admin.messaging().sendToDevice(
+            workerToken.token,
+            {
+                notification: {
+                    title: 'Sorry, Booking Cancelled',
+                    body: 'The customer has cancelled the booking. Please check your dashboard for more details'
+                }
+            }
+        )
+        const refundRequest = https.request(options, (res) => {
+            let data = ''
+            res.on('data', (chunk) => {
+                data += chunk
+            }
+            )
+            res.on('end', () => {
+                console.log(JSON.parse(data))
+            }
+            )
+        })
+        refundRequest.write(refundDetails)
+        bookingModel.findOneAndUpdate({ ref }, {
+            cancelled: true,
+        }) // find and delete bookng
+        refundRequest.end()
+        return res.status(200).json({
+            msg: 'Refund Processed',
+            status: 200,
+        })
+    }
+    catch (e) {
+        return commonError(res, e.message)
+    }
+})
+
 module.exports.workerProfileRoute = router
