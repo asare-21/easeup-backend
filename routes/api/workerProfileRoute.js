@@ -124,16 +124,16 @@ router.post('/comments/:worker', async (req, res) => {
         // get worker 
         const workerData = await workerModel.findById(worker)
         // send notification to worker
-        // await admin.messaging().sendToDevice(workerData.token, {
-        //     notification: {
-        //         title: 'New comment',
-        //         body: `${name} commented on your post`
-        //     },
-        //     data: {
-        //         type: 'comment',
-        //         post
-        //     }
-        // })
+        await admin.messaging().sendToDevice(workerData.token, {
+            notification: {
+                title: 'New comment',
+                body: `${name} commented on your post`
+            },
+            data: {
+                type: 'comment',
+                post
+            }
+        })
         newComment.save((err, comment) => {
             if (err) {
                 return commonError(res, err.message)
@@ -898,7 +898,7 @@ router.post('/verify-payment', async (req, res) => {
                 if (!booking) return commonError(res, 'Booking not found')
                 // send notification to device of worker and client
                 const workerToken = await workerModel.findById(booking.worker)
-                const userToken = await workerModel.findById(booking.client)
+                const userToken = await userModel.findById(booking.client)
                 await admin.messaging().sendToDevice(
                     userToken.token,
                     {
