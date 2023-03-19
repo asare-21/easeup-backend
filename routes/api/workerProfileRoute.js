@@ -955,7 +955,7 @@ router.post('/refund/:ref', async (req, res) => {
         // Set refund details
         const refundDetails = JSON.stringify({
             'transaction': foundBooking.ref,
-            'amount': foundBooking.commitmentFee * 0.8,
+            'amount': (foundBooking.commitmentFee * 100) * 0.8,
         })
         // send notification to device of worker and client
         await admin.messaging().sendToDevice(
