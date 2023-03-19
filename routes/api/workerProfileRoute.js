@@ -899,7 +899,7 @@ router.post('/verify-payment', async (req, res) => {
     }
 })
 
-router.post('refund/:ref', async (req, res) => {
+router.post('/refund/:ref', async (req, res) => {
     // refund payment and cancel booking.
     // Only refund 60% of the commitment fee
     const options = {
