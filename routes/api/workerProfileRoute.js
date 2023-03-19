@@ -156,7 +156,6 @@ router.post('/comments/:worker', async (req, res) => {
     }
 })
 
-
 router.post('/charge', async (req, res) => {
     const { worker, charge } = req.body
     try {
@@ -458,7 +457,6 @@ router.post('/work-radius', async (req, res) => {
     }
 })
 
-
 // get timeslots and bookings
 router.get('/booking-slot/:worker', async (req, res) => {
     const { worker } = req.params
@@ -491,7 +489,26 @@ router.get('/booking/:worker', async (req, res) => {
             msg: 'Worker Profile Fetched Successfully',
             status: 200,
             success: true,
-
+            bookings
+        })
+    } catch (e) {
+        if (e.errorInfo) {
+            // User Not Found
+            log.warn(e.message)
+            return returnUnAuthUserError(res, e.message)
+        }
+        return commonError(res, e.message)
+    }
+})
+router.get('/paid/:user', async (req, res) => {
+    const { user } = req.params
+    try {
+        await admin.auth().getUser(user) // check if worker is valid
+        const bookings = await bookingModel.find({ client: user, isPaid: true })
+        return res.status(200).json({
+            msg: 'Worker Profile Fetched Successfully',
+            status: 200,
+            success: true,
             bookings
         })
     } catch (e) {
@@ -578,7 +595,6 @@ router.get('/booking-completed/:worker', async (req, res) => {
         return commonError(res, e.message)
     }
 })
-
 
 // update booking status
 router.put('/booking-status', async (req, res) => {
@@ -707,7 +723,6 @@ router.get('/booking-cancelled/:worker', async (req, res) => {
         return commonError(res, e.message)
     }
 })
-
 
 router.get('/available-slots/:worker', async (req, res) => {
     try {
