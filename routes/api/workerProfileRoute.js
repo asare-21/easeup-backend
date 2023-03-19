@@ -689,7 +689,8 @@ router.get('/booking-cancelled/:worker', async (req, res) => {
     const { worker } = req.params
     try {
         await admin.auth().getUser(worker) // check if worker is valid
-        const bookings = await bookingModel.find({ worker, $eq: { cancelled: true, completed: false, isPaid: true } })
+        const bookings = await bookingModel.find({ [user ? 'client' : 'worker']: worker, isPaid: true, completed: false, cancelled: true })
+
         return res.status(200).json({
             msg: 'Worker Profile Fetched Successfully',
             status: 200,
