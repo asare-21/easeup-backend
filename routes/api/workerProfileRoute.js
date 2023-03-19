@@ -14,6 +14,7 @@ const workerCache = cache;
 const { isValidDate } = require('../../utils');
 const crypto = require('crypto');
 const { workerModel } = require('../../models/worker_models');
+const { userModel } = require('../../models/user_model');
 const secret = process.env.PAYSTACK_SECRET;
 
 router.get('/:worker', getWorkerProfileCache, async (req, res) => {
@@ -862,8 +863,8 @@ router.post('/verify-payment', async (req, res) => {
                 console.log("Found booking ", booking)
                 if (!booking) return commonError(res, 'Booking not found')
                 // send notification to device of worker and client
-                const workerToken = await workerModel.find(booking.worker)
-                const userToken = await workerModel.find(booking.client)
+                const workerToken = await workerModel.findById(booking.worker)
+                const userToken = await workerModel.findById(booking.client)
                 await admin.messaging().sendToDevice(
                     userToken.token,
                     {
@@ -915,8 +916,8 @@ router.post('/refund/:ref', async (req, res) => {
     try {
         const foundBooking = await bookingModel.findOne({ ref }) // find booking
         // user and worker device tokens to send an alert that the refund has been process and booking cancelled
-        const workerToken = await workerModel.find(foundBooking.worker)
-        const userToken = await workerModel.find(foundBooking.client)
+        const workerToken = await workerModel.findById(foundBooking.worker)
+        const userToken = await userModel.findById(foundBooking.client)
         // Set refund details
         const refundDetails = JSON.stringify({
             'transaction': foundBooking.ref,
