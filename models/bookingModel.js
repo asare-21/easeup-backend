@@ -16,6 +16,10 @@ const bookingSchema = new Schema({
         type: String,
         required: true
     },
+    clientName: {
+        type: String,
+        required: true
+    },
     name: {
         type: String,
         required: true

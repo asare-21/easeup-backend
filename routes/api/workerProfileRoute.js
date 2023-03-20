@@ -706,7 +706,7 @@ router.get('/booking-cancelled/:worker', async (req, res) => {
     const { user } = req.query
     try {
         await admin.auth().getUser(worker) // check if worker is valid
-        const bookings = await bookingModel.find({ [user ? 'client' : 'worker']: worker, isPaid: true, completed: false, cancelled: true })
+        const bookings = await bookingModel.find({ [user == true || 'true' ? 'client' : 'worker']: worker, isPaid: true, completed: false, cancelled: true })
 
         return res.status(200).json({
             msg: 'Worker Profile Fetched Successfully',
@@ -761,7 +761,7 @@ router.get('/available-slots/:worker', async (req, res) => {
 })
 
 router.post('/book-slot', async (req, res) => {
-    const { worker, client, start, skills, end, name, fee, ref, latlng, image, workerImage, day, photos, } = req.body
+    const { worker, client, start, skills, end, name, fee, ref, latlng, image, workerImage, day, photos, clientName } = req.body
     // const d = req.body.date
     try {
         const date = new Date(start)
@@ -771,7 +771,7 @@ router.post('/book-slot', async (req, res) => {
 
         if (!date || !end) return commonError(res, 'Please provide all required fields. Start and End times are required.')
 
-        if (!worker || !client || !skills || !name || !fee || !ref || !image || !workerImage) return commonError(res, 'Please provide all required fields. Worker, Client, Skills, Fee...')
+        if (!worker || !client || !skills || !name || !fee || !ref || !image || !workerImage, clientName) return commonError(res, 'Please provide all required fields. Worker, Client, Skills, Fee...')
         await admin.auth().getUser(worker) // check if worker is valid
         await admin.auth().getUser(client) // check if client is valid
         // return error if date is in the past
@@ -807,6 +807,7 @@ router.post('/book-slot', async (req, res) => {
                 skills,
                 name,
                 // fee,
+                clientName,
                 ref,
                 latlng,
                 image,
@@ -816,26 +817,7 @@ router.post('/book-slot', async (req, res) => {
                 photos
             })
 
-            await newBooking.save() // save booking
-            // if (workerToken) await admin.messaging().send({
-            //     notification: {
-            //         title: 'New Booking',
-            //         body: 'You have a new booking. Please check your dashboard for more details.'
-            //     },
-            //     token: workerToken.token
-            // })
-            // if (userToken) await admin.messaging().send({
-            //     notification: {
-            //         title: 'New Booking',
-            //         body: 'Your booking was successful. Awaiting payment.'
-            //     },
-            //     token: userToken.token
-            // })
-            return res.status(200).json({
-                msg: 'Booking Successful',
-                status: 200,
-                success: true,
-            })
+            await newBooking.save() // save booking            
         } else {
             // save booking
             const newBooking = new bookingModel({
@@ -845,7 +827,8 @@ router.post('/book-slot', async (req, res) => {
                 end,
                 skills,
                 name,
-                fee,
+                clientName,
+                // fee,
                 ref,
                 latlng,
                 image,
@@ -854,30 +837,28 @@ router.post('/book-slot', async (req, res) => {
                 day,
                 photos
             })
-
             await newBooking.save() // save booking
-            // send notification to worker
-            // await admin.messaging().send({
-            //     notification: {
-            //         title: 'New Booking',
-            //         body: 'You have a new booking. Please check your dashboard for more details.'
-            //     },
-            //     token: workerToken.token
-            // })
-            // await admin.messaging().send({
-            //     notification: {
-            //         title: 'New Booking',
-            //         body: 'Your booking was successful. Awaiting payment.'
-            //     },
-            //     token: userToken.token
-            // })
 
-            return res.status(200).json({
-                msg: 'Booking Successful',
-                status: 200,
-                success: true,
-            })
         }
+        if (workerToken) await admin.messaging().send({
+            notification: {
+                title: 'New Booking',
+                body: 'You have a new booking. Please check your dashboard for more details.'
+            },
+            token: workerToken.token
+        })
+        if (userToken) await admin.messaging().send({
+            notification: {
+                title: 'New Booking',
+                body: 'Your booking was successful. Awaiting payment.'
+            },
+            token: userToken.token
+        })
+        return res.status(200).json({
+            msg: 'Booking Successful',
+            status: 200,
+            success: true,
+        })
     }
     catch (e) {
         console.log("booking error ", e)
