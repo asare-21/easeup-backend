@@ -23,17 +23,27 @@ router.get('/:worker', getWorkerProfileCache, async (req, res) => {
     // check if user is authenticated
     try {
         await admin.auth().getUser(worker) // check if uid is valid
-        workerProfileModel.findOne({ worker }, (err, result) => {
-            if (err) {
-                return commonError(res, err.message)
+        const foundWorker = await workerProfileModel.findOne({ worker })
+        workerCache.set(`worker-profile/${worker}`, JSON.stringify(foundWorker))
+        const avgRating = await reviewModel.aggregate([
+            {
+                $match: { worker }
+            },
+            {
+                $group: {
+                    _id: null,
+                    avgRating: { $avg: "$rating" }
+                }
             }
-            workerCache.set(`worker-profile/${worker}`, JSON.stringify(result))
-            return res.status(200).json({
-                msg: 'Worker Profile',
-                status: 200,
-                success: true,
-                worker: result
-            })
+        ]).exec()
+        const totalReviews = await reviewModel.countDocuments({ worker })
+        return res.status(200).json({
+            msg: 'Worker Profile',
+            status: 200,
+            success: true,
+            worker: result,
+            totalReviews,
+            avgRating: avgRating[0].avgRating,
         })
     }
     catch (e) {
@@ -694,26 +704,26 @@ router.get('/worker-review/:worker', async (req, res) => {
         await admin.auth().getUser(worker) // check if worker is valid
 
         const reviews = await reviewModel.find({ worker }).limit(80).sort({ date: -1 })
-        const avgRating = await reviewModel.aggregate([
-            {
-                $match: { worker }
-            },
-            {
-                $group: {
-                    _id: null,
-                    avgRating: { $avg: "$rating" }
-                }
-            }
-        ]).exec()
-        const totalReviews = await reviewModel.countDocuments({ worker })
+        // const avgRating = await reviewModel.aggregate([
+        //     {
+        //         $match: { worker }
+        //     },
+        //     {
+        //         $group: {
+        //             _id: null,
+        //             avgRating: { $avg: "$rating" }
+        //         }
+        //     }
+        // ]).exec()
+        // const totalReviews = await reviewModel.countDocuments({ worker })
         console.log(avgRating)
         return res.status(200).json({
             msg: 'Reveiw saved',
             status: 200,
             success: true,
             reviews,
-            avgRating: avgRating[0].avgRating,
-            total: totalReviews
+            // avgRating: avgRating[0].avgRating,
+            // total: totalReviews
         })
     } catch (e) {
         if (e.errorInfo) {
