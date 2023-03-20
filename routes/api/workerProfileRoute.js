@@ -17,6 +17,7 @@ const { workerModel } = require('../../models/worker_models');
 const { userModel } = require('../../models/user_model');
 const secret = process.env.PAYSTACK_SECRET;
 const https = require('https');
+const { query } = require('express');
 router.get('/:worker', getWorkerProfileCache, async (req, res) => {
     const { worker } = req.params
     // check if user is authenticated
@@ -598,10 +599,11 @@ router.get('/booking-completed/:worker', async (req, res) => {
 router.get('/booking-cancelled/:worker', async (req, res) => {
     const { worker } = req.params
     const { user } = req.query
+    console.log(query)
     try {
         await admin.auth().getUser(worker) // check if worker is valid
         // const bookings = await bookingModel.find({ [user == true || 'true' ? 'client' : 'worker']: worker, isPaid: true, completed: false, cancelled: true })
-        const bookings = user ? await bookingModel.find({ 'client': worker, isPaid: true, completed: false, cancelled: true }) : await bookingModel.find({ worker: worker, isPaid: true, completed: false, cancelled: true })
+        const bookings = user ? await bookingModel.find({ 'client': worker, isPaid: true, completed: false, cancelled: true }) : await bookingModel.find({ worker, isPaid: true, completed: false, cancelled: true })
 
         return res.status(200).json({
             msg: 'Worker Profile Fetched Successfully',
