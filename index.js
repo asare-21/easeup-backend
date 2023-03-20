@@ -34,12 +34,14 @@ const { getAndCacheUsers, getAndCacheWorkerMedia, getAndCacheWorkerProfiles, get
 const { dashboard } = require('./routes/api/dashboard');
 const limiter = rateLimit({
     windowMs: 1 * 60 * 1000, // 30 minutes
-    max: 50, // Limit each IP to 1000 requests per `window` (here, per 15 minutes)
+    max: 40, // Limit each IP to 1000 requests per `window` (here, per 15 minutes)
     standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
     legacyHeaders: false, // Disable the `X-RateLimit-*` headers
-    message: { msg: 'Too many requests from this IP, please try again later', status: 429, success: false },
+
+    message: { msg: 'Too many requests from this IP, please try again later', status: 429, success: false, limit: true },
     onLimitReached: (req, res, options) => {
         log.warn(`Rate limit reached for IP: ${req.ip}`)
+        return res.status(429).json({ msg: 'Too many requests from this IP, please try again later', status: 429, success: false, limit: true })
     }
 })
 
