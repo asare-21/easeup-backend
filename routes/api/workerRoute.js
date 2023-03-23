@@ -294,7 +294,10 @@ router.post('/update/ghc', (req, res) => {
         // Find the user
         workerProfileModel.findOneAndUpdate
             ({ worker: user_id }, {
-                ghc_image: ghc,
+                // ghc_image: ghc,
+                gh_card_to_face: ghc[0],
+                gh_card_image_back: ghc[1],
+                gh_card_image_front: ghc[2],
                 ghc_number: ghc_n,
                 ghc_exp: ghc_exp
             }, (err, user) => {

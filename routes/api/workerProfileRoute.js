@@ -539,7 +539,7 @@ router.get('/booking-upcoming/:worker', async (req, res) => {
     const { user } = req.query
     try {
         await admin.auth().getUser(worker) // check if worker is valid
-        console.log("User variable ", user)
+        // console.log("User variable ", user)
         const bookings = user ? await bookingModel.find({ client: worker, isPaid: true, cancelled: false, started: false }) : await bookingModel.find({ worker: worker, isPaid: true, cancelled: false, started: false })
         console.log("Fetched bookings ", bookings)
         return res.status(200).json({
@@ -563,7 +563,7 @@ router.get('/booking-progress/:worker', async (req, res) => {
     const { user } = req.query
     try {
         await admin.auth().getUser(worker) // check if worker is valid
-        console.log("User variable ", user)
+        // console.log("User variable ", user)
         const bookings = user ? await bookingModel.find({ 'client': worker, isPaid: true, completed: false, started: true }) : await bookingModel.find({ worker: worker, isPaid: true, completed: false, started: true })
         console.log("Fetched bookings ", bookings)
         return res.status(200).json({
