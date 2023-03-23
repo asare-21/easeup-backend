@@ -299,6 +299,7 @@ router.post('/update/phone', (req, res) => {
 router.post('/update/ghc', (req, res) => {
     try {  // required field : user_id
         const { user_id, ghc, ghc_n, ghc_exp } = req.body;
+        console.log(req.body)
         if (!user_id) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID is required
         //check firebase if uid exists
         admin.auth().getUser(user_id)
