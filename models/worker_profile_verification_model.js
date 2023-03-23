@@ -108,6 +108,14 @@ const workerProfileVerificationSchema = new Schema({
         required: false,
         default: ''
     },
+    ghc_number: {
+        type: String,
+        default: ''
+    },
+    ghc_exp: {
+        type: String,
+        default: ''
+    },
 });
 
 module.exports.workerProfileVerificationModel = model('WorkerProfileVerification', workerProfileVerificationSchema);
