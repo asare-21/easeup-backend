@@ -303,7 +303,7 @@ router.post('/update/ghc', (req, res) => {
                     return res.status(500).json({ msg: err.message, status: 500, success: false }) // Internal Server Error
                 }
                 if (!user) return res.status(404).json({ msg: 'User Not Found', status: 404, success: false }) // User Not Found
-                userCache.del(`worker/${user_id}`);
+                cache.del(`worker/${user_id}`);
 
                 return res.status(200).json({
                     msg: 'Profile updated', status: 200, success: true, user
