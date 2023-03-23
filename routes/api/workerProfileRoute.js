@@ -37,12 +37,10 @@ router.get('/:worker', getWorkerProfileCache, async (req, res) => {
             }
         ]).exec()
         const totalReviews = await reviewModel.countDocuments({ worker })
-        foundWorker.avgRating = avgRating[0].avgRating
-        foundWorker.totalReviews = totalReviews
         workerCache.set(`worker-profile/${worker}`, JSON.stringify({
             ...foundWorker,
-            // totalReviews,
-            // avgRating: avgRating[0].avgRating,
+            totalReviews,
+            avgRating: avgRating[0].avgRating,
         }))
         return res.status(200).json({
             msg: 'Worker Profile',
