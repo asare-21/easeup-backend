@@ -292,8 +292,8 @@ router.post('/update/ghc', (req, res) => {
         // check for required fields
         if (!ghc) return res.status(400).json({ msg: 'Bad Request. Missing fields', status: 400, success: false }) // At least one field is required
         // Find the user
-        workerProfileModel.findByIdAndUpdate
-            (user_id, {
+        workerProfileModel.findOneAndUpdate
+            ({ worker: user_id }, {
                 ghc_image: ghc,
                 ghc_number: ghc_n,
                 ghc_exp: ghc_exp
