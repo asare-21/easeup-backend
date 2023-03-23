@@ -58,7 +58,19 @@ const workerSchema = new Schema({
     rooms: {
         type: [String],
         default: []
-    }
+    },
+    ghc_number: {
+        type: String,
+        default: ''
+    },
+    ghc_exp: {
+        type: String,
+        default: ''
+    },
+    ghc_image: {
+        type: Array,
+        default: [] // shoild contains the front and back image and image of the worker holding the card to face
+    },
 })
 
 module.exports.workerModel = model('Worker', workerSchema);
