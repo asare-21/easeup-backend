@@ -46,7 +46,7 @@ router.get('/:worker', getWorkerProfileCache, async (req, res) => {
             msg: 'Worker Profile',
             status: 200,
             success: true,
-            worker: result,
+            worker: foundWorker,
             totalReviews,
             avgRating: avgRating[0].avgRating,
         })
