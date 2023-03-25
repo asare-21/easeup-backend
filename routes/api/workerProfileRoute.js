@@ -189,7 +189,11 @@ router.post('/skills', async (req, res) => {
     try {
         if (!skills) return commonError(res, 'No skills provided')
         await admin.auth().getUser(worker) // check if worker is valid
-        const foundWorker = await workerProfileModel.findOneAndUpdate({ worker })
+        const foundWorker = await workerProfileModel.findOneAndUpdate({ worker }, {
+            $set: {
+                skills
+            }
+        })
         workerCache.del(`worker-profile/${worker}`)
         return res.status(200).json({
             msg: 'Worker Profile Updated',
@@ -213,7 +217,11 @@ router.post('/bio', async (req, res) => {
     try {
         if (!bio) return commonError(res, 'No bio provided')
         await admin.auth().getUser(worker) // check if worker is valid
-        const foundWorker = await workerProfileModel.findOneAndUpdate({ worker })
+        const foundWorker = await workerProfileModel.findOneAndUpdate({ worker }, {
+            $set: {
+                bio
+            }
+        })
         workerCache.del(`worker-profile/${worker}`)
         return res.status(200).json({
             msg: 'Worker Profile Updated',
