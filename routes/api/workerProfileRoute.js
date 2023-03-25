@@ -23,9 +23,9 @@ router.get('/:worker', getWorkerProfileCache, async (req, res) => {
     // check if user is authenticated
     try {
         await admin.auth().getUser(worker) // check if uid is valid
-        const promiseWorker = await workerProfileModel.findOne({ worker })
+        const promiseWorker = workerProfileModel.findOne({ worker })
 
-        const promiseRating = await reviewModel.aggregate([
+        const promiseRating = reviewModel.aggregate([
             {
                 $match: { worker }
             },
@@ -36,7 +36,7 @@ router.get('/:worker', getWorkerProfileCache, async (req, res) => {
                 }
             }
         ]).exec()
-        const totalReviews = await reviewModel.countDocuments({ worker })
+        const totalReviews = reviewModel.countDocuments({ worker })
 
         const { foundWorker, avgRating, reviews } = await Promise.all([promiseWorker, promiseRating, totalReviews])
         console.log(foundWorker, avgRating, reviews)
