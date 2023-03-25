@@ -67,16 +67,12 @@ router.get('/reviews/:worker', async (req, res) => {
     // check if user is authenticated
     try {
         await admin.auth().getUser(worker) // check if uid is valid
-        reviewModel.findOne({ worker }, (err, worker) => {
-            if (err) {
-                return commonError(res, err.message)
-            }
-            return res.status(200).json({
-                msg: 'Worker Profile',
-                status: 200,
-                success: true,
-                worker
-            })
+        const worker = await reviewModel.findOne({ worker },)
+        return res.status(200).json({
+            msg: 'Worker Profile',
+            status: 200,
+            success: true,
+            worker
         })
     }
     catch (e) {
@@ -95,16 +91,12 @@ router.get('/comments/:worker/:post', async (req, res) => {
     // check if user is authenticated
     try {
         await admin.auth().getUser(worker) // check if uid is valid
-        commentModel.find({ post }, (err, posts) => {
-            if (err) {
-                return commonError(res, err.message)
-            }
-            return res.status(200).json({
-                msg: 'Comments fetched',
-                status: 200,
-                success: true,
-                posts
-            })
+        const posts = await commentModel.find({ post },)
+        return res.status(200).json({
+            msg: 'Comments fetched',
+            status: 200,
+            success: true,
+            posts
         })
     }
     catch (e) {
@@ -148,16 +140,12 @@ router.post('/comments/:worker', async (req, res) => {
                 post
             }
         })
-        newComment.save((err, comment) => {
-            if (err) {
-                return commonError(res, err.message)
-            }
-            return res.status(200).json({
-                msg: 'Comment Added',
-                status: 200,
-                success: true,
-                comment
-            })
+        await newComment.save()
+        return res.status(200).json({
+            msg: 'Comment Added',
+            status: 200,
+            success: true,
+            comment
         })
     }
     catch (e) {
@@ -175,22 +163,15 @@ router.post('/charge', async (req, res) => {
     try {
         if (!charge) return commonError(res, 'No skills provided')
         await admin.auth().getUser(worker) // check if worker is valid
-        workerProfileModel.findOneAndUpdate({ worker }, {
+        const foundWorker = await workerProfileModel.findOneAndUpdate({ worker }, {
             base_price: charge
-        }, (err, worker) => {
-            if (err) {
-                return commonError(res, err.message)
-            }
-
-            workerCache.del(`worker-profile/${worker}`)
-
-
-            return res.status(200).json({
-                msg: 'Worker Profile Updated',
-                status: 200,
-                success: true,
-                worker
-            })
+        })
+        workerCache.del(`worker-profile/${worker}`)
+        return res.status(200).json({
+            msg: 'Worker Profile Updated',
+            status: 200,
+            success: true,
+            worker: foundWorker
         })
     }
     catch (e) {
@@ -208,21 +189,13 @@ router.post('/skills', async (req, res) => {
     try {
         if (!skills) return commonError(res, 'No skills provided')
         await admin.auth().getUser(worker) // check if worker is valid
-        workerProfileModel.findOneAndUpdate({ worker }, {
-            skills
-        }, (err, worker) => {
-            if (err) {
-                return commonError(res, err.message)
-            }
-
-            workerCache.del(`worker-profile/${worker}`)
-
-            return res.status(200).json({
-                msg: 'Worker Profile Updated',
-                status: 200,
-                success: true,
-                worker
-            })
+        const foundWorker = await workerProfileModel.findOneAndUpdate({ worker })
+        workerCache.del(`worker-profile/${worker}`)
+        return res.status(200).json({
+            msg: 'Worker Profile Updated',
+            status: 200,
+            success: true,
+            worker: foundWorker
         })
     }
     catch (e) {
@@ -240,21 +213,13 @@ router.post('/bio', async (req, res) => {
     try {
         if (!bio) return commonError(res, 'No bio provided')
         await admin.auth().getUser(worker) // check if worker is valid
-        workerProfileModel.findOneAndUpdate({ worker }, {
-            bio
-        }, (err, result) => {
-            if (err) {
-                return commonError(res, err.message)
-            }
-
-            workerCache.del(`worker-profile/${worker}`)
-
-            return res.status(200).json({
-                msg: 'Worker Profile Updated',
-                status: 200,
-                success: true,
-                worker: result
-            })
+        const foundWorker = await workerProfileModel.findOneAndUpdate({ worker })
+        workerCache.del(`worker-profile/${worker}`)
+        return res.status(200).json({
+            msg: 'Worker Profile Updated',
+            status: 200,
+            success: true,
+            worker: foundWorker
         })
     }
     catch (e) {
@@ -272,22 +237,18 @@ router.post('/instagram', async (req, res) => {
     try {
         if (!ig) return commonError(res, 'No username provided')
         await admin.auth().getUser(worker) // check if worker is valid
-        workerProfileModel.findOneAndUpdate({ worker }, {
+        const foundWorker = await workerProfileModel.findOneAndUpdate({ worker }, {
             $set: {
                 'links.instagram': ig
             }
-        }, (err, result) => {
-            if (err) {
-                return commonError(res, err.message)
-            }
-            workerCache.del(`worker-profile/${worker}`)
+        })
+        workerCache.del(`worker-profile/${worker}`)
 
-            return res.status(200).json({
-                msg: 'Worker Profile Updated',
-                status: 200,
-                success: true,
-                worker: result
-            })
+        return res.status(200).json({
+            msg: 'Worker Profile Updated',
+            status: 200,
+            success: true,
+            worker: foundWorker
         })
     }
     catch (e) {
@@ -305,24 +266,20 @@ router.post('/twitter', async (req, res) => {
     try {
         if (!twitter) return commonError(res, 'No username provided')
         await admin.auth().getUser(worker) // check if worker is valid
-        workerProfileModel.findOneAndUpdate({ worker }, {
+        const foundWorker = await workerProfileModel.findOneAndUpdate({ worker }, {
             $set: {
                 'links.twitter':
                     twitter
 
             }
-        }, (err, result) => {
-            if (err) {
-                return commonError(res, err.message)
-            }
-            workerCache.del(`worker-profile/${worker}`)
+        },)
+        workerCache.del(`worker-profile/${worker}`)
 
-            return res.status(200).json({
-                msg: 'Worker Profile Updated',
-                status: 200,
-                success: true,
-                worker: result
-            })
+        return res.status(200).json({
+            msg: 'Worker Profile Updated',
+            status: 200,
+            success: true,
+            worker: foundWorker
         })
     }
     catch (e) {
