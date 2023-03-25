@@ -18,6 +18,8 @@ const { userModel } = require('../../models/user_model');
 const secret = process.env.PAYSTACK_SECRET;
 const https = require('https');
 const { query } = require('express');
+
+
 router.get('/:worker', getWorkerProfileCache, async (req, res) => {
     const { worker } = req.params
     // check if user is authenticated
@@ -479,6 +481,7 @@ router.get('/booking/:worker', async (req, res) => {
         return commonError(res, e.message)
     }
 })
+
 router.get('/paid/:user', async (req, res) => {
     const { user } = req.params
     try {
@@ -703,7 +706,6 @@ router.get('/worker-review/:worker', async (req, res) => {
         return commonError(res, e.message)
     }
 })
-
 
 router.get('/available-slots/:worker', async (req, res) => {
     try {

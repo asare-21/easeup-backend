@@ -101,7 +101,7 @@ router.post('/create', async (req, res) => {
         const existingUser = await userModel.findById(req.body.worker)
         if (existingUser) return res.status(400).json({ msg: 'Bad Request. User already exists', status: 400, success: false }) // At least one field is required
         const { worker, email, profile_name, last_login, token } = req.body;
-        console.log(req.body)
+        // console.log(req.body)
         if (!worker) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID is required
         // required field : email, profile_name, last_login
         await admin.auth().getUser(worker)
@@ -151,15 +151,7 @@ router.post('/create', async (req, res) => {
                 profile_picture: req.body.profile_picture || ''
             }
             );
-            // create notification
-            const notification = new notificationModel({
-                user: worker,
-                title: 'Welcome to Easeup',
-                message: "We're glad to have you on board. Enjoy your stay",
-                type: 'welcome',
-                read: false,
-                created_at: new Date()
-            })
+
             await userProfile.save(
                 async (err) => {
                     if (err) {
@@ -180,9 +172,9 @@ router.post('/create', async (req, res) => {
                 }
             );
             // create notification
-            // await createNotification(worker, 'Welcome to Easeup', "We're glad to have you on board. Enjoy your stay", 'welcome', token)
+            await createNotification(worker, 'Welcome to Easeup', "We're glad to have you on board. Enjoy your stay", 'welcome', token)
             // // send notification to update user profile
-            // await createNotification(worker, 'Update your profile', "We noticed you haven't updated your profile. Please update your profile to enjoy the full experience", 'update_profile', token)
+            await createNotification(worker, 'Update your profile', "We noticed you haven't updated your profile. Please update your profile to enjoy the full experience", 'update_profile', token)
             return res.status(200).json({ msg: 'User Created', status: 200, success: true }) // User Created
         })
     }
@@ -313,6 +305,59 @@ router.post('/update/ghc', (req, res) => {
                 }) // User Found and returned
             }
             )
+    }
+    catch (e) {
+        if (e.errorInfo) {
+            // User Not Found
+            log.warn(e.message)
+
+            return returnUnAuthUserError(res, e.message)
+        }
+        return commonError(res, e.message)
+    }
+})
+
+router.get('/nofications/:user_id', async (req, res) => {
+    try {   // required field : user_id
+        const { user_id } = req.params;
+
+        if (!user_id) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID is required
+        //check firebase if uid exists
+        await admin.auth().getUser(user_id)
+        // Find the user
+        notificationModel.find({ user: user_id }, (err, notifications) => {
+            if (err) return res.status(500).json({ msg: err.message, status: 500, success: false, }) // Internal Server Error
+            return res.status(200).json({ msg: 'Notifications Found', status: 200, success: true, notifications }) // Notifications Found and returned
+        })
+
+    }
+    catch (e) {
+        if (e.errorInfo) {
+            // User Not Found
+            log.warn(e.message)
+
+            return returnUnAuthUserError(res, e.message)
+        }
+        return commonError(res, e.message)
+    }
+})
+
+router.post('/nofications/update/:user_id', async (req, res) => {
+    try {   // required field : user_id
+        const { user_id } = req.params;
+        const { id } = req.body;
+
+        if (!user_id) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID is required
+        //check firebase if uid exists
+        await admin.auth().getUser(user_id)
+        // Find the user
+        notificationModel.findOneAndUpdate({ user: user_id, _id: id }, {
+            read: true
+        }, (err, notification) => {
+            if (err) return res.status(500).json({ msg: err.message, status: 500, success: false, }) // Internal Server Error
+            return res.status(200).json({ msg: 'Notification updated', status: 200, success: true, notification }) // Notifications Found and returned
+        })
+
     }
     catch (e) {
         if (e.errorInfo) {

@@ -510,15 +510,7 @@ router.post('/create', async (req, res) => {
         user.save(async (err) => {
             console.log(err)
             if (err) return res.status(500).json({ msg: err.message, status: 500, success: false }) // Internal Server Error
-            // create notification
-            const notification = new notificationModel({
-                user: user_id,
-                title: 'Welcome to Easeup',
-                message: "We're glad to have you on board. Enjoy your stay",
-                type: 'welcome',
-                read: false,
-                created_at: new Date()
-            })
+
             // create notification
             await createNotification(user_id, 'Welcome to Easeup', "We're glad to have you on board. Enjoy your stay", 'welcome', token)
             // send notification to update user profile
@@ -590,7 +582,6 @@ router.post('/nofications/update/:user_id', async (req, res) => {
         return commonError(res, e.message)
     }
 })
-
 
 router.get('/bookmarks', async (req, res) => {
     try { // required field : user_id

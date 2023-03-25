@@ -11,7 +11,6 @@ const { workerProfileModel } = require("../../models/worker_profile_model");
 // worker profile verification data
 router.get('/:worker', async (req, res) => {
     const { worker } = req.params
-
     // check if user is authenticated
     try {
         await admin.auth().getUser(worker) // check if worker is valid
@@ -36,7 +35,6 @@ router.get('/:worker', async (req, res) => {
         return commonError(res, e.message)
     }
 })
-
 // update selfie
 router.post('/update/image', (req, res) => {
     try {  // required field : user_id
@@ -120,7 +118,6 @@ router.post('/update/ghc-images', (req, res) => {
         return commonError(res, e.message)
     }
 })
-
 // update age doc
 router.post('/update/age-verify', (req, res) => {
     try {  // required field : user_id
@@ -156,7 +153,6 @@ router.post('/update/age-verify', (req, res) => {
         return commonError(res, e.message)
     }
 })
-
 // update proof of skill
 router.post('/update/pos', (req, res) => {
     try {  // required field : user_id
@@ -192,7 +188,6 @@ router.post('/update/pos', (req, res) => {
         return commonError(res, e.message)
     }
 })
-
 // insurance
 router.post('/update/insurance', (req, res) => {
     try {  // required field : user_id
@@ -268,7 +263,6 @@ router.post('/update/address', (req, res) => {
         return commonError(res, e.message)
     }
 })
-
 // update gender
 router.post('/update/gender', (req, res) => {
     try {  // required field : worker
@@ -305,7 +299,6 @@ router.post('/update/gender', (req, res) => {
         return commonError(res, e.message)
     }
 })
-
 // send verifcatioin code
 router.post('/phone/send-code', async (req, res) => {
     // 
@@ -353,7 +346,6 @@ router.post('/phone/send-code', async (req, res) => {
         return commonError(res, e.message)
     }
 })
-
 // update phone
 router.post('/phone/verify-code', async (req, res) => {
     // 
