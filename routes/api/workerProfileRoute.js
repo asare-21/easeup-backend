@@ -36,15 +36,16 @@ router.get('/:worker', getWorkerProfileCache, async (req, res) => {
                 }
             }
         ]).exec()
-        const { foundWorker, avgRating } = await Promise.all([promiseWorker, promiseRating])
         const totalReviews = await reviewModel.countDocuments({ worker })
+
+        const { foundWorker, avgRating, reviews } = await Promise.all([promiseWorker, promiseRating, totalReviews])
         workerCache.del(`worker-profile/${worker}`)
         return res.status(200).json({
             msg: 'Worker Profile',
             status: 200,
             success: true,
             worker: foundWorker,
-            totalReviews,
+            totalReviews: reviews,
             avgRating: avgRating[0].avgRating,
         })
     }
