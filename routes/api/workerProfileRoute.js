@@ -49,7 +49,7 @@ router.get('/:worker', getWorkerProfileCache, async (req, res) => {
             success: true,
             worker: foundWorker,
             totalReviews: reviews,
-            avgRating: promiseRating[0].avgRating,
+            avgRating: promiseRating[0].avgRating ?? 0,
         })
     }
     catch (e) {
