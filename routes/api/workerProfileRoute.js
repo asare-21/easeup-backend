@@ -70,7 +70,7 @@ router.get('/reviews/:worker', async (req, res) => {
     // check if user is authenticated
     try {
         await admin.auth().getUser(worker) // check if uid is valid
-        const foundWorker = await reviewModel.findOne({ worker },)
+        const foundWorker = await reviewModel.find({ worker },)
         return res.status(200).json({
             msg: 'Worker Profile',
             status: 200,
