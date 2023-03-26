@@ -9,7 +9,11 @@ const reviewSchema = new Schema({
         ref: 'Worker',
         required: true
     },
+    name: {
+        type: String,
+        required: true
 
+    },
     user: {
         type: String,
         ref: 'User',
