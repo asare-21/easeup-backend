@@ -641,7 +641,7 @@ router.put('/booking-status', async (req, res) => {
 
 // receive worker review
 router.post('/worker-review', async (req, res) => {
-    const { worker, user, rating, review, } = req.body
+    const { worker, user, rating, review, userImage } = req.body
     try {
         await admin.auth().getUser(worker) // check if worker is valid
         await admin.auth().getUser(user) // check if user is valid
@@ -650,6 +650,7 @@ router.post('/worker-review', async (req, res) => {
             user,
             rating,
             review,
+            userImage
         },)
         // save review
         await reviewM.save()

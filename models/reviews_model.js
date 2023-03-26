@@ -15,6 +15,10 @@ const reviewSchema = new Schema({
         ref: 'User',
         required: true
     },
+    userImage: {
+        type: String,
+        default: ''
+    },
     rating: {
         type: Number,
         required: true
