@@ -757,7 +757,7 @@ router.post('/book-slot', async (req, res) => {
 
         if (!date || !end) return commonError(res, 'Please provide all required fields. Start and End times are required.')
 
-        if (!worker || !client || !skills || !name || !fee || !ref || !image || !workerImage, clientName) return commonError(res, 'Please provide all required fields. Worker, Client, Skills, Fee...')
+        if (!worker || !client || !skills || !name || !fee || !ref || !image || !workerImage || !clientName || !photos) return commonError(res, 'Please provide all required fields. Worker, Client, Skills, Fee...')
         await admin.auth().getUser(worker) // check if worker is valid
         await admin.auth().getUser(client) // check if client is valid
         // return error if date is in the past
