@@ -49,6 +49,7 @@ router.get('/:worker', getWorkerProfileCache, async (req, res) => {
             worker: promiseWorker,
             totalReviews: totalReviews,
             avgRating: promiseRating[0].avgRating,
+
         })
     }
     catch (e) {
@@ -69,12 +70,12 @@ router.get('/reviews/:worker', async (req, res) => {
     // check if user is authenticated
     try {
         await admin.auth().getUser(worker) // check if uid is valid
-        const worker = await reviewModel.findOne({ worker },)
+        const foundWorker = await reviewModel.findOne({ worker },)
         return res.status(200).json({
             msg: 'Worker Profile',
             status: 200,
             success: true,
-            worker
+            worker: foundWorker
         })
     }
     catch (e) {
