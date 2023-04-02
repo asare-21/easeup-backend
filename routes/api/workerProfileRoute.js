@@ -990,4 +990,59 @@ router.post('/refund/:ref', async (req, res) => {
     }
 })
 
+router.patch('/update-location', async (req, res) => {
+    const { worker, client, location } = req.body
+
+    try {
+        await admin.auth().getUser(worker) // check if worker is valid
+        await admin.auth().getUser(client) // check if worker is valid
+        const bookings = await bookingModel.findOneAndUpdate({
+            worker,
+            client,
+        }, {
+            $set: {
+                latlng: location
+            }
+        })
+        // send notification to device of worker and client
+        const workerToken = await workerModel.findById(worker)
+        const userToken = await userModel.findById(client)
+        Promise.all([
+            await admin.messaging().sendToDevice(
+                userToken.token,
+                {
+                    notification: {
+                        title: 'Location update successfull',
+                        body: 'Your location has been updated. We will notify the worker.'
+                    }
+                }
+            ),
+            await admin.messaging().sendToDevice(
+                workerToken.token,
+                {
+                    notification: {
+                        title: 'Job location update.',
+                        body: 'The client has updated their location. Please check your dashboard for more details'
+                    }
+                }
+            )
+        ])
+
+        return res.status(200).json({
+            msg: 'Address Update Successfull',
+            status: 200,
+            success: true,
+            bookings
+        })
+
+    } catch (e) {
+        if (e.errorInfo) {
+            // User Not Found
+            log.warn(e.message)
+            return returnUnAuthUserError(res, e.message)
+        }
+        return commonError(res, e.message)
+    }
+})
+
 module.exports.workerProfileRoute = router
