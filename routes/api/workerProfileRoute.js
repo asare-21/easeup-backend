@@ -1000,9 +1000,9 @@ router.patch('/update-location', async (req, res) => {
             worker,
             client,
         }, {
-            $set: {
-                latlng: location
-            }
+
+            latlng: location
+
         })
         // send notification to device of worker and client
         const workerToken = await workerModel.findById(worker)
