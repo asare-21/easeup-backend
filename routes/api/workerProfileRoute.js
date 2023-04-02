@@ -1065,7 +1065,7 @@ router.patch('/update-date', async (req, res) => {
         }, { new: true }).exec()
         if (!bookings) return commonError(res, 'Booking not found')
 
-        console.log(bookings, typeof location[0], typeof location[1])
+        console.log(bookings)
         // send notification to device of worker and client
         const workerToken = await workerModel.findById(worker)
         const userToken = await userModel.findById(client)
