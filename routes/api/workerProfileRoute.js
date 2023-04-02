@@ -1058,10 +1058,10 @@ router.patch('/update-date', async (req, res) => {
         const bookings = await bookingModel.findOneAndUpdate({
             worker,
             client,
+
+        }, {
             date,
             day
-        }, {
-            latlng: location
         }, { new: true }).exec()
         if (!bookings) return commonError(res, 'Booking not found')
 
