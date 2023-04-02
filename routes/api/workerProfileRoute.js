@@ -715,12 +715,13 @@ router.get('/available-slots/:worker', async (req, res) => {
         const { worker } = req.params
         const { start, day, user } = req.query
         await admin.auth().getUser(worker) // check if worker is valid
-        const date = new Date(start)
+        // const date = new Date(start)
 
         const timeslots = await bookingModel.find({
-            [user ? 'client' : 'worker']: worker,
+            worker,
             day
         },)
+        console.log("Timeslots ", timeslots)
 
         if (!timeslots) return res.status(200).json({
             msg: 'Worker Profile Fetched Successfully',
