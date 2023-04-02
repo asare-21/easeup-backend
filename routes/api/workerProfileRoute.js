@@ -1001,7 +1001,7 @@ router.patch('/update-location', async (req, res) => {
             client,
         }, {
             latlng: location
-        })
+        }, { new: true }).exec()
         if (!bookings) return commonError(res, 'Booking not found')
 
         console.log(bookings, typeof location[0], typeof location[1])
