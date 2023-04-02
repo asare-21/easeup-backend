@@ -1048,6 +1048,7 @@ router.patch('/update-location', async (req, res) => {
         return commonError(res, e.message)
     }
 })
+
 router.patch('/update-date', async (req, res) => {
     const { worker, client, date, day } = req.body
 
