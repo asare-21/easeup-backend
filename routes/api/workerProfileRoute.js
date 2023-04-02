@@ -1000,9 +1000,9 @@ router.patch('/update-location', async (req, res) => {
             worker,
             client,
         }, {
-
-            latlng: location
-
+            $set: {
+                latlng: location
+            }
         })
         if (!bookings) return commonError(res, 'Booking not found')
 
