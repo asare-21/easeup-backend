@@ -1050,7 +1050,7 @@ router.patch('/update-location', async (req, res) => {
 })
 
 router.patch('/update-date', async (req, res) => {
-    const { worker, client, date, day } = req.body
+    const { worker, client, date, day, ref } = req.body
 
     try {
         await admin.auth().getUser(worker) // check if worker is valid
@@ -1058,11 +1058,11 @@ router.patch('/update-date', async (req, res) => {
         const bookings = await bookingModel.findOneAndUpdate({
             worker,
             client,
-
+            ref
         }, {
             date,
             day
-        }, { new: true }).exec()
+        }, { new: true })
         if (!bookings) return commonError(res, 'Booking not found')
 
         console.log(bookings)
