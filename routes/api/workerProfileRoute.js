@@ -734,7 +734,8 @@ router.get('/available-slots/:worker', async (req, res) => {
             msg: 'Worker Profile Fetched Successfully',
             status: 200,
             success: true,
-            timeslots
+            timeslots,
+            length: timeslots.length
         })
     }
     catch (e) {
