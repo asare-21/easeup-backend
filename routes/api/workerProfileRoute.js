@@ -713,7 +713,7 @@ router.get('/worker-review/:worker', async (req, res) => {
 router.get('/available-slots/:worker', async (req, res) => {
     try {
         const { worker } = req.params
-        const { start, day, user } = req.query
+        const { day } = req.query
         await admin.auth().getUser(worker) // check if worker is valid
         // const date = new Date(start)
 
@@ -1034,6 +1034,63 @@ router.patch('/update-location', async (req, res) => {
 
         return res.status(200).json({
             msg: 'Address Update Successfull',
+            status: 200,
+            success: true,
+            bookings
+        })
+
+    } catch (e) {
+        if (e.errorInfo) {
+            // User Not Found
+            log.warn(e.message)
+            return returnUnAuthUserError(res, e.message)
+        }
+        return commonError(res, e.message)
+    }
+})
+router.patch('/update-date', async (req, res) => {
+    const { worker, client, date, day } = req.body
+
+    try {
+        await admin.auth().getUser(worker) // check if worker is valid
+        await admin.auth().getUser(client) // check if worker is valid
+        const bookings = await bookingModel.findOneAndUpdate({
+            worker,
+            client,
+            date,
+            day
+        }, {
+            latlng: location
+        }, { new: true }).exec()
+        if (!bookings) return commonError(res, 'Booking not found')
+
+        console.log(bookings, typeof location[0], typeof location[1])
+        // send notification to device of worker and client
+        const workerToken = await workerModel.findById(worker)
+        const userToken = await userModel.findById(client)
+        Promise.all([
+            await admin.messaging().sendToDevice(
+                userToken.token,
+                {
+                    notification: {
+                        title: 'Date update successfull',
+                        body: 'New date has been updated. We will notify the worker.'
+                    }
+                }
+            ),
+            await admin.messaging().sendToDevice(
+                workerToken.token,
+                {
+                    notification: {
+                        title: 'Job date update.',
+                        body: 'The client has updated the date and time for the job. Please check your dashboard for more details'
+                    }
+                }
+            )
+        ])
+
+        return res.status(200).json({
+            msg: 'Update Successfull',
             status: 200,
             success: true,
             bookings
