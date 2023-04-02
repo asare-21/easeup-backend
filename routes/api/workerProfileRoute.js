@@ -1000,13 +1000,11 @@ router.patch('/update-location', async (req, res) => {
             worker,
             client,
         }, {
-            $set: {
-                latlng: location
-            }
+            latlng: location
         })
         if (!bookings) return commonError(res, 'Booking not found')
 
-        console.log(bookings, location)
+        console.log(bookings, typeof location[0], typeof location[1])
         // send notification to device of worker and client
         const workerToken = await workerModel.findById(worker)
         const userToken = await userModel.findById(client)
