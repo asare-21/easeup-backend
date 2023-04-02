@@ -991,7 +991,7 @@ router.post('/refund/:ref', async (req, res) => {
 })
 
 router.patch('/update-location', async (req, res) => {
-    const { worker, client, location } = req.body
+    const { worker, client, location, ref } = req.body
 
     try {
         await admin.auth().getUser(worker) // check if worker is valid
@@ -999,6 +999,7 @@ router.patch('/update-location', async (req, res) => {
         const bookings = await bookingModel.findOneAndUpdate({
             worker,
             client,
+            ref
         }, {
             latlng: location
         }, { new: true }).exec()
