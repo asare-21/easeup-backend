@@ -159,10 +159,10 @@ http.listen(PORT, async () => {
             );
             console.log('Connected to MongoDB');
         }, 15 * 1000 * 60);// 5 minutes
-    }, 6000);// 5 minutes
+        // }, 6000);// 5 minutes
     } catch (err) {
-    console.error(err)
-}
+        console.error(err)
+    }
 })
 
 
