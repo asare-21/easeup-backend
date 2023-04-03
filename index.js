@@ -147,22 +147,22 @@ http.listen(PORT, async () => {
         });
         // initial cache
 
-        // setInterval(async () => {
-        //     Promise.all(
-        //         [
-        //             // Load and cached data
-        //             await getAndCacheUsers(),
-        //             await getAndCacheWorkers(),
-        //             await getAndCacheWorkerProfiles(),
-        //             await getAndCacheWorkerMedia(),
-        //         ]
-        //     );
-        //     console.log('Connected to MongoDB');
-        // }, 15 * 1000 * 60);// 5 minutes
-        // }, 6000);// 5 minutes
+        setInterval(async () => {
+            Promise.all(
+                [
+                    // Load and cached data
+                    await getAndCacheUsers(),
+                    await getAndCacheWorkers(),
+                    await getAndCacheWorkerProfiles(),
+                    await getAndCacheWorkerMedia(),
+                ]
+            );
+            console.log('Connected to MongoDB');
+        }, 15 * 1000 * 60);// 5 minutes
+    }, 6000);// 5 minutes
     } catch (err) {
-        console.error(err)
-    }
+    console.error(err)
+}
 })
 
 
