@@ -941,7 +941,7 @@ router.post('/refund/:ref', async (req, res) => {
         // Set refund details
         const refundDetails = JSON.stringify({
             'transaction': foundBooking.ref,
-            'amount': (foundBooking.commitmentFee * 100) * 0.8,
+            // 'amount': (foundBooking.commitmentFee * 100),
         })
         // send notification to device of worker and client
         await admin.messaging().sendToDevice(
@@ -984,6 +984,49 @@ router.post('/refund/:ref', async (req, res) => {
         })
         refundRequest.write(refundDetails)
         refundRequest.end()
+
+        // find and delete bookng
+
+    }
+    catch (e) {
+        console.log("Something went wrong ", e);
+        return commonError(res, e.message)
+    }
+})
+router.post('/cancel/:ref', async (req, res) => {
+    // refund payment and cancel booking.
+
+    const { ref } = req.params
+    try {
+        const foundBooking = await bookingModel.findOne({ ref }) // find booking
+        // user and worker device tokens to send an alert that the refund has been process and booking cancelled
+        const workerToken = await workerModel.findById(foundBooking.worker)
+        const userToken = await userModel.findById(foundBooking.client)
+
+        // send notification to device of worker and client
+        await admin.messaging().sendToDevice(
+            userToken.token,
+            {
+                notification: {
+                    title: 'Booking Cancelled',
+                    body: 'Your booking has been cancelled successfully'
+                }
+            }
+        )
+        await admin.messaging().sendToDevice(
+            workerToken.token,
+            {
+                notification: {
+                    title: 'Sorry, Booking Cancelled',
+                    body: 'The customer has cancelled the booking. Please check your dashboard for more details'
+                }
+            }
+        )
+        return res.status(200).json({
+            msg: 'Booking cancelled',
+            status: 200,
+            success: true,
+        })
 
         // find and delete bookng
 
