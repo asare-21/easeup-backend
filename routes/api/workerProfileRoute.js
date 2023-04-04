@@ -923,6 +923,7 @@ router.post('/verify-payment', async (req, res) => {
 router.post('/refund/:ref', async (req, res) => {
     // refund payment and cancel booking.
     // Only refund 60% of the commitment fee
+    const { worker, reason } = req.body
     const options = {
         method: 'POST',
         hostname: 'api.paystack.co',
@@ -936,7 +937,7 @@ router.post('/refund/:ref', async (req, res) => {
     try {
         const foundBooking = await bookingModel.findOne({ ref }) // find booking
         // user and worker device tokens to send an alert that the refund has been process and booking cancelled
-        const workerToken = await workerModel.findById(foundBooking.worker)
+        const workerToken = await workerModel.findById(worker)
         const userToken = await userModel.findById(foundBooking.client)
         // Set refund details
         const refundDetails = JSON.stringify({
@@ -970,8 +971,9 @@ router.post('/refund/:ref', async (req, res) => {
             );
             response.on('end', async () => {
                 console.log(JSON.parse(data));
-                await bookingModel.findOneAndUpdate({ ref }, {
+                await bookingModel.findOneAndUpdate({ ref, worker }, {
                     cancelled: true,
+                    cancelledReason: reason,
                     endTime: Date.now()
                 })
                 return res.status(200).json({
@@ -995,15 +997,13 @@ router.post('/refund/:ref', async (req, res) => {
 })
 router.post('/cancel/:ref', async (req, res) => {
     // refund payment and cancel booking.
-
     const { ref } = req.params
+    const { client } = req.body
     try {
         const foundBooking = await bookingModel.findOne({ ref }) // find booking
         // user and worker device tokens to send an alert that the refund has been process and booking cancelled
         const workerToken = await workerModel.findById(foundBooking.worker)
-        const userToken = await userModel.findById(foundBooking.client)
-
-        // send notification to device of worker and client
+        const userToken = await userModel.findById(client)
         await admin.messaging().sendToDevice(
             userToken.token,
             {
