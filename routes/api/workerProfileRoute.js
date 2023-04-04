@@ -306,7 +306,7 @@ router.post('/twitter', async (req, res) => {
 })
 
 router.post('/portfolio', async (req, res) => {
-    const { worker, media, description, image } = req.body
+    const { worker, media, description, thumbnail, image } = req.body
     try {
         if (!media && !description) return commonError(res, 'No media provided');
         await admin.auth().getUser(worker) // check if worker is valid
@@ -323,7 +323,7 @@ router.post('/portfolio', async (req, res) => {
                         url: media,
                         description,
                         image,
-                        // thumbnail
+                        thumbnail
                     },
                 })
 
@@ -348,7 +348,7 @@ router.post('/portfolio', async (req, res) => {
                             url: media,
                             description,
                             image,
-                            // thumbnail
+                            thumbnail
                         }
                     }
                 }, (err, worker) => {
