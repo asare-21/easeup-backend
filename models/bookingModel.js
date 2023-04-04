@@ -86,6 +86,11 @@ const bookingSchema = new Schema({
     photos: {
         type: Array,
         required: true,
+    },
+    basePrice: {
+        type: Number,
+        required: true
+
     }
 })
 
