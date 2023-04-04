@@ -48,6 +48,8 @@ router.get('/:worker', getWorkerProfileCache, async (req, res) => {
             status: 200,
             success: true,
             worker: promiseWorker,
+            avgRating,
+            totalReviews
 
         })
     }
