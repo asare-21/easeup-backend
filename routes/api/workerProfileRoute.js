@@ -43,7 +43,7 @@ router.get('/:worker', getWorkerProfileCache, async (req, res) => {
         promiseWorker.totalReviews = totalReviews
         promiseWorker.jobs = totalReviews
         // console.log(foundWorker, avgRating, reviews)
-        workerCache.set(`worker-profile/${worker}`, promiseWorker)
+        workerCache.set(`worker-profile/${worker}`, JSON.stringify(promiseWorker))
         return res.status(200).json({
             msg: 'Worker Profile',
             status: 200,
