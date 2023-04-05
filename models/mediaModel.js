@@ -20,7 +20,10 @@ const comment = new Schema({
 })
 
 const media = new Schema({
-    url: [String],
+    url: {
+        type: [String],
+        required: true
+    },
     image: {
         type: Boolean,
         default: false
