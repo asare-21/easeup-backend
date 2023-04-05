@@ -348,7 +348,7 @@ router.get('/portfolio/:worker/:page', mediaCache, async (req, res) => {
     try {
         await admin.auth().getUser(worker) // check if worker is valid
         const posts = await mediaModel.find({ worker }).limit(5).skip(page * 5) // get 5 posts per page
-        console.log(posts)
+        console.log("Found media ", posts)
 
         if (!posts) return commonError(res, 'No portfolio found')
 
