@@ -18,6 +18,7 @@ const { userModel } = require('../../models/user_model');
 const secret = process.env.PAYSTACK_SECRET;
 const https = require('https');
 const { query } = require('express');
+const { mediaCache } = require('../../cache/media_cache');
 
 
 router.get('/:worker', getWorkerProfileCache, async (req, res) => {
@@ -310,63 +311,24 @@ router.post('/portfolio', async (req, res) => {
     try {
         if (!media && !description) return commonError(res, 'No media provided');
         await admin.auth().getUser(worker) // check if worker is valid
-        mediaModel.find({ worker }, (err, result) => {
+        const newMedia = new mediaModel({
+            worker,
+            url: media,
+            description,
+            image,
+            thumbnail
+        })
+        newMedia.save((err, worker) => {
             if (err) {
                 console.log(err)
                 return commonError(res, err.message)
             }
-
-            if (result.length === 0) {
-                const newMedia = new mediaModel({
-                    worker,
-                    media: {
-                        url: media,
-                        description,
-                        image,
-                        thumbnail
-                    },
-                })
-
-                workerCache.del(`portfolio/${worker}`)
-
-                newMedia.save((err, worker) => {
-                    if (err) {
-                        console.log(err)
-                        return commonError(res, err.message)
-                    }
-                    return res.status(200).json({
-                        msg: 'Worker Profile Updated',
-                        status: 200,
-                        success: true,
-                        worker
-                    })
-                })
-            } else {
-                mediaModel.findOneAndUpdate({ worker }, {
-                    $push: {
-                        media: {
-                            url: media,
-                            description,
-                            image,
-                            thumbnail
-                        }
-                    }
-                }, (err, worker) => {
-                    if (err) {
-                        console.log(err)
-                        return commonError(res, err.message)
-                    }
-
-                    workerCache.del(`portfolio/${worker}`)
-
-                    return res.status(200).json({
-                        msg: 'Worker Profile Updated',
-                        status: 200,
-                        success: true,
-                        worker
-                    })
-                })
-            }
+            return res.status(200).json({
+                msg: 'Worker Profile Updated',
+                status: 200,
+                success: true,
+                worker
+            })
         })
 
     }
@@ -381,19 +343,20 @@ router.post('/portfolio', async (req, res) => {
     }
 })
 
-router.get('/portfolio/:worker', getWorkerPortfolioCache, async (req, res) => {
-    const { worker } = req.params
+router.get('/portfolio/:worker/:page', mediaCache, async (req, res) => {
+    const { worker, page } = req.params
     try {
         await admin.auth().getUser(worker) // check if worker is valid
-        const posts = await mediaModel.findOne({ worker })
+        const posts = await mediaModel.find({ worker }).limit(5).skip(page * 5) // get 5 posts per page
+        console.log(posts)
 
         if (!posts) return commonError(res, 'No portfolio found')
 
         console.log(posts)
 
-        workerCache.set(`portfolio/${worker}`, JSON.stringify(posts))
+        workerCache.set(`portfolio/${page}/${worker}`, JSON.stringify(posts))
         return res.status(200).json({
-            msg: 'Worker Profile Fetched Successfully',
+            msg: 'Worker Profile Media Fetched Successfully',
             status: 200,
             success: true,
             worker: posts

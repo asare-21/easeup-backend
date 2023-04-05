@@ -38,6 +38,11 @@ const media = new Schema({
         type: Number,
         default: 0
     },
+    worker: {
+        type: String,
+        ref: 'Worker',
+        required: true
+    }
 });
 
 const mediaModelSchema = new Schema({
@@ -49,4 +54,4 @@ const mediaModelSchema = new Schema({
     }
 })
 
-module.exports.mediaModel = model('Media', mediaModelSchema);
+module.exports.mediaModel = model('Media', media);
