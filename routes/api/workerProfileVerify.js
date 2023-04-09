@@ -7,7 +7,7 @@ const otpGenerator = require('otp-generator')
 const axios = require('axios')
 const { commonError, returnUnAuthUserError } = require('../api/user_route')
 const { workerProfileModel } = require("../../models/worker_profile_model");
-
+const { cache } = require('../../cache/user_cache')
 // worker profile verification data
 router.get('/:worker', async (req, res) => {
     const { worker } = req.params
@@ -63,6 +63,7 @@ router.post('/update/image', (req, res) => {
                         log.warn(err.message)
                         return res.status(500).json({ msg: err.message, status: 500, success: false }) // Internal Server Error
                     }
+                    cache.del(`worker-profile/${worker}`)
                     return res.status(200).json({
                         msg: 'Profile updated', status: 200, success: true, user
                     })

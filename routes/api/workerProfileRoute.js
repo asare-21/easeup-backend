@@ -494,6 +494,7 @@ router.get('/booking-upcoming/:worker', async (req, res) => {
         return commonError(res, e.message)
     }
 })
+
 // upcoming
 router.get('/booking-progress/:worker', async (req, res) => {
     const { worker } = req.params
@@ -518,6 +519,7 @@ router.get('/booking-progress/:worker', async (req, res) => {
         return commonError(res, e.message)
     }
 })
+
 // completed
 router.get('/booking-completed/:worker', async (req, res) => {
     const { worker } = req.params
@@ -543,6 +545,7 @@ router.get('/booking-completed/:worker', async (req, res) => {
         return commonError(res, e.message)
     }
 })
+
 //cancelled
 router.get('/booking-cancelled/:worker', async (req, res) => {
     const { worker } = req.params
