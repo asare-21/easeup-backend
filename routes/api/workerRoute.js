@@ -7,7 +7,7 @@ const { commonError, returnUnAuthUserError } = require('../api/user_route');
 const { workerProfileModel } = require('../../models/worker_profile_model');
 const { workerProfileVerificationModel } = require('../../models/worker_profile_verification_model');
 const { locationModel } = require("../../models/workerLocationModel");
-const { getWorkerCache } = require('../../cache/worker_cache');
+const { getWorkerCache, getWorkerTokenCache } = require('../../cache/worker_cache');
 const { cache } = require('../../cache/user_cache');
 const { userModel } = require('../../models/user_model');
 const workerCache = cache;
@@ -75,6 +75,31 @@ router.get('/:worker', getWorkerCache, async (req, res) => {
             status: 200,
             success: true,
             worker: result
+        })
+    }
+    catch (e) {
+        if (e.errorInfo) {
+            // User Not Found
+            log.warn(e.message)
+            return returnUnAuthUserError(res, e.message)
+        }
+        return commonError(res, e.message)
+    }
+})
+router.get('token/:worker', getWorkerTokenCache, async (req, res) => {
+    const { worker } = req.params
+    // check if user is authenticated
+    try {
+        await admin.auth().getUser(worker) // check if worker is valid
+        const result = await workerModel.findById(worker)
+
+        workerCache.set(`worker/${worker._id}`, result); //cache results
+
+        return res.status(200).json({
+            msg: 'Worker Profile',
+            status: 200,
+            success: true,
+            token: result.token
         })
     }
     catch (e) {
