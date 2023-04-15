@@ -90,8 +90,16 @@ const bookingSchema = new Schema({
     basePrice: {
         type: Number,
         required: true
+    },
+    workerPhone: {
+        type: String,
+        required: true
+    },
+    clientPhone: {
+        type: String,
+        required: true
+    },
 
-    }
 })
 
 
