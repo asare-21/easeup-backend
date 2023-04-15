@@ -86,7 +86,7 @@ router.get('/:worker', getWorkerCache, async (req, res) => {
         return commonError(res, e.message)
     }
 })
-router.get('token/:worker', getWorkerTokenCache, async (req, res) => {
+router.get('/token/:worker', getWorkerTokenCache, async (req, res) => {
     const { worker } = req.params
     // check if user is authenticated
     try {
@@ -99,7 +99,6 @@ router.get('token/:worker', getWorkerTokenCache, async (req, res) => {
                 body: 'You have a new job request from a user. Please check and accept or reject the request as soon as possible.'
             }
         })
-
 
         return res.status(200).json({
             msg: 'Worker Profile',
