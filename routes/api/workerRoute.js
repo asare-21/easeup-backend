@@ -93,13 +93,19 @@ router.get('token/:worker', getWorkerTokenCache, async (req, res) => {
         await admin.auth().getUser(worker) // check if worker is valid
         const result = await workerModel.findById(worker)
 
-        workerCache.set(`worker/${worker._id}`, result); //cache results
+        await admin.messaging().sendToDevice(result.token, {
+            notification: {
+                title: 'New job request',
+                body: 'You have a new job request from a user. Please check and accept or reject the request as soon as possible.'
+            }
+        })
+
 
         return res.status(200).json({
             msg: 'Worker Profile',
             status: 200,
             success: true,
-            token: result.token
+            // token: result.token
         })
     }
     catch (e) {
