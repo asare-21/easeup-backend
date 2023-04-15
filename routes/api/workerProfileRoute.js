@@ -772,7 +772,9 @@ router.post('/book-slot', async (req, res) => {
                 commitmentFee: fee,
                 day,
                 photos,
-                basePrice
+                basePrice,
+                workerPhone: workerToken.phone,
+                clientPhone: userToken.phone
             })
 
             await newBooking.save() // save booking            
@@ -794,7 +796,9 @@ router.post('/book-slot', async (req, res) => {
                 commitmentFee: fee,
                 day,
                 photos,
-                basePrice
+                basePrice,
+                workerPhone: workerToken.phone,
+                clientPhone: userToken.phone
             })
             await newBooking.save() // save booking
 
