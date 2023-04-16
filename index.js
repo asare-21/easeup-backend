@@ -37,7 +37,6 @@ const limiter = rateLimit({
     max: 1000, // Limit each IP to 1000 requests per `window` (here, per 15 minutes)
     standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
     legacyHeaders: true, // Disable the `X-RateLimit-*` headers
-
     message: { msg: 'Too many requests from this IP, please try again later', status: 429, success: false, limit: true },
     onLimitReached: (req, res, options) => {
         log.warn(`Rate limit reached for IP: ${req.ip}`)

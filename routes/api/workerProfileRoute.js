@@ -345,7 +345,7 @@ router.post('/portfolio', async (req, res) => {
 
 router.get('/portfolio/:worker/:page', mediaCache, async (req, res) => {
     const { worker, page } = req.params
-    const pageSize = 5
+    const pageSize = 10
     try {
         await admin.auth().getUser(worker) // check if worker is valid
         const posts = await mediaModel.find({ worker }).limit(pageSize).skip((page - 1) * pageSize) // get 5 posts per page
