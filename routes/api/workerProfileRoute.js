@@ -733,7 +733,7 @@ router.post('/book-slot', async (req, res) => {
         await admin.auth().getUser(worker) // check if worker is valid
         await admin.auth().getUser(client) // check if client is valid
         // return error if date is in the past
-        const workerToken = await workerProfileVerificationModel.findById(worker)
+        const workerToken = await workerProfileVerificationModel.findOne(worker)
         const userToken = await userModel.findById(client)
         // Promise.all([workerToken, userToken])
         console.log
