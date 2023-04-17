@@ -19,6 +19,7 @@ const secret = process.env.PAYSTACK_SECRET;
 const https = require('https');
 const { query } = require('express');
 const { mediaCache } = require('../../cache/media_cache');
+const { workerProfileVerificationModel } = require('../../models/worker_profile_verification_model');
 
 
 router.get('/:worker', getWorkerProfileCache, async (req, res) => {
@@ -732,8 +733,10 @@ router.post('/book-slot', async (req, res) => {
         await admin.auth().getUser(worker) // check if worker is valid
         await admin.auth().getUser(client) // check if client is valid
         // return error if date is in the past
-        const workerToken = await workerModel.findById(worker)
+        const workerToken = await workerProfileVerificationModel.findById(worker)
         const userToken = await userModel.findById(client)
+        // Promise.all([workerToken, userToken])
+        console.log
         console.log(userToken, workerToken)
         const foundBookings = await bookingModel.find({ worker: worker, isPaid: true, completed: false, cancelled: false, day })
         // console.log(foundBookings)
