@@ -843,6 +843,7 @@ router.post('/book-slot', async (req, res) => {
 router.post('/verify-payment', async (req, res) => {
     const { event, data } = req.body
     try {
+        console.log(req.body, event, data)
         const hash = crypto.createHmac('sha512', secret).update(JSON.stringify(req.body)).digest('hex');
         if (hash == req.headers['x-paystack-signature']) {
             // Retrieve the request's body
