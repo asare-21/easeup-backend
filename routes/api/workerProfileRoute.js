@@ -893,6 +893,10 @@ router.post('/verify-payment', async (req, res) => {
                 status: 200,
             })
         }
+        return res.status(200).json({
+            msg: 'Payment Not Verified',
+            status: 200,
+        })
     } catch (e) {
         return commonError(res, e.message)
     }
