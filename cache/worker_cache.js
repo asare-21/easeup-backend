@@ -1,6 +1,8 @@
 const NodeCache = require("node-cache");
 const { cache } = require("./user_cache");
 const myCache = cache
+const admin = require("firebase-admin");
+
 module.exports.getWorkerCache = async function getWorkerCache(req, res, next) {
     // use user id to get user cache
     const worker = myCache.get(`worker/${req.params.worker}`);
