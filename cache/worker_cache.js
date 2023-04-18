@@ -19,7 +19,7 @@ module.exports.getWorkerCache = async function getWorkerCache(req, res, next) {
 module.exports.getWorkerTokenCache = async function getWorkerTokenCache(req, res, next) {
     // use user id to get user cache
     const worker = myCache.get(`worker-token/${req.params.worker}`);
-    console.log('cached worker ', worker);
+    console.log('cached worker token ', worker);
     if (worker !== null && worker !== undefined) {
         console.log('Worker found in cache');
 

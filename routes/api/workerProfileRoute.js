@@ -843,7 +843,10 @@ router.post('/book-slot', async (req, res) => {
 router.post('/verify-payment', async (req, res) => {
     const { event, data } = req.body
     try {
-        console.log(req.body, event, data)
+        console.log("------------ Pay stack webhook request body ------------")
+        console.log(req.body)
+        console.log("------------ Pay stack request headers ------------")
+        console.log(req.headers)
         const hash = crypto.createHmac('sha512', secret).update(JSON.stringify(req.body)).digest('hex');
         if (hash == req.headers['x-paystack-signature']) {
             // Retrieve the request's body
@@ -889,6 +892,7 @@ router.post('/verify-payment', async (req, res) => {
                     status: 200,
                 })
             }
+
             return res.status(200).json({
                 msg: 'Payment Not Verified',
                 status: 200,
