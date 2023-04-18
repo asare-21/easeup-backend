@@ -848,7 +848,13 @@ router.post('/verify-payment', async (req, res) => {
         console.log("------------ Pay stack request headers ------------")
         console.log(req.headers)
         const hash = crypto.createHmac('sha512', secret).update(JSON.stringify(req.body)).digest('hex');
-        if (hash == req.headers['x-paystack-signature']) {
+        console.log("------------ Pay stack generated hash ------------")
+        console.log(hash)
+        console.log("------------ Pay stack request hash ------------")
+        console.log(req.headers['x-paystack-signature'])
+        console.log("------------ Pay stack hash check equality ------------")
+        console.log(hash === req.headers['x-paystack-signature'])
+        if (hash === req.headers['x-paystack-signature']) {
             // Retrieve the request's body
             const success = data.gateway_response === 'Approved' || "Successful" && event === 'charge.success'
             const ref = data.reference
