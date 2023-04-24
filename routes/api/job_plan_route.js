@@ -7,11 +7,12 @@ const { cache } = require('../../cache/user_cache');
 router.get("/:client", jobPlanCache, async (req, res) => {
     // used to get job plans
     await admin.auth().getUser(req.params.client) // check if uid is valid
-    const jobPlans = await jobModel.find({ client: req.params.client }).sort({ date: -1 })
+    const jobPlans = await jobModel.find({ client: req.params.client })
+    console.log("Found job plans: ", jobPlans)
     if (jobPlans.length === 0) {
         return res.status(404).json({
             msg: 'No job plans found',
-            status: 404,
+            status: 200,
             success: false,
         })
     }
@@ -46,36 +47,48 @@ router.get("/:client/:job_id", singleJobPlanCache, async (req, res) => {
 })
 
 router.post("/:client", async (req, res) => {
-    const { client, jobDescription, location, skills, photos } = req.body;
-    await admin.auth().getUser(client) // check if uid is valid
-    // check if a job plan with the same description exists
+    const { jobDescription, location, skills, photos } = req.body;
+    const client = req.params.client;
+    try {
+        await admin.auth().getUser(client) // check if uid is valid
+        // check if a job plan with the same description exists
 
-    const existingPlan = await jobModel.findOne({ jobDescription, skills })
-    if (existingPlan) {
+        const existingPlan = await jobModel.findOne({ jobDescription, skills })
+        if (!existingPlan) console.log('Plan does not exist')
+        if (existingPlan) {
+            return res.status(400).json({
+                msg: 'Job plan already exists',
+                status: 400,
+                success: false,
+            })
+        }
+        const jobPlan = new jobModel({
+            client,
+            jobDescription,
+            location,
+            skills,
+            photos
+        })
+
+        await jobPlan.save()
+        // clear cache for this user
+        cache.del(`plans/${req.params.client}/${req.params.job_id}`)
+        cache.del(`plans/${req.params.client}`)
+        return res.status(200).json({
+            success: true,
+            status: 200,
+            msg: 'Job plan created',
+            jobPlan
+        })
+    }
+    catch (err) {
+        console.log(err)
         return res.status(400).json({
-            msg: 'Job plan already exists',
+            msg: 'Something went wrong',
             status: 400,
             success: false,
         })
     }
-
-
-    const jobPlan = new jobModel({
-        client,
-        jobDescription,
-        location,
-        skills,
-        photos
-    })
-
-    await jobPlan.save()
-
-    return res.status(200).json({
-        success: true,
-        status: 200,
-        msg: 'Job plan created',
-        jobPlan
-    })
 
 })
 
@@ -84,12 +97,17 @@ router.delete("/:client/:job_id", async (req, res) => {
     const deleteJobPlan = await jobModel.findByIdAndDelete(req.params.job_id)
 
     if (!deleteJobPlan) {
-        return res.status(404).json({
+        return res.status(200).json({
             msg: 'Job plan not found',
             status: 404,
             success: false,
         })
     }
+    // clear cache
+    cache.del(`plans/${req.params.client}/${req.params.job_id}`)
+    cache.del(`plans/${req.params.client}`)
+
+
 
     return res.status(200).json({
         msg: 'Job plan deleted',

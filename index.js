@@ -128,6 +128,7 @@ else {
     app.use('/worker', workerRoute)
     app.use('/worker-profile', workerProfileRoute)
     app.use('/room', chatRoute)
+    app.use('/jplan', jobPlanRoute)
 
 }
 
