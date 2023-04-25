@@ -720,16 +720,10 @@ router.get('/available-slots/:worker', async (req, res) => {
 })
 
 router.post('/book-slot', async (req, res) => {
-    const {
-        worker, client, skills, name, fee, reference, latlng, image, workerImage, day,
-        photos, clientName, basePrice, clientPhone, workerPhone
-    } = req.body;
-
-    console.log(req.body)
-
+    const { worker, client, skills, name, fee, ref, latlng, image, workerImage, day, photos, clientName, basePrice } = req.body;
     try {
         const missingField = getMissingField({
-            worker, client, skills, name, fee, reference, latlng, image, workerImage, clientName, photos
+            worker, client, skills, name, fee, ref, latlng, image, workerImage, day, photos, clientName, basePrice
         });
 
         if (missingField) {
@@ -741,12 +735,20 @@ router.post('/book-slot', async (req, res) => {
         await admin.auth().getUser(client); // check if client is valid
 
         const start = await findEarliestAvailableTimeSlot(worker, day); // find earliest availble timeslor
+        console.log("Generated start time ", start)
         if (!start) {
             return commonError(res, 'No available time slots for the selected day. Please choose another day.');
         }
 
         const end = new Date(start).getTime() + 2 * 60 * 60 * 1000; // Calculate the end time (2 hours after the start time)
+        // get client and worker phone numbers
+        const clientPhone = await userModel.findById(client);
 
+        const workerPhone = await workerProfileVerificationModel.findOne({ worker });
+        // check if the phone numbers are available
+        if (!clientPhone.phone || !workerPhone.phone) {
+            return commonError(res, 'Phone number not found.');
+        }
         const newBooking = new bookingModel({
             worker,
             client,
@@ -755,18 +757,18 @@ router.post('/book-slot', async (req, res) => {
             skills,
             name,
             clientName,
-            ref: reference,
+            ref,
             latlng,
             image,
             workerImage,
             commitmentFee: fee,
-            day: start,
-            // date: start,
+            day,
+            date: start,
             photos,
             basePrice,
             isPaid: true, // remove this when testing is completed
-            clientPhone,
-            workerPhone
+            clientPhone: clientPhone.phone,
+            workerPhone: workerPhone.phone,
         });
 
         const result = await newBooking.save(); // save booking

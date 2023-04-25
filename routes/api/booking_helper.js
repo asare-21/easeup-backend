@@ -1,9 +1,10 @@
 const { bookingModel } = require('../../models/bookingModel')
+
 const findEarliestAvailableTimeSlot = async (worker, day) => {
-    const foundBookings = await bookingModel.find({ worker: worker, isPaid: true, completed: false, cancelled: false, day }).sort('start');
-    console.log("Found bookings", foundBookings)
+    const foundBookings = await bookingModel.find({ worker: worker, isPaid: true, day, cancelled: false, }).sort({ date: 1 })
+    console.log("Found bookings: ", foundBookings)
     const twoHours = 2 * 60 * 60 * 1000;
-    const maxBookingsPerDay = 3;
+    const maxBookingsPerDay = 4;
 
     if (foundBookings.length >= maxBookingsPerDay) {
         return null;
@@ -13,7 +14,7 @@ const findEarliestAvailableTimeSlot = async (worker, day) => {
     currentTimeSlot.setHours(8, 0, 0, 0); // Set time to 8am on the given day
 
     for (const booking of foundBookings) {
-        const bookingEnd = new Date(booking.end);
+        const bookingEnd = new Date(booking.date);
 
         if (currentTimeSlot.getTime() + twoHours <= booking.day) {
             return currentTimeSlot;
