@@ -761,7 +761,7 @@ router.post('/book-slot', async (req, res) => {
             workerImage,
             commitmentFee: fee,
             day: start,
-            date: start,
+            // date: start,
             photos,
             basePrice,
             isPaid: true, // remove this when testing is completed

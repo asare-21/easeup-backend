@@ -15,7 +15,7 @@ const findEarliestAvailableTimeSlot = async (worker, day) => {
     for (const booking of foundBookings) {
         const bookingEnd = new Date(booking.end);
 
-        if (currentTimeSlot.getTime() + twoHours <= booking.start) {
+        if (currentTimeSlot.getTime() + twoHours <= booking.day) {
             return currentTimeSlot;
         }
 
