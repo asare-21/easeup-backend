@@ -20,6 +20,7 @@ const https = require('https');
 const { query } = require('express');
 const { mediaCache } = require('../../cache/media_cache');
 const { workerProfileVerificationModel } = require('../../models/worker_profile_verification_model');
+const { findEarliestAvailableTimeSlot, getMissingField } = require('./booking_helper');
 
 
 router.get('/:worker', getWorkerProfileCache, async (req, res) => {
@@ -719,114 +720,76 @@ router.get('/available-slots/:worker', async (req, res) => {
 })
 
 router.post('/book-slot', async (req, res) => {
-    const { worker, client, start, skills, end, name, fee, ref, latlng, image, workerImage, day, photos, clientName, basePrice } = req.body
-    // const d = req.body.date
+    const {
+        worker, client, skills, name, fee, reference, latlng, image, workerImage, day,
+        photos, clientName, basePrice, clientPhone, workerPhone
+    } = req.body;
+
+    console.log(req.body)
+
     try {
-        const date = new Date(start)
-        if (!date || !end) return commonError(res, 'Please provide all required fields. Start and End times are required.')
+        const missingField = getMissingField({
+            worker, client, skills, name, fee, reference, latlng, image, workerImage, clientName, photos
+        });
 
-        if (!worker || !client || !skills || !name || !fee || !ref || !image || !workerImage || !clientName || !photos) return commonError(res, 'Please provide all required fields. Worker, Client, Skills, Fee...')
-        await admin.auth().getUser(worker) // check if worker is valid
-        await admin.auth().getUser(client) // check if client is valid
-        // return error if date is in the past
-        const workerToken = await workerProfileVerificationModel.findOne({ worker })
-        const userToken = await userModel.findById(client)
-        const foundBookings = await bookingModel.find({ worker: worker, isPaid: true, completed: false, cancelled: false, day })
-        if (foundBookings.length === 3) {
-            return commonError(res, 'All slots for the day have been booked. Please select another day.')
+        if (missingField) {
+            return commonError(res, `Please provide the missing field: ${missingField}.`);
         }
-        // check time difference between last booking and current booking
-        const lastBooking = foundBookings[foundBookings.length - 1]
-        if (lastBooking) {
-            const lastBookingEnd = new Date(lastBooking.end)
-            const currentBookingStart = new Date(start)
-            const timeDifference = currentBookingStart.getTime() - lastBookingEnd.getTime()
-            if (timeDifference < 3600000) {
-                return commonError(res, 'Please book at least an hour apart from the last booking.')
-            }
-            // time is okay, now check if the time is within the working hours
-            const currentBookingStartHour = currentBookingStart.getHours()
-            if (currentBookingStartHour < 8 || currentBookingStartHour > 16) {
-                return commonError(res, 'Please book within the working hours of 8am - 4pm.')
-            }
-            // save booking
-            const newBooking = new bookingModel({
-                worker,
-                client,
-                start,
-                end,
-                skills,
-                name,
-                // fee,
-                clientName,
-                ref,
-                latlng,
-                image,
-                workerImage,
-                commitmentFee: fee,
-                day,
-                photos,
-                basePrice,
-                workerPhone: workerToken.phone,
-                clientPhone: userToken.phone
-            })
 
-            await newBooking.save() // save booking            
-        } else {
-            // save booking
-            const newBooking = new bookingModel({
-                worker,
-                client,
-                start,
-                end,
-                skills,
-                name,
-                clientName,
-                // fee,
-                ref,
-                latlng,
-                image,
-                workerImage,
-                commitmentFee: fee,
-                day,
-                photos,
-                basePrice,
-                workerPhone: workerToken.phone,
-                clientPhone: userToken.phone
-            })
-            await newBooking.save() // save booking
+
+        await admin.auth().getUser(worker); // check if worker is valid
+        await admin.auth().getUser(client); // check if client is valid
+
+        const start = await findEarliestAvailableTimeSlot(worker, day); // find earliest availble timeslor
+        if (!start) {
+            return commonError(res, 'No available time slots for the selected day. Please choose another day.');
         }
-        const workerData = await workerModel.findById(worker)
-        if (workerData) await admin.messaging().send({
-            notification: {
-                title: 'New Booking',
-                body: 'You have a new booking. Please check your dashboard for more details.'
-            },
-            token: workerData.token
-        })
-        if (userToken) await admin.messaging().send({
-            notification: {
-                title: 'New Booking',
-                body: 'Your booking was successful. Awaiting payment.'
-            },
-            token: userToken.token
-        })
-        return res.status(200).json({
+
+        const end = new Date(start).getTime() + 2 * 60 * 60 * 1000; // Calculate the end time (2 hours after the start time)
+
+        const newBooking = new bookingModel({
+            worker,
+            client,
+            start,
+            end,
+            skills,
+            name,
+            clientName,
+            ref: reference,
+            latlng,
+            image,
+            workerImage,
+            commitmentFee: fee,
+            day: start,
+            date: start,
+            photos,
+            basePrice,
+            isPaid: true, // remove this when testing is completed
+            clientPhone,
+            workerPhone
+        });
+
+        const result = await newBooking.save(); // save booking
+
+        // Send notifications to the worker and client
+        // ...
+
+        res.status(200).json({
             msg: 'Booking Successful',
             status: 200,
             success: true,
-        })
-    }
-    catch (e) {
-        console.log("booking error ", e)
+            result
+        });
+    } catch (e) {
+        console.log("booking error ", e);
         if (e.errorInfo) {
             // User Not Found
-            log.warn(e.message)
-            return returnUnAuthUserError(res, e.message)
+            log.warn(e.message);
+            return returnUnAuthUserError(res, e.message);
         }
-        return commonError(res, e.message)
+        return commonError(res, e.message);
     }
-})
+});
 
 // webhook to verify payment
 router.post('/verify-payment', async (req, res) => {

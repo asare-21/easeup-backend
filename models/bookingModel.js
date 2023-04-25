@@ -33,7 +33,6 @@ const bookingSchema = new Schema({
         // end time of the slot
         type: Date,
         default: null
-
     },
     skills: {
         type: Array,
@@ -99,7 +98,6 @@ const bookingSchema = new Schema({
         type: String,
         required: true
     },
-
 })
 
 
