@@ -52,9 +52,18 @@ router.post("/:client", async (req, res) => {
     try {
         await admin.auth().getUser(client) // check if uid is valid
         // check if a job plan with the same description exists
-
         const existingPlan = await jobModel.findOne({ jobDescription, skills })
         if (!existingPlan) console.log('Plan does not exist')
+
+        const plans = await jobModel.find({ jobDescription, skills }).countDocuments()
+
+        if (plans === 5) return res.status(400).json({
+            msg: 'Job plan limit reached',
+            status: 400,
+            success: false,
+        })
+
+
         if (existingPlan) {
             return res.status(400).json({
                 msg: 'Job plan already exists',

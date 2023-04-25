@@ -723,10 +723,6 @@ router.post('/book-slot', async (req, res) => {
     // const d = req.body.date
     try {
         const date = new Date(start)
-        // console.log(req.body)
-        // console.log(typeof (date))
-        // console.log(typeof start)
-
         if (!date || !end) return commonError(res, 'Please provide all required fields. Start and End times are required.')
 
         if (!worker || !client || !skills || !name || !fee || !ref || !image || !workerImage || !clientName || !photos) return commonError(res, 'Please provide all required fields. Worker, Client, Skills, Fee...')
@@ -735,12 +731,7 @@ router.post('/book-slot', async (req, res) => {
         // return error if date is in the past
         const workerToken = await workerProfileVerificationModel.findOne({ worker })
         const userToken = await userModel.findById(client)
-        // Promise.all([workerToken, userToken])
-        console.log
-        console.log(userToken, workerToken)
         const foundBookings = await bookingModel.find({ worker: worker, isPaid: true, completed: false, cancelled: false, day })
-        // console.log(foundBookings)
-
         if (foundBookings.length === 3) {
             return commonError(res, 'All slots for the day have been booked. Please select another day.')
         }
@@ -804,10 +795,8 @@ router.post('/book-slot', async (req, res) => {
                 clientPhone: userToken.phone
             })
             await newBooking.save() // save booking
-
         }
         const workerData = await workerModel.findById(worker)
-
         if (workerData) await admin.messaging().send({
             notification: {
                 title: 'New Booking',
