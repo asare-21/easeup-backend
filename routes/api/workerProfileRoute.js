@@ -958,10 +958,13 @@ router.post('/cancel/:ref', async (req, res) => {
     const { ref } = req.params
     const { client } = req.body
     try {
-        const foundBooking = await bookingModel.findOne({ ref }) // find booking
+        const foundBooking = await bookingModel.findOneAndUpdate({ ref },{cancelled:true}) // find booking
+
         // user and worker device tokens to send an alert that the refund has been process and booking cancelled
         const workerToken = await workerModel.findById(foundBooking.worker)
         const userToken = await userModel.findById(client)
+        // update booking to cancelled
+
         await admin.messaging().sendToDevice(
             userToken.token,
             {
