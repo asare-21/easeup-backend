@@ -785,7 +785,7 @@ router.post('/book-slot', async (req, res) => {
         })
 
 
-        res.status(200).json({
+        return res.status(200).json({
             msg: 'Booking Successful',
             status: 200,
             success: true,
