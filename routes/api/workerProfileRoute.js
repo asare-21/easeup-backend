@@ -351,12 +351,7 @@ router.get('/portfolio/:worker/:page', mediaCache, async (req, res) => {
     try {
         await admin.auth().getUser(worker) // check if worker is valid
         const posts = await mediaModel.find({ worker }).limit(pageSize).skip((page - 1) * pageSize) // get 5 posts per page
-        console.log("Found media ", posts)
-
         if (!posts) return commonError(res, 'No portfolio found')
-
-        console.log(posts)
-
         workerCache.set(`portfolio/${page}/${worker}`, JSON.stringify(posts))
         return res.status(200).json({
             msg: 'Worker Profile Media Fetched Successfully',
@@ -774,7 +769,21 @@ router.post('/book-slot', async (req, res) => {
         const result = await newBooking.save(); // save booking
 
         // Send notifications to the worker and client
-        // ...
+        if (workerPhone) await admin.messaging().send({
+            notification: {
+                title: 'New Booking',
+                body: 'You have a new booking. Please check your dashboard for more details.'
+            },
+            token: workerPhone.token
+        })
+        if (clientPhone) await admin.messaging().send({
+            notification: {
+                title: 'New Booking',
+                body: 'Your booking was successful. Awaiting payment.'
+            },
+            token: clientPhone.token
+        })
+
 
         res.status(200).json({
             msg: 'Booking Successful',
