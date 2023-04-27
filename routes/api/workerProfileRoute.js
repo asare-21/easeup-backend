@@ -678,10 +678,10 @@ router.get('/worker-review/:worker', async (req, res) => {
 
 router.post('/available-slots/:worker', async (req, res) => {
     try {
-        const {workerList} = req.body
-        const { day } = req.query
+        const {workers,day} = req.body
+        // const { day } = req.query
         // const date = new Date(start)
-        const availableSlots = await Promise.all(workerList.map(async (workerId) => {
+        const availableSlots = await Promise.all(workers.map(async (workerId) => {
             await admin.auth().getUser(workerId); // check if worker is valid
             // get only pending bookings
             const slots = await bookingModel.find({
