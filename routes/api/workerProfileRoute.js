@@ -762,7 +762,7 @@ router.post('/book-slot', async (req, res) => {
             date: start,
             photos,
             basePrice,
-            isPaid: true, // remove this when testing is completed
+            // isPaid: true, // remove this when testing is completed
             clientPhone: clientPhone.phone,
             workerPhone: workerPhone.phone,
         });
@@ -771,22 +771,22 @@ router.post('/book-slot', async (req, res) => {
 
         // Send notifications to the worker and client
         if (workerPhone && clientPhone)
-            Promise.all([
-                await admin.messaging().send({
-                    notification: {
-                        title: 'New Booking',
-                        body: 'You have a new booking. Please check your dashboard for more details.'
-                    },
-                    token: workerToken.token
-                }),
-                await admin.messaging().send({
-                    notification: {
-                        title: 'New Booking',
-                        body: 'Your booking was successful. Awaiting payment.'
-                    },
-                    token: clientPhone.token
-                })
-            ])
+          await Promise.all([
+              await admin.messaging().send({
+                  notification: {
+                      title: 'New Booking',
+                      body: 'You have a new booking. Please check your dashboard for more details.'
+                  },
+                  token: workerToken.token
+              }),
+              await admin.messaging().send({
+                  notification: {
+                      title: 'New Booking',
+                      body: 'Your booking was successful. Awaiting payment.'
+                  },
+                  token: clientPhone.token
+              })
+          ])
 
         return res.status(200).json({
             msg: 'Booking Successful',
