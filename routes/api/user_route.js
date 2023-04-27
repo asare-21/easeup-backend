@@ -93,17 +93,27 @@ router.get('/profile/:user_id', getUserCache, async (req, res) => {
         //check firebase if uid exists
         await admin.auth().getUser(user_id)
         // Find the user
-        userModel.findById(user_id, (err, user) => {
-            if (err) {
-                log.warn(err.message)
-                return res.status(500).json({ msg: err.message, status: 500, success: false }) // Internal Server Error
-            }
-            if (!user) return res.status(404).json({ msg: 'User Not Found', status: 404, success: false }) // User Not Found
-            userCache.set(`user/${user_id}`, user);
-            return res.status(200).json({
-                msg: 'User Found', status: 200, success: true, user
-            }) // User Found and returned
+        const userData = await userModel.findById(user_id)
+        // cache data
+        userCache.set(`user/${user_id}`, userData);
+
+        if (!userData)
+            return res.status(500).json({ msg: 'Something went wrong', status: 500, success: false }) // Internal Server Error
+        // return user data
+        return res.status(200).json({
+            msg: 'User Found', status: 200, success: true, userData
         })
+        // userModel.findById(user_id, (err, user) => {
+        //     if (err) {
+        //         log.warn(err.message)
+        //         return res.status(500).json({ msg: err.message, status: 500, success: false }) // Internal Server Error
+        //     }
+        //     if (!user) return res.status(404).json({ msg: 'User Not Found', status: 404, success: false }) // User Not Found
+        //     userCache.set(`user/${user_id}`, user);
+        //     return res.status(200).json({
+        //         msg: 'User Found', status: 200, success: true, user
+        //     }) // User Found and returned
+        // })
     }
     catch (e) {
         if (e.errorInfo) { // User Not Found firebase error
