@@ -678,30 +678,39 @@ router.get('/worker-review/:worker', async (req, res) => {
 
 router.get('/available-slots/:worker', async (req, res) => {
     try {
-        const { worker } = req.params
+        const {workerList} = req.body
         const { day } = req.query
-        await admin.auth().getUser(worker) // check if worker is valid
         // const date = new Date(start)
+        const availableSlots = await Promise.all(workerList.map(async (workerId) => {
+            await admin.auth().getUser(workerId); // check if worker is valid
+            // get only pending bookings
+            const slots = await bookingModel.find({
+                worker: workerId,
+                day,
+                cancelled:false,
+                completed:false,
+                started:false,
+                isPaid:true
+            });
 
-        const timeslots = await bookingModel.find({
-            worker,
-            day
-        },)
-        console.log("Timeslots ", timeslots)
+            if(!slots) return {
+                workerId,
+                slots:[],
+                slotCount:0
+            }
 
-        if (!timeslots) return res.status(200).json({
-            msg: 'Worker Profile Fetched Successfully',
-            status: 200,
-            success: true,
-            timeslots: []
-        })
+            return {
+                workerId,
+                slots,
+                slotCount: slots.length,
+            };
+        }));
 
         return res.status(200).json({
             msg: 'Worker Profile Fetched Successfully',
             status: 200,
             success: true,
-            timeslots,
-            length: timeslots.length
+            timeslots:availableSlots,
         })
     }
     catch (e) {
