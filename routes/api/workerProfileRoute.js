@@ -676,7 +676,7 @@ router.get('/worker-review/:worker', async (req, res) => {
     }
 })
 
-router.get('/available-slots/:worker', async (req, res) => {
+router.post('/available-slots/:worker', async (req, res) => {
     try {
         const {workerList} = req.body
         const { day } = req.query
