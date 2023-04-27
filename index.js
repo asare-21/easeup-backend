@@ -148,6 +148,7 @@ http.listen(PORT, async () => {
         FBadmin.initializeApp({
             credential: FBadmin.credential.cert(serviceAccount)
         });
+        console.log("Connected to MongoDB and running")
         // initial cache
 
         // setInterval(async () => {

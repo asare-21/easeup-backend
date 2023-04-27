@@ -740,6 +740,7 @@ router.post('/book-slot', async (req, res) => {
         const clientPhone = await userModel.findById(client);
 
         const workerPhone = await workerProfileVerificationModel.findOne({ worker });
+        const workerToken = await workerModel.findById(worker)
         // check if the phone numbers are available
         if (!clientPhone.phone || !workerPhone.phone) {
             return commonError(res, 'Phone number not found.');
@@ -776,7 +777,7 @@ router.post('/book-slot', async (req, res) => {
                         title: 'New Booking',
                         body: 'You have a new booking. Please check your dashboard for more details.'
                     },
-                    token: workerPhone.token
+                    token: workerToken.token
                 }),
                 await admin.messaging().send({
                     notification: {
