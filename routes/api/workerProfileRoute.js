@@ -1015,7 +1015,6 @@ router.post('/cancel/:ref', async (req, res) => {
             response.on('end', async () => {
                     console.log(JSON.parse(data));
                 // update booking to cancelled
-
                 await bookingModel.findOneAndUpdate({ ref, }, {
                         cancelled: true,
                         // cancelledReason: reason,
@@ -1031,11 +1030,7 @@ router.post('/cancel/:ref', async (req, res) => {
         })
         refundRequest.write(refundDetails)
         refundRequest.end()
-        return res.status(200).json({
-            msg: 'Booking cancelled',
-            status: 200,
-            success: true,
-        })
+
 
         // find and delete bookng
 
