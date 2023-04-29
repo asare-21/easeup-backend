@@ -3,7 +3,7 @@ const { bookingModel } = require('../../models/bookingModel')
 const findEarliestAvailableTimeSlot = async (worker, day) => {
     const foundBookings = await bookingModel.find({ worker: worker, isPaid: true, day, cancelled: false, }).sort({ date: 1 })
     console.log("Found bookings: ", foundBookings)
-    const twoHours = 2 * 60 * 60 * 1000;
+    const twoHours = 3 * 60 * 60 * 1000;
     const maxBookingsPerDay = 4;
 
     if (foundBookings.length >= maxBookingsPerDay) {
