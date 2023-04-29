@@ -966,32 +966,71 @@ router.post('/cancel/:ref', async (req, res) => {
     // refund payment and cancel booking.
     const { ref } = req.params
     const { client } = req.body
+    const options = {
+        method: 'POST',
+        hostname: 'api.paystack.co',
+        path: '/refund',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${secret}`
+        },
+    }
     try {
         const foundBooking = await bookingModel.findOneAndUpdate({ ref },{cancelled:true}) // find booking
 
         // user and worker device tokens to send an alert that the refund has been process and booking cancelled
         const workerToken = await workerModel.findById(foundBooking.worker)
         const userToken = await userModel.findById(client)
-        // update booking to cancelled
+        // Set refund details
+        const refundDetails = JSON.stringify({
+            'transaction': foundBooking.ref,
+            'amount': (foundBooking.commitmentFee * 100) * 0.7,
+        })
+      await Promise.all([
+           await admin.messaging().sendToDevice(
+               userToken.token,
+               {
+                   notification: {
+                       title: 'Booking Cancelled.',
+                       body: 'Your booking has been cancelled successfully. You will a 70% refund within 3-5 working days'
+                   }
+               }
+           ),
+           await admin.messaging().sendToDevice(
+               workerToken.token,
+               {
+                   notification: {
+                       title: 'Sorry, Booking Cancelled',
+                       body: 'The customer has cancelled the booking. Please check your dashboard for more details'
+                   }
+               }
+           )
+       ]) // parallel async
+        const refundRequest = https.request(options, (response) => {
+            let data = '';
+            response.on('data', (chunk) => {
+                    data += chunk;
+                }
+            );
+            response.on('end', async () => {
+                    console.log(JSON.parse(data));
+                // update booking to cancelled
 
-        await admin.messaging().sendToDevice(
-            userToken.token,
-            {
-                notification: {
-                    title: 'Booking Cancelled',
-                    body: 'Your booking has been cancelled successfully'
+                await bookingModel.findOneAndUpdate({ ref, worker }, {
+                        cancelled: true,
+                        // cancelledReason: reason,
+                        endTime: Date.now()
+                    })
+                    return res.status(200).json({
+                        msg: 'Refund Processed',
+                        status: 200,
+                        success: true,
+                    })
                 }
-            }
-        )
-        await admin.messaging().sendToDevice(
-            workerToken.token,
-            {
-                notification: {
-                    title: 'Sorry, Booking Cancelled',
-                    body: 'The customer has cancelled the booking. Please check your dashboard for more details'
-                }
-            }
-        )
+            );
+        })
+        refundRequest.write(refundDetails)
+        refundRequest.end()
         return res.status(200).json({
             msg: 'Booking cancelled',
             status: 200,
