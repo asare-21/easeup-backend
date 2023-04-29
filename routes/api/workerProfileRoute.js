@@ -58,11 +58,10 @@ router.get('/:worker', getWorkerProfileCache, async (req, res) => {
         })
     }
     catch (e) {
-        log.warn(e.message)
 
         if (e.errorInfo) {
             // User Not Found
-            log.warn(e.message)
+            console.log(e.message)
             return returnUnAuthUserError(res, e.message)
         }
         return commonError(res, e.message)
