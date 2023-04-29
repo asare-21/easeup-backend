@@ -976,7 +976,7 @@ router.post('/cancel/:ref', async (req, res) => {
         },
     }
     try {
-        const foundBooking = await bookingModel.findOneAndUpdate({ ref },{cancelled:true}) // find booking
+        const foundBooking = await bookingModel.findOne({ ref },{cancelled:true}) // find booking
 
         // user and worker device tokens to send an alert that the refund has been process and booking cancelled
         const workerToken = await workerModel.findById(foundBooking.worker)
@@ -1016,7 +1016,7 @@ router.post('/cancel/:ref', async (req, res) => {
                     console.log(JSON.parse(data));
                 // update booking to cancelled
 
-                await bookingModel.findOneAndUpdate({ ref, worker }, {
+                await bookingModel.findOneAndUpdate({ ref, }, {
                         cancelled: true,
                         // cancelledReason: reason,
                         endTime: Date.now()
