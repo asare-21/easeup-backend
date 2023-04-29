@@ -976,7 +976,7 @@ router.post('/cancel/:ref', async (req, res) => {
         },
     }
     try {
-        const foundBooking = await bookingModel.findOne({ ref },{cancelled:true}) // find booking
+        const foundBooking = await bookingModel.findOne({ ref }) // find booking
 
         // user and worker device tokens to send an alert that the refund has been process and booking cancelled
         const workerToken = await workerModel.findById(foundBooking.worker)
@@ -1030,8 +1030,6 @@ router.post('/cancel/:ref', async (req, res) => {
         })
         refundRequest.write(refundDetails)
         refundRequest.end()
-
-
         // find and delete bookng
 
     }
