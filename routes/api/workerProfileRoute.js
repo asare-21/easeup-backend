@@ -52,7 +52,7 @@ router.get('/:worker', getWorkerProfileCache, async (req, res) => {
             status: 200,
             success: true,
             worker: promiseWorker,
-            avgRating,
+            avgRating: avgRating ?? 0,
             totalReviews
 
         })
@@ -677,7 +677,7 @@ router.get('/worker-review/:worker', async (req, res) => {
 
 router.post('/available-slots/:worker', async (req, res) => {
     try {
-        const {workers,day} = req.body
+        const { workers, day } = req.body
         // const { day } = req.query
         // const date = new Date(start)
         const availableSlots = await Promise.all(workers.map(async (workerId) => {
@@ -686,16 +686,16 @@ router.post('/available-slots/:worker', async (req, res) => {
             const slots = await bookingModel.find({
                 worker: workerId,
                 day,
-                cancelled:false,
-                completed:false,
-                started:false,
-                isPaid:true
+                cancelled: false,
+                completed: false,
+                started: false,
+                isPaid: true
             });
 
-            if(!slots) return {
+            if (!slots) return {
                 workerId,
-                slots:[],
-                slotCount:0
+                slots: [],
+                slotCount: 0
             }
 
             return {
@@ -709,7 +709,7 @@ router.post('/available-slots/:worker', async (req, res) => {
             msg: 'Worker Profile Fetched Successfully',
             status: 200,
             success: true,
-            timeslots:availableSlots,
+            timeslots: availableSlots,
         })
     }
     catch (e) {
@@ -779,22 +779,22 @@ router.post('/book-slot', async (req, res) => {
 
         // Send notifications to the worker and client
         if (workerPhone && clientPhone)
-          await Promise.all([
-              await admin.messaging().send({
-                  notification: {
-                      title: 'New Booking',
-                      body: 'You have a new booking. Please check your dashboard for more details.'
-                  },
-                  token: workerToken.token
-              }),
-              await admin.messaging().send({
-                  notification: {
-                      title: 'New Booking',
-                      body: 'Your booking was successful. Awaiting payment.'
-                  },
-                  token: clientPhone.token
-              })
-          ])
+            await Promise.all([
+                await admin.messaging().send({
+                    notification: {
+                        title: 'New Booking',
+                        body: 'You have a new booking. Please check your dashboard for more details.'
+                    },
+                    token: workerToken.token
+                }),
+                await admin.messaging().send({
+                    notification: {
+                        title: 'New Booking',
+                        body: 'Your booking was successful. Awaiting payment.'
+                    },
+                    token: clientPhone.token
+                })
+            ])
 
         return res.status(200).json({
             msg: 'Booking Successful',
@@ -986,46 +986,46 @@ router.post('/cancel/:ref', async (req, res) => {
             'transaction': foundBooking.ref,
             'amount': (foundBooking.commitmentFee * 100) * 0.7,
         })
-      await Promise.all([
-           await admin.messaging().sendToDevice(
-               userToken.token,
-               {
-                   notification: {
-                       title: 'Booking Cancelled.',
-                       body: 'Your booking has been cancelled successfully. You will a 70% refund within 3-5 working days'
-                   }
-               }
-           ),
-           await admin.messaging().sendToDevice(
-               workerToken.token,
-               {
-                   notification: {
-                       title: 'Sorry, Booking Cancelled',
-                       body: 'The customer has cancelled the booking. Please check your dashboard for more details'
-                   }
-               }
-           )
-       ]) // parallel async
+        await Promise.all([
+            await admin.messaging().sendToDevice(
+                userToken.token,
+                {
+                    notification: {
+                        title: 'Booking Cancelled.',
+                        body: 'Your booking has been cancelled successfully. You will a 70% refund within 3-5 working days'
+                    }
+                }
+            ),
+            await admin.messaging().sendToDevice(
+                workerToken.token,
+                {
+                    notification: {
+                        title: 'Sorry, Booking Cancelled',
+                        body: 'The customer has cancelled the booking. Please check your dashboard for more details'
+                    }
+                }
+            )
+        ]) // parallel async
         const refundRequest = https.request(options, (response) => {
             let data = '';
             response.on('data', (chunk) => {
-                    data += chunk;
-                }
+                data += chunk;
+            }
             );
             response.on('end', async () => {
-                    console.log(JSON.parse(data));
+                console.log(JSON.parse(data));
                 // update booking to cancelled
                 await bookingModel.findOneAndUpdate({ ref, }, {
-                        cancelled: true,
-                        // cancelledReason: reason,
-                        endTime: Date.now()
-                    })
-                    return res.status(200).json({
-                        msg: 'Refund Processed',
-                        status: 200,
-                        success: true,
-                    })
-                }
+                    cancelled: true,
+                    // cancelledReason: reason,
+                    endTime: Date.now()
+                })
+                return res.status(200).json({
+                    msg: 'Refund Processed',
+                    status: 200,
+                    success: true,
+                })
+            }
             );
         })
         refundRequest.write(refundDetails)
