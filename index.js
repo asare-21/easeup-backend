@@ -78,7 +78,7 @@ app.use(limiter)
 
 // vhost (subdomain and domain)
 if (process.env.NODE_ENV === 'production') {
-    app.use(vhost('api.easeupgh.tech', api));
+    // app.use(vhost('api.easeupgh.tech', api));
     app.use(vhost('/', api));
     app.use(vhost('easeupgh.tech', frontEndApp));
     // app.use(vhost('www.easeupgh.tech', frontEndApp));
