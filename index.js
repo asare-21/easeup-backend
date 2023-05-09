@@ -79,9 +79,10 @@ app.use(limiter)
 // vhost (subdomain and domain)
 if (process.env.NODE_ENV === 'production') {
     app.use(vhost('api.easeupgh.tech', api));
+    app.use(vhost('/', api));
     app.use(vhost('easeupgh.tech', frontEndApp));
-    app.use(vhost('www.easeupgh.tech', frontEndApp));
-    admin.use(vhost('admin.easeupgh.tech', admin));
+    // app.use(vhost('www.easeupgh.tech', frontEndApp));
+    // admin.use(vhost('admin.easeupgh.tech', admin));
     frontEndApp.use('/', HOME)
     // api routes for production
     api.use('/user', USER_ROUTE);
@@ -149,21 +150,7 @@ http.listen(PORT, async () => {
             credential: FBadmin.credential.cert(serviceAccount)
         });
         console.log("Connected to MongoDB and running")
-        // initial cache
 
-        // setInterval(async () => {
-        //     Promise.all(
-        //         [
-        //             // Load and cached data
-        //             await getAndCacheUsers(),
-        //             await getAndCacheWorkers(),
-        //             await getAndCacheWorkerProfiles(),
-        //             await getAndCacheWorkerMedia(),
-        //         ]
-        //     );
-        //     console.log('Connected to MongoDB');
-        // }, 15 * 1000 * 60);// 5 minutes
-        // }, 6000);// 5 minutes
     } catch (err) {
         console.error(err)
     }
