@@ -145,7 +145,7 @@ router.post('/create', async (req, res) => {
         console.log(userExists)
         if (userExists) {
             // User Already Exists
-            return res.status(200).json({ user: userExists, msg: 'User exists. Account not created', status: 200, success: true })
+            return res.status(200).json({ user: userExists, msg: 'An account with this email exists as a client. Sign in request denied.', status: 200, success: true })
         } // User Already Exists
         // Create the user
         const user = new workerModel({
@@ -170,7 +170,6 @@ router.post('/create', async (req, res) => {
             if (err) {
                 console.log(err)
                 return res.status(500).json({ msg: err.message, status: 500, success: false }) // Internal Server Error
-
             }
             workerCache.set(`worker/${worker}`, {
                 email,
