@@ -98,6 +98,10 @@ const bookingSchema = new Schema({
         type: String,
         required: true
     },
+    contactedCustomer: {
+        type: Boolean,
+        default: false
+    }
 })
 
 
