@@ -33,6 +33,7 @@ const { userModel } = require('./models/user_model');
 const { getAndCacheUsers, getAndCacheWorkerMedia, getAndCacheWorkerProfiles, getAndCacheWorkers } = require('./utils');
 const { dashboard } = require('./routes/api/dashboard');
 const { jobPlanRoute } = require('./routes/api/job_plan_route');
+const { jobs } = require('./routes/api/jobs');
 const limiter = rateLimit({
     windowMs: 5 * 60 * 1000, // 30 minutes
     max: 1000, // Limit each IP to 1000 requests per `window` (here, per 15 minutes)
@@ -92,6 +93,7 @@ if (process.env.NODE_ENV === 'production') {
     api.use('/worker', workerRoute)
     api.use('/worker-profile', workerProfileRoute)
     api.use('/room', chatRoute)
+    api.use('/jobs', jobs)
     api.use('/jplan', jobPlanRoute)
     // api.use('/dashboard', dashboard)
     // handle 404
