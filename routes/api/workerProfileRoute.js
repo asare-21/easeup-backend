@@ -40,7 +40,7 @@ router.get('/:worker', getWorkerProfileCache, async (req, res) => {
                 }
             }
         ]).exec()
-        var avgRating = 0
+        let avgRating = 0
 
         if (promiseRating) avgRating = promiseRating[0].avgRating ?? 0
         const totalReviews = await reviewModel.countDocuments({ worker })
@@ -56,7 +56,6 @@ router.get('/:worker', getWorkerProfileCache, async (req, res) => {
             worker: promiseWorker,
             avgRating: avgRating ?? 0,
             totalReviews
-
         })
     }
     catch (e) {
@@ -663,13 +662,12 @@ router.get('/worker-review/:worker', async (req, res) => {
             }
         ]).exec()
         const totalReviews = await reviewModel.countDocuments({ worker })
-        console.log(avgRating)
         return res.status(200).json({
             msg: 'Reveiw saved',
             status: 200,
             success: true,
             reviews,
-            avgRating: avgRating[0].avgRating,
+            avgRating: avgRating[0].avgRating ?? 0,
             total: totalReviews
         })
     } catch (e) {
