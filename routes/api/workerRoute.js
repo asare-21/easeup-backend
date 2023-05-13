@@ -131,7 +131,7 @@ router.post('/create', async (req, res) => {
         }
         if (missing_fields.length > 0) return res.status(400).json({ msg: 'Bad Request. Missing fields', status: 400, success: false, missing_fields }) // At least one field is required
         const existingUser = await userModel.findById(req.body.worker)
-        if (existingUser) return res.status(400).json({ msg: 'Bad Request. User already exists', status: 400, success: false }) // At least one field is required
+        if (existingUser) return res.status(400).json({ msg: 'An account with this email exists as a client. Sign in request denied.', status: 400, success: false }) // At least one field is required
         const { worker, email, profile_name, last_login, token } = req.body;
         // console.log(req.body)
         if (!worker) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID is required
