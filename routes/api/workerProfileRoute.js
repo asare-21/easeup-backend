@@ -40,7 +40,9 @@ router.get('/:worker', getWorkerProfileCache, async (req, res) => {
                 }
             }
         ]).exec()
-        const avgRating = promiseRating[0].avgRating ?? 0
+        var avgRating = 0
+
+        if (promiseRating) avgRating = promiseRating[0].avgRating ?? 0
         const totalReviews = await reviewModel.countDocuments({ worker })
         promiseWorker.rating = avgRating
         promiseWorker.totalReviews = totalReviews
