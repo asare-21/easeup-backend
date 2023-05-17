@@ -1169,6 +1169,12 @@ router.get("/notify/:worker", async (req, res) => {
                 body: 'You have a new booking request. Please check your dashboard to accept/reject the booking.'
             },
             // token: workerToken.token
+
+        })
+        return res.status(200).json({
+            msg: 'Notification sent',
+            status: 200,
+            success: true,
         })
     }
     catch (e) {
