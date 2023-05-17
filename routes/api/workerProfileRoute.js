@@ -786,14 +786,14 @@ router.post('/book-slot', async (req, res) => {
         // Send notifications to the worker and client
         if (workerPhone && clientPhone)
             await Promise.all([
-                await admin.messaging().send({
+                admin.messaging().send({
                     notification: {
                         title: 'New Booking',
                         body: 'You have a new booking. Please check your dashboard for more details.'
                     },
                     token: workerToken.token
                 }),
-                await admin.messaging().send({
+                admin.messaging().send({
                     notification: {
                         title: 'New Booking',
                         body: 'Your booking was successful. Awaiting payment.'
