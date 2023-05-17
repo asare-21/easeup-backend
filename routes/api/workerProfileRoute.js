@@ -790,14 +790,14 @@ router.post('/book-slot', async (req, res) => {
                         title: 'New Booking',
                         body: 'You have a new booking. Please check your dashboard for more details.'
                     },
-                    token: workerToken.token
+                    // token: workerToken.token
                 }),
                 admin.messaging().sendToDevice(clientPhone.token, {
                     notification: {
                         title: 'New Booking',
                         body: 'Your booking was successful. Awaiting payment.'
                     },
-                    token: clientPhone.token
+                    // token: clientPhone.token
                 })
             ])
 
