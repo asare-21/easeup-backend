@@ -1158,5 +1158,27 @@ router.patch('/update-date', async (req, res) => {
         return commonError(res, e.message)
     }
 })
+router.get("/notify/:worker", async (req, res) => {
+    if (!req.params.worker) return commonError(res, "Worker ID not provided")
+    try {
+        admin.auth().getUser(req.params.worker)
+        const workerToken = await workerModel.findById(req.params.worker)
+        admin.messaging().sendToDevice(workerToken.token, {
+            notification: {
+                title: 'Booking request',
+                body: 'You have a new booking request. Please check your dashboard to accept/reject the booking.'
+            },
+            // token: workerToken.token
+        })
+    }
+    catch (e) {
+        if (e.errorInfo) {
+            // User Not Found
+            console.log(e.message)
+            return returnUnAuthUserError(res, e.message)
+        }
+        return commonError(res, e.message)
+    }
+})
 
 module.exports.workerProfileRoute = router
