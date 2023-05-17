@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const admin = require("firebase-admin");
 const { bookingModel } = require('../../models/bookingModel');
+const { userModel } = require('../../models/user_model');
 
 
 router.post('/notifications', async (req, res) => {
@@ -12,10 +13,12 @@ router.post('/notifications', async (req, res) => {
     try {
         await admin.auth().getUser(worker)
         // send notification
-
+        const booking = await
+            bookingModel.findOneAndUpdate({ worker, ref }, { contactedCustomer: true })
+        const client = await userModel.findById(booking.client)
         // run aysnc in parallel
         await Promise.all([
-            admin.messaging().sendToDevice(worker, {
+            admin.messaging().sendToDevice(client.token, {
                 data: {
                     message
                 }
