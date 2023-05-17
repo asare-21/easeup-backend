@@ -776,7 +776,6 @@ router.post('/book-slot', async (req, res) => {
             date: start,
             photos,
             basePrice,
-            // isPaid: true, // remove this when testing is completed
             clientPhone: clientPhone.phone,
             workerPhone: workerPhone.phone,
         });
