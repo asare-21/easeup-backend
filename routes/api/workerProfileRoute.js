@@ -579,9 +579,11 @@ router.put('/booking-status', async (req, res) => {
             admin.auth().getUser(worker), // check if worker is valid
             admin.auth().getUser(client) // check if user is valid
         ])
-        // check if any bookng has been started but not completed 
-        const bookingStarted = await bookingModel.findOne({ worker, client, ref, started: true, completed: false })
-        if (bookingStarted) return commonError(res, 'Sorry, you have a booking in progress. Please complete it before starting another booking.')
+        if (!completed) {
+            // check if any bookng has been started but not completed 
+            const bookingStarted = await bookingModel.findOne({ worker, client, ref, started: true, completed: false })
+            if (bookingStarted) return commonError(res, 'Sorry, you have a booking in progress. Please complete it before starting another booking.')
+        }
         const booking = await bookingModel.findOneAndUpdate({
             worker,
             client,
