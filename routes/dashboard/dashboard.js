@@ -44,7 +44,7 @@ router.get('/users/:uid', async (req, res) => {
         await admin.auth().getUser(uid)
 
         const users = await userModel.find().count()
-        return res.status(200).json({
+        return res.json({
             msg: 'User Profiles',
             status: 200,
             success: true,
@@ -71,7 +71,8 @@ router.get('/workers/:uid', async (req, res) => {
         await admin.auth().getUser(uid)
 
         const workers = await workerModel.find().count()
-        return res.status(200).json({
+
+        return res.json({
             msg: 'worker Profiles',
             status: 200,
             success: true,
