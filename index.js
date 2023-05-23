@@ -96,7 +96,7 @@ if (process.env.NODE_ENV === 'production') {
     api.use('/jobs', jobs)
 
     api.use('/jplan', jobPlanRoute)
-    api.use('/dashboard/v1', dashboard)
+    api.use('/dashboard', dashboard)
     // handle 404
     api.use((req, res, next) => {
         return res.status(404).json({
