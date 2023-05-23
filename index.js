@@ -94,6 +94,7 @@ if (process.env.NODE_ENV === 'production') {
     api.use('/worker-profile', workerProfileRoute)
     api.use('/room', chatRoute)
     api.use('/jobs', jobs)
+
     api.use('/jplan', jobPlanRoute)
     api.use('/dashboard/v1', dashboard)
     // handle 404
