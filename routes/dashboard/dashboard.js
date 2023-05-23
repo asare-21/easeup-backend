@@ -25,7 +25,6 @@ router.get('/pending/:uid', async (req, res) => {
             status: 200,
             success: true,
             profiles: workerProfiles,
-            count: workerProfiles.length
         })
     } catch (e) {
         console.log(e)
