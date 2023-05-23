@@ -4,6 +4,7 @@ const { workerModel } = require('../../models/worker_models');
 const { workerProfileModel } = require('../../models/worker_profile_model');
 const admin = require("firebase-admin");
 const { returnUnAuthUserError } = require('../api/user_route');
+const { workerProfileVerificationModel } = require('../../models/worker_profile_verification_model');
 
 const router = require('express').Router();
 
@@ -13,7 +14,7 @@ router.get('/pending/:uid', async (req, res) => {
         // verify user
         await admin.auth().getUser(uid)
 
-        const workerProfiles = await workerProfileModel.find({
+        const workerProfiles = await workerProfileVerificationModel.find({
             skill_verified: false,
             gh_card_verified: false,
             selfie_verified: false,
