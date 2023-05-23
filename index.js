@@ -31,7 +31,7 @@ const { chatModel } = require('./models/chat_message_model');
 const { workerModel } = require('./models/worker_models');
 const { userModel } = require('./models/user_model');
 const { getAndCacheUsers, getAndCacheWorkerMedia, getAndCacheWorkerProfiles, getAndCacheWorkers } = require('./utils');
-const { dashboard } = require('./routes/api/dashboard');
+const { dashboard } = require('./routes/dashboard/dashboard');
 const { jobPlanRoute } = require('./routes/api/job_plan_route');
 const { jobs } = require('./routes/api/jobs');
 const limiter = rateLimit({
@@ -95,7 +95,7 @@ if (process.env.NODE_ENV === 'production') {
     api.use('/room', chatRoute)
     api.use('/jobs', jobs)
     api.use('/jplan', jobPlanRoute)
-    // api.use('/dashboard', dashboard)
+    api.use('/dashboard/v1', dashboard)
     // handle 404
     api.use((req, res, next) => {
         return res.status(404).json({
