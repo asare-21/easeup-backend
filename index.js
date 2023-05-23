@@ -45,10 +45,11 @@ const limiter = rateLimit({
         return res.status(429).json({ msg: 'Too many requests from this IP, please try again later', status: 429, success: false, limit: true })
     }
 })
-
+const cors = require('cors')
 // Static files
 app.use(express.static(path.join(__dirname, 'public')));
 app.enable('trust proxy');
+app.use(cors())
 app.set('view engine', 'ejs');
 app.set('views', 'views');
 frontEndApp.use(express.static(path.join(__dirname, 'public')));
