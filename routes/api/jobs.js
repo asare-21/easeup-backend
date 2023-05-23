@@ -28,7 +28,7 @@ router.post('/notifications', async (req, res) => {
         ])
 
         return res.status(200).json({ msg: 'Notification sent.', status: 200, success: true })
-    } catch (error) {
+    } catch (e) {
         if (e.errorInfo) {
             // User Not Found
             console.log(e.message)
