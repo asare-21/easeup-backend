@@ -64,6 +64,33 @@ router.get('/users/:uid', async (req, res) => {
 
     }
 })
+router.get('/users/profiles/:uid', async (req, res) => {
+    try {
+        const { uid } = req.params
+        // verify user
+        await admin.auth().getUser(uid)
+
+        const users = await userModel.find()
+        return res.json({
+            msg: 'User Profiles',
+            status: 200,
+            success: true,
+            profiles: users ?? []
+        })
+    } catch (e) {
+        console.log(e)
+        if (e.errorInfo) {
+            // User Not Found
+            return returnUnAuthUserError(res, e.message)
+        }
+        return res.status(400).json({
+            msg: 'Error fetching worker profiles',
+            status: 400,
+            success: false,
+        })
+
+    }
+})
 router.get('/workers/:uid', async (req, res) => {
     try {
         const { uid } = req.params
