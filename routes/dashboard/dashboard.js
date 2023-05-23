@@ -70,7 +70,7 @@ router.get('/workers/:uid', async (req, res) => {
         // verify user
         await admin.auth().getUser(uid)
 
-        const workers = await workerModel.find({
+        const workers = await workerProfileVerificationModel.find({
             skill_verified: true,
             gh_card_verified: true,
             selfie_verified: true,
