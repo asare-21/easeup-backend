@@ -70,7 +70,12 @@ router.get('/workers/:uid', async (req, res) => {
         // verify user
         await admin.auth().getUser(uid)
 
-        const workers = await workerModel.find().count()
+        const workers = await workerModel.find({
+            skill_verified: true,
+            gh_card_verified: true,
+            selfie_verified: true,
+            insurance_verified: true,
+        }).count()
 
         return res.json({
             msg: 'worker Profiles',
