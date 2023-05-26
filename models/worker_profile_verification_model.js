@@ -63,6 +63,14 @@ const workerProfileVerificationSchema = new Schema({
         type: Boolean,
         default: false
     },
+    selfie_verified_by: {
+        type: String,
+        default: ""
+    },
+    selfie_verified_date: {
+        type: Date,
+        default: null
+    },
     age_verfication: {
         type: Boolean,
         default: false,
@@ -75,6 +83,14 @@ const workerProfileVerificationSchema = new Schema({
     insurance_verified: {
         type: Boolean,
         default: false
+    },
+    insurance_verified_by: {
+        type: String,
+        default: ""
+    },
+    insurance_verified_date: {
+        type: Date,
+        default: null
     },
     insurance_document: {
         type: String,
@@ -103,6 +119,14 @@ const workerProfileVerificationSchema = new Schema({
         type: Boolean,
         default: false
     },
+    skill_verified_by: {
+        type: String,
+        default: ""
+    },
+    skill_verified_date: {
+        type: Date,
+        default: null
+    },
     code: {
         type: String,
         required: false,
@@ -116,6 +140,10 @@ const workerProfileVerificationSchema = new Schema({
         type: String,
         default: ''
     },
+    notified: {
+        type: Boolean,
+        default: false
+    }
 });
 
 module.exports.workerProfileVerificationModel = model('WorkerProfileVerification', workerProfileVerificationSchema);

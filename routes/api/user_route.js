@@ -395,7 +395,7 @@ router.post('/phone/send-code', async (req, res) => {
         const body = {
             messages: [
                 {
-                    text: `Your EaseUp verification code is ${code}`,
+                    text: `Your EaseUp verification code is ${code}. Please do not share this code with anyone.`,
                     type: 1,
                     sender: process.env.EASEUP_SMS_SENDER,
                     destinations: {
