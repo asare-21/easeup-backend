@@ -192,21 +192,71 @@ router.patch('/verify/:uid', async (req, res) => {
         }
 
         if (ghCard) {
-            updateVerificationStatus(workerProfile, 'gh_card', employeeId);
+            updateVerificationStatus(workerProfile, 'gh_card', employeeId, true);
         }
 
         if (selfie) {
-            updateVerificationStatus(workerProfile, 'selfie', employeeId);
+            updateVerificationStatus(workerProfile, 'selfie', employeeId, true);
         }
 
         if (insurance) {
-            updateVerificationStatus(workerProfile, 'insurance', employeeId);
+            updateVerificationStatus(workerProfile, 'insurance', employeeId, true);
         }
 
         if (skill) {
-            updateVerificationStatus(workerProfile, 'skill', employeeId);
+            updateVerificationStatus(workerProfile, 'skill', employeeId, true);
         }
         await workerProfile.save()
+    } catch (e) {
+
+        if (e.errorInfo) {
+            // User Not Found
+            return returnUnAuthUserError(res, e.message)
+        }
+        return res.status(400).json({
+            msg: 'Error verifying worker profile',
+            status: 400,
+            success: false,
+        })
+    }
+})
+
+router.patch('/no-verify/:uid', async (req, res) => {
+    const { ghCard, selfie, insurance, skill, employeeId } = req.body // these are booleans
+    const { uid } = req.params
+    // only one of these can be true at a time
+    // update the worker profile verification model's respective fields when one of the booleans are true
+    try {
+        await admin.auth().getUser(uid) // verify worker
+        await admin.auth().getUser(employeeId) // verify employee
+
+        const workerProfile = await workerProfileVerificationModel.findOne({ worker: uid })
+        if (!workerProfile) {
+            return res.status(400).json({
+                msg: 'Error verifying worker profile',
+                status: 400,
+                success: false,
+            })
+        }
+
+        if (ghCard) {
+            updateVerificationStatus(workerProfile, 'gh_card', employeeId, false);
+        }
+
+        if (selfie) {
+            updateVerificationStatus(workerProfile, 'selfie', employeeId, false);
+        }
+
+        if (insurance) {
+            updateVerificationStatus(workerProfile, 'insurance', employeeId, false);
+        }
+
+        if (skill) {
+            updateVerificationStatus(workerProfile, 'skill', employeeId, false);
+        }
+
+        await Promise.all([rejectionSMS(uid), workerProfile.save()])
+
     } catch (e) {
 
         if (e.errorInfo) {
@@ -346,8 +396,50 @@ Thank you for choosing Easeup (WorkBuddy) - where talent meets opportunity. Let'
     console.log(response.data.data.messages)
 }
 
-function updateVerificationStatus(workerProfile, field, employeeId) {
-    workerProfile[`${field}_verified`] = true;
+async function rejectionSMS(
+    id
+) {
+    const worker = await workerModel.findById(id)
+
+    if (!worker) return
+
+    const body = {
+        messages: [
+            {
+                text: `Document Rejection
+
+Hi ${worker.name},
+
+We regret to inform you that your document has been rejected. We appreciate your effort and interest in Easeup - WorkBuddy, but unfortunately, your document did not meet our requirements.
+
+Please visit the Easeup - WorkBuddy app to submit the rejected document again.
+
+Thank you for choosing Easeup - WorkBuddy. We are here to support you on your professional journey.
+
+Best regards,
+Easeup (WorkBuddy) Team`,
+                type: 0,
+                sender: process.env.EASEUP_SMS_SENDER,
+                destinations
+            }
+        ]
+
+    };
+    const headers = {
+        headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Host: "api.smsonlinegh.com",
+            Authorization:
+                `key ${process.env.EASEUP_SMS_API_KEY}`,
+        },
+    };
+
+    const response = await axios.post("https://api.smsonlinegh.com/v4/message/sms/send", body, headers)// wait for the sms to be sent
+}
+
+function updateVerificationStatus(workerProfile, field, employeeId, status) {
+    workerProfile[`${field}_verified`] = status;
     workerProfile[`${field}_verified_by`] = employeeId;
     workerProfile[`${field}_verified_date`] = Date.now();
 }
@@ -395,5 +487,31 @@ cron.schedule('*/15 * * * *', async () => {
         console.error('Error notifying verified profiles:', error);
     }
 });
+
+// set up a cron job to delete worker profiles that have not been verified after 30 days
+// cron.schedule('0 0 * * *', async () => {
+//     try {
+//         const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+//         const unverifiedProfiles = await workerProfileVerificationModel.find({
+//             createdAt: { $lte: thirtyDaysAgo },
+//             gh_card_verified: false,
+//             selfie_verified: false,
+//             insurance_verified: false,
+//             skill_verified: false,
+//         });
+//         console.log('Unverified Profiles:', unverifiedProfiles)
+
+//         for (const worker of unverifiedProfiles) {
+//             // delete worker profile
+//             const workerProfile = await workerModel.findById(worker.worker)
+//             if (!workerProfile) {
+//                 continue
+//             }
+//             await workerProfile.deleteOne()
+//         }
+//     } catch (error) {
+//         console.error('Error deleting unverified profiles: xw', error);
+//     }
+// })
 
 module.exports.dashboard = router
