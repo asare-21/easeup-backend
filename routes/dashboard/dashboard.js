@@ -209,6 +209,11 @@ router.patch('/verify/:uid', async (req, res) => {
             updateVerificationStatus(workerProfile, 'skill', employeeId, true);
         }
         await workerProfile.save()
+        return res.status(200).json({
+            msg: 'Worker Profile Verified',
+            status: 200,
+            success: true,
+        })
     } catch (e) {
 
         if (e.errorInfo) {
