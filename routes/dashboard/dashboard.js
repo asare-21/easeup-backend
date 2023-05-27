@@ -7,7 +7,8 @@ const { returnUnAuthUserError } = require('../api/user_route');
 const { workerProfileVerificationModel } = require('../../models/worker_profile_verification_model');
 const router = require('express').Router();
 const cron = require('node-cron');
-const axios = require('axios')
+const axios = require('axios');
+const { bookingModel } = require('../../models/bookingModel');
 const headers = {
     "Content-Type": "application/json",
     Accept: "application/json",
@@ -220,6 +221,64 @@ router.patch('/verify/:uid', async (req, res) => {
     }
 })
 
+router.get('/completed-bookings/:uid', async (req, res) => {
+    try {
+        const { uid } = req.params
+
+        await admin.auth().getUser(uid) // verify worker
+
+        const completedBookings = await bookingModel.find({
+            completed: true,
+        }).count()
+
+        return res.status(200).json({
+            msg: 'Completed Bookings',
+            status: 200,
+            success: true,
+            count: completedBookings ?? 0
+        })
+
+    }
+    catch (e) {
+        if (e.errorInfo) {
+            // User Not Found
+            return returnUnAuthUserError(res, e.message)
+        }
+        return res.status(400).json({
+            msg: 'Error fetching completed bookings',
+            status: 400,
+            success: false,
+        })
+    }
+})
+router.get('/reviews/:uid', async (req, res) => {
+    try {
+        const { uid } = req.params
+
+        await admin.auth().getUser(uid) // verify worker
+
+        const reviews = await reviewModel.find().count()
+
+        return res.status(200).json({
+            msg: 'Completed Bookings',
+            status: 200,
+            success: true,
+            count: reviews ?? 0
+        })
+
+    }
+    catch (e) {
+        if (e.errorInfo) {
+            // User Not Found
+            return returnUnAuthUserError(res, e.message)
+        }
+        return res.status(400).json({
+            msg: 'Error fetching completed bookings',
+            status: 400,
+            success: false,
+        })
+    }
+})
 
 async function sendSMS(destinations) {
     const body = {
