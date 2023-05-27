@@ -21,6 +21,38 @@ const options = {
     hostname: "https://api.smsonlinegh.com/v4/message/sms/send",
 
 }
+
+router.get('/sms/:id', async (req, res) => {
+    try {
+        await admin.auth().getUser(req.params.id)
+        const response = await axios.get(`https://api.smsonlinegh.com/v4/report/balance`, {
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+                Authorization: `key ${process.env.EASEUP_SMS_API_KEY}`
+            }
+        })
+        console.log(response.data)
+        return res.status(200).json({
+            msg: 'SMS Balance',
+            status: 200,
+            amount: response.data.data.balance.amount ?? 0
+        })
+    }
+    catch (e) {
+        console.log(e)
+        if (e.errorInfo) {
+            // User Not Found
+            return returnUnAuthUserError(res, e.message)
+        }
+        return res.status(400).json({
+            msg: 'Error sending sms',
+            status: 400,
+            success: false,
+        })
+    }
+})
+
 router.get('/pending/:uid', async (req, res) => {
     try {
         const { uid } = req.params
@@ -157,6 +189,7 @@ router.patch('/verify/:uid', async (req, res) => {
                 success: false,
             })
         }
+
         if (ghCard) {
             updateVerificationStatus(workerProfile, 'gh_card', employeeId);
         }
