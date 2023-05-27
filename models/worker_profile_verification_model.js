@@ -143,6 +143,10 @@ const workerProfileVerificationSchema = new Schema({
     notified: {
         type: Boolean,
         default: false
+    },
+    created: {
+        type: Date,
+        default: Date.now
     }
 });
 

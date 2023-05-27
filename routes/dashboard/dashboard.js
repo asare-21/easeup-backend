@@ -251,6 +251,7 @@ router.get('/completed-bookings/:uid', async (req, res) => {
         })
     }
 })
+
 router.get('/reviews/:uid', async (req, res) => {
     try {
         const { uid } = req.params
