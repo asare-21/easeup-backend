@@ -73,7 +73,7 @@ const workerProfileVerificationSchema = new Schema({
     },
     age_verfication: {
         type: Boolean,
-        default: false,
+        default: true,
     },
     age_verification_document: {
         type: String,
@@ -82,7 +82,7 @@ const workerProfileVerificationSchema = new Schema({
     },
     insurance_verified: {
         type: Boolean,
-        default: false
+        default: true
     },
     insurance_verified_by: {
         type: String,
