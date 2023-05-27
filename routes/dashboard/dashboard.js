@@ -61,10 +61,12 @@ router.get('/pending/:uid', async (req, res) => {
         await admin.auth().getUser(uid)
 
         const workerProfiles = await workerProfileVerificationModel.find({
-            skill_verified: false,
-            gh_card_verified: false,
-            selfie_verified: false,
-            insurance_verified: false,
+            $or: [
+                { skill_verified: false },
+                { gh_card_verified: false },
+                { selfie_verified: false },
+                { insurance_verified: false }
+            ]
         })
         return res.status(200).json({
             msg: 'Worker Profiles',
