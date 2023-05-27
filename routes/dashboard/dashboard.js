@@ -480,7 +480,7 @@ function updateVerificationStatus(workerProfile, field, employeeId, status) {
 
 
 // Schedule the task to run every 15 minutes
-cron.schedule('*/15 * * * *', async () => {
+cron.schedule('*/5 * * * *', async () => {
 
     try {
         const verifiedProfiles = await workerProfileVerificationModel.find({
