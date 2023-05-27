@@ -260,7 +260,7 @@ router.get('/reviews/:uid', async (req, res) => {
         const reviews = await reviewModel.find().count()
 
         return res.status(200).json({
-            msg: 'Completed Bookings',
+            msg: 'reviews',
             status: 200,
             success: true,
             count: reviews ?? 0
@@ -273,7 +273,7 @@ router.get('/reviews/:uid', async (req, res) => {
             return returnUnAuthUserError(res, e.message)
         }
         return res.status(400).json({
-            msg: 'Error fetching completed bookings',
+            msg: 'Error fetching reviews',
             status: 400,
             success: false,
         })
@@ -292,10 +292,10 @@ router.get('/avg-rating/:uid', async (req, res) => {
         ])
 
         return res.status(200).json({
-            msg: 'Completed Bookings',
+            msg: 'Average rating',
             status: 200,
             success: true,
-            rating: avgRating ?? 0
+            rating: avgRating[0].rating ?? 0
         })
 
     }
@@ -305,7 +305,7 @@ router.get('/avg-rating/:uid', async (req, res) => {
             return returnUnAuthUserError(res, e.message)
         }
         return res.status(400).json({
-            msg: 'Error fetching completed bookings',
+            msg: 'Error fetching average rating',
             status: 400,
             success: false,
         })
