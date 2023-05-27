@@ -280,6 +280,38 @@ router.get('/reviews/:uid', async (req, res) => {
     }
 })
 
+router.get('/avg-rating/:uid', async (req, res) => {
+    try {
+        const { uid } = req.params
+
+        await admin.auth().getUser(uid) // verify worker
+
+        const avgRating = await reviewModel.aggregate([
+            { $group: { _id: null, rating: { $avg: '$rating' } } },
+            { $project: { _id: 0, rating: 1 } }
+        ])
+
+        return res.status(200).json({
+            msg: 'Completed Bookings',
+            status: 200,
+            success: true,
+            rating: avgRating ?? 0
+        })
+
+    }
+    catch (e) {
+        if (e.errorInfo) {
+            // User Not Found
+            return returnUnAuthUserError(res, e.message)
+        }
+        return res.status(400).json({
+            msg: 'Error fetching completed bookings',
+            status: 400,
+            success: false,
+        })
+    }
+})
+
 async function sendSMS(destinations) {
     const body = {
         messages: [
