@@ -440,8 +440,8 @@ Easeup (WorkBuddy) Team`,
 
 function updateVerificationStatus(workerProfile, field, employeeId, status) {
     workerProfile[`${field}_verified`] = status;
-    workerProfile[`${field}_verified_by`] = employeeId;
-    workerProfile[`${field}_verified_date`] = Date.now();
+    workerProfile[`${field}_verified_by`] = status ? employeeId : "";
+    workerProfile[`${field}_verified_date`] = !status ? null : Date.now();
 }
 
 
