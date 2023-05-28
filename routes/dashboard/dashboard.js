@@ -105,13 +105,14 @@ router.get('/users/:uid', async (req, res) => {
             return returnUnAuthUserError(res, e.message)
         }
         return res.status(400).json({
-            msg: 'Error fetching worker profiles',
+            msg: 'Error fetching user profiles',
             status: 400,
             success: false,
         })
 
     }
 })
+
 router.get('/users/profiles/:uid', async (req, res) => {
     try {
         const { uid } = req.params
@@ -132,6 +133,34 @@ router.get('/users/profiles/:uid', async (req, res) => {
             return returnUnAuthUserError(res, e.message)
         }
         return res.status(400).json({
+            msg: 'Error fetching user profiles',
+            status: 400,
+            success: false,
+        })
+
+    }
+})
+
+router.get('/workers/profiles/:uid', async (req, res) => {
+    try {
+        const { uid } = req.params
+        // verify user
+        await admin.auth().getUser(uid)
+
+        const workers = await workerProfileModel.find()
+        return res.json({
+            msg: 'Worker Profiles',
+            status: 200,
+            success: true,
+            profiles: workers ?? []
+        })
+    } catch (e) {
+        console.log(e)
+        if (e.errorInfo) {
+            // User Not Found
+            return returnUnAuthUserError(res, e.message)
+        }
+        return res.status(400).json({
             msg: 'Error fetching worker profiles',
             status: 400,
             success: false,
@@ -139,6 +168,7 @@ router.get('/users/profiles/:uid', async (req, res) => {
 
     }
 })
+
 router.get('/workers/:uid', async (req, res) => {
     try {
         const { uid } = req.params
