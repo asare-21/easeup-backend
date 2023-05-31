@@ -40,7 +40,9 @@ router.get('/:worker', getWorkerProfileCache, async (req, res) => {
                 }
             }
         ]).exec()
-        const avgRating = promiseRating[0].avgRating
+        let avgRating = 0
+
+        if (promiseRating.length > 0) avgRating = promiseRating[0].avgRating ?? 0
         const totalReviews = await reviewModel.countDocuments({ worker })
         promiseWorker.rating = avgRating
         promiseWorker.totalReviews = totalReviews
@@ -52,17 +54,15 @@ router.get('/:worker', getWorkerProfileCache, async (req, res) => {
             status: 200,
             success: true,
             worker: promiseWorker,
-            avgRating,
+            avgRating: avgRating ?? 0,
             totalReviews
-
         })
     }
     catch (e) {
-        log.warn(e.message)
 
         if (e.errorInfo) {
             // User Not Found
-            log.warn(e.message)
+            console.log(e.message)
             return returnUnAuthUserError(res, e.message)
         }
         return commonError(res, e.message)
@@ -351,12 +351,7 @@ router.get('/portfolio/:worker/:page', mediaCache, async (req, res) => {
     try {
         await admin.auth().getUser(worker) // check if worker is valid
         const posts = await mediaModel.find({ worker }).limit(pageSize).skip((page - 1) * pageSize) // get 5 posts per page
-        console.log("Found media ", posts)
-
         if (!posts) return commonError(res, 'No portfolio found')
-
-        console.log(posts)
-
         workerCache.set(`portfolio/${page}/${worker}`, JSON.stringify(posts))
         return res.status(200).json({
             msg: 'Worker Profile Media Fetched Successfully',
@@ -407,28 +402,6 @@ router.post('/work-radius', async (req, res) => {
     }
 })
 
-// get timeslots and bookings
-router.get('/booking-slot/:worker', async (req, res) => {
-    const { worker } = req.params
-    try {
-        await admin.auth().getUser(worker) // check if worker is valid
-        const timeslots = await workerSlotModel.findOne({ worker })
-        return res.status(200).json({
-            msg: 'Worker Profile Fetched Successfully',
-            status: 200,
-            success: true,
-            timeslots,
-
-        })
-    } catch (e) {
-        if (e.errorInfo) {
-            // User Not Found
-            log.warn(e.message)
-            return returnUnAuthUserError(res, e.message)
-        }
-        return commonError(res, e.message)
-    }
-})
 
 router.get('/booking/:worker', async (req, res) => {
     const { worker } = req.params
@@ -579,8 +552,16 @@ router.put('/booking-status', async (req, res) => {
     const { worker, client, ref } = req.body
     const { started, completed } = req.query;
     try {
-        await admin.auth().getUser(worker) // check if worker is valid
-        await admin.auth().getUser(client) // check if user is valid
+
+        await Promise.all([
+            admin.auth().getUser(worker), // check if worker is valid
+            admin.auth().getUser(client) // check if user is valid
+        ])
+        if (!completed) {
+            // check if any bookng has been started but not completed 
+            const bookingStarted = await bookingModel.findOne({ worker, client, ref, started: true, completed: false })
+            if (bookingStarted) return commonError(res, 'Sorry, you have a booking in progress. Please complete it before starting another booking.')
+        }
         const booking = await bookingModel.findOneAndUpdate({
             worker,
             client,
@@ -588,7 +569,7 @@ router.put('/booking-status', async (req, res) => {
         }, {
             completed: completed ? completed : false,
             started: started ? started : false,
-            end: Date.now()
+            endTime: Date.now()
         },)
         console.log(booking)
         if (!booking) return commonError(res, 'Booking not found')
@@ -661,13 +642,12 @@ router.get('/worker-review/:worker', async (req, res) => {
             }
         ]).exec()
         const totalReviews = await reviewModel.countDocuments({ worker })
-        console.log(avgRating)
         return res.status(200).json({
             msg: 'Reveiw saved',
             status: 200,
             success: true,
             reviews,
-            avgRating: avgRating[0].avgRating,
+            avgRating: avgRating[0].avgRating ?? 0,
             total: totalReviews
         })
     } catch (e) {
@@ -681,32 +661,45 @@ router.get('/worker-review/:worker', async (req, res) => {
     }
 })
 
-router.get('/available-slots/:worker', async (req, res) => {
+router.post('/available-slots/:worker', async (req, res) => {
     try {
-        const { worker } = req.params
-        const { day } = req.query
-        await admin.auth().getUser(worker) // check if worker is valid
+        const { workers, day } = req.body
+        // const { day } = req.query
         // const date = new Date(start)
+        const availableSlots = await Promise.all(workers.map(async (workerId) => {
+            await admin.auth().getUser(workerId); // check if worker is valid
+            // get only pending bookings
+            const slots = await bookingModel.find({
+                worker: workerId,
+                day,
+                cancelled: false,
+                completed: false,
+                isPaid: true,
+                // Find either started or not started
+                $or: [
+                    { started: true },
+                    { started: false }
+                ]
+            });
 
-        const timeslots = await bookingModel.find({
-            worker,
-            day
-        },)
-        console.log("Timeslots ", timeslots)
+            if (!slots) return {
+                workerId,
+                slots: [],
+                slotCount: 0
+            }
 
-        if (!timeslots) return res.status(200).json({
-            msg: 'Worker Profile Fetched Successfully',
-            status: 200,
-            success: true,
-            timeslots: []
-        })
+            return {
+                workerId,
+                slots,
+                slotCount: slots.length,
+            };
+        }));
 
         return res.status(200).json({
             msg: 'Worker Profile Fetched Successfully',
             status: 200,
             success: true,
-            timeslots,
-            length: timeslots.length
+            timeslots: availableSlots,
         })
     }
     catch (e) {
@@ -745,6 +738,7 @@ router.post('/book-slot', async (req, res) => {
         const clientPhone = await userModel.findById(client);
 
         const workerPhone = await workerProfileVerificationModel.findOne({ worker });
+        const workerToken = await workerModel.findById(worker)
         // check if the phone numbers are available
         if (!clientPhone.phone || !workerPhone.phone) {
             return commonError(res, 'Phone number not found.');
@@ -766,7 +760,6 @@ router.post('/book-slot', async (req, res) => {
             date: start,
             photos,
             basePrice,
-            isPaid: true, // remove this when testing is completed
             clientPhone: clientPhone.phone,
             workerPhone: workerPhone.phone,
         });
@@ -774,9 +767,25 @@ router.post('/book-slot', async (req, res) => {
         const result = await newBooking.save(); // save booking
 
         // Send notifications to the worker and client
-        // ...
+        if (workerPhone && clientPhone)
+            await Promise.all([
+                admin.messaging().sendToDevice(workerToken.token, {
+                    notification: {
+                        title: 'New Booking',
+                        body: 'You have a new booking. Please check your dashboard for more details.'
+                    },
+                    // token: workerToken.token
+                }),
+                admin.messaging().sendToDevice(clientPhone.token, {
+                    notification: {
+                        title: 'New Booking',
+                        body: 'Your booking was successful. Awaiting payment.'
+                    },
+                    // token: clientPhone.token
+                })
+            ])
 
-        res.status(200).json({
+        return res.status(200).json({
             msg: 'Booking Successful',
             status: 200,
             success: true,
@@ -946,35 +955,70 @@ router.post('/cancel/:ref', async (req, res) => {
     // refund payment and cancel booking.
     const { ref } = req.params
     const { client } = req.body
+    const options = {
+        method: 'POST',
+        hostname: 'api.paystack.co',
+        path: '/refund',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${secret}`
+        },
+    }
     try {
         const foundBooking = await bookingModel.findOne({ ref }) // find booking
+
         // user and worker device tokens to send an alert that the refund has been process and booking cancelled
         const workerToken = await workerModel.findById(foundBooking.worker)
         const userToken = await userModel.findById(client)
-        await admin.messaging().sendToDevice(
-            userToken.token,
-            {
-                notification: {
-                    title: 'Booking Cancelled',
-                    body: 'Your booking has been cancelled successfully'
-                }
-            }
-        )
-        await admin.messaging().sendToDevice(
-            workerToken.token,
-            {
-                notification: {
-                    title: 'Sorry, Booking Cancelled',
-                    body: 'The customer has cancelled the booking. Please check your dashboard for more details'
-                }
-            }
-        )
-        return res.status(200).json({
-            msg: 'Booking cancelled',
-            status: 200,
-            success: true,
+        // Set refund details
+        const refundDetails = JSON.stringify({
+            'transaction': foundBooking.ref,
+            'amount': (foundBooking.commitmentFee * 100) * 0.7,
         })
-
+        await Promise.all([
+            await admin.messaging().sendToDevice(
+                userToken.token,
+                {
+                    notification: {
+                        title: 'Booking Cancelled.',
+                        body: 'Your booking has been cancelled successfully. You will a 70% refund within 3-5 working days'
+                    }
+                }
+            ),
+            await admin.messaging().sendToDevice(
+                workerToken.token,
+                {
+                    notification: {
+                        title: 'Sorry, Booking Cancelled',
+                        body: 'The customer has cancelled the booking. Please check your dashboard for more details'
+                    }
+                }
+            )
+        ]) // parallel async
+        const refundRequest = https.request(options, (response) => {
+            let data = '';
+            response.on('data', (chunk) => {
+                data += chunk;
+            }
+            );
+            response.on('end', async () => {
+                console.log(JSON.parse(data));
+                // update booking to cancelled
+                await bookingModel.findOneAndUpdate({ ref, }, {
+                    cancelled: true,
+                    // cancelledReason: reason,
+                    endTime: Date.now()
+                })
+                return res.status(200).json({
+                    msg: 'Refund Processed',
+                    status: 200,
+                    success: true,
+                })
+            }
+            );
+        })
+        refundRequest.write(refundDetails)
+        refundRequest.end()
         // find and delete bookng
 
     }
@@ -1093,6 +1137,34 @@ router.patch('/update-date', async (req, res) => {
         if (e.errorInfo) {
             // User Not Found
             log.warn(e.message)
+            return returnUnAuthUserError(res, e.message)
+        }
+        return commonError(res, e.message)
+    }
+})
+router.get("/notify/:worker", async (req, res) => {
+    if (!req.params.worker) return commonError(res, "Worker ID not provided")
+    try {
+        admin.auth().getUser(req.params.worker)
+        const workerToken = await workerModel.findById(req.params.worker)
+        admin.messaging().sendToDevice(workerToken.token, {
+            notification: {
+                title: 'Booking request',
+                body: 'You have a new booking request. Please check your dashboard to accept/reject the booking.'
+            },
+            // token: workerToken.token
+
+        })
+        return res.status(200).json({
+            msg: 'Notification sent',
+            status: 200,
+            success: true,
+        })
+    }
+    catch (e) {
+        if (e.errorInfo) {
+            // User Not Found
+            console.log(e.message)
             return returnUnAuthUserError(res, e.message)
         }
         return commonError(res, e.message)

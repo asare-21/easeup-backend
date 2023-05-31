@@ -15,7 +15,7 @@ const jobSchema = new Schema({
     },
     date: {
         type: Date,
-        default: Date.now
+        default: null
     },
     skills: {
         type: Array,

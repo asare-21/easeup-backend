@@ -57,7 +57,7 @@ router.post("/:client", async (req, res) => {
 
         const plans = await jobModel.find({ jobDescription, skills }).countDocuments()
 
-        if (plans === 5) return res.status(400).json({
+        if (plans == 5) return res.status(400).json({
             msg: 'Job plan limit reached',
             status: 400,
             success: false,

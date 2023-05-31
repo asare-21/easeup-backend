@@ -405,7 +405,7 @@ router.post('/phone/send-code', async (req, res) => {
         const body = {
             messages: [
                 {
-                    text: `Your EaseUp verification code is ${code}`,
+                    text: `Your EaseUp verification code is ${code}. Please do not share this code with anyone.`,
                     type: 1,
                     sender: process.env.EASEUP_SMS_SENDER,
                     destinations: {
@@ -494,7 +494,7 @@ router.post('/create', async (req, res) => {
         const existingWorker = await workerModel.findById(user_id).exec()
         if (existingWorker) {
             // Worker Already Exists
-            return res.status(400).json({ user: existingWorker, msg: 'Worker exists. Account not created', status: 400, success: false })
+            return res.status(400).json({ user: existingWorker, msg: 'An account with this email exists as a worker. Sign in request denied.', status: 400, success: false })
         }
         // check if user already exists
         const userExists = await userModel

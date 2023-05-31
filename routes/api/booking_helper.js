@@ -1,34 +1,49 @@
 const { bookingModel } = require('../../models/bookingModel')
 
 const findEarliestAvailableTimeSlot = async (worker, day) => {
-    const foundBookings = await bookingModel.find({ worker: worker, isPaid: true, day, cancelled: false, }).sort({ date: 1 })
-    console.log("Found bookings: ", foundBookings)
-    const twoHours = 2 * 60 * 60 * 1000;
+    const foundBookings = await bookingModel.find({
+        worker: worker,
+        isPaid: true,
+        day,
+        cancelled: false,
+    }).sort({ date: 1 });
+    console.log("Found bookings: ", foundBookings);
+    const bookingInterval = 3 * 60 * 60 * 1000; // 3 hours in milliseconds
     const maxBookingsPerDay = 4;
+    const startOfDay = new Date(day);
+    startOfDay.setHours(8, 0, 0, 0); // Set time to 8am on the given day
+    let currentTimeSlot = startOfDay;
 
     if (foundBookings.length >= maxBookingsPerDay) {
         return null;
     }
 
-    let currentTimeSlot = new Date(day);
-    currentTimeSlot.setHours(8, 0, 0, 0); // Set time to 8am on the given day
-
     for (const booking of foundBookings) {
         const bookingEnd = new Date(booking.date);
 
-        if (currentTimeSlot.getTime() + twoHours <= booking.day) {
+        if (currentTimeSlot.getTime() + bookingInterval <= bookingEnd.getTime()) {
+            // The current time slot is before the booking, so return it
             return currentTimeSlot;
         }
 
-        currentTimeSlot = new Date(bookingEnd.getTime() + twoHours);
+        currentTimeSlot = new Date(bookingEnd.getTime() + bookingInterval);
     }
 
-    if (currentTimeSlot.getHours() <= 15) {
+    // Return the last time slot of the day if there are less than 4 bookings
+    const endOfDay = new Date(day);
+    endOfDay.setHours(15, 0, 0, 0); // Set time to 3pm on the given day
+
+    if (currentTimeSlot.getTime() < endOfDay.getTime()) {
         return currentTimeSlot;
     }
 
-    return null;
+    // Calculate the next available time slot on the next day
+    const nextDay = new Date(day.getTime() + 24 * 60 * 60 * 1000);
+    nextDay.setHours(8, 0, 0, 0); // Set time to 8am on the next day
+
+    return findEarliestAvailableTimeSlot(worker, nextDay);
 };
+
 
 // Helper function to validate required fields and return the name of the missing field
 const getMissingField = (fields) => {

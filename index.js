@@ -31,8 +31,9 @@ const { chatModel } = require('./models/chat_message_model');
 const { workerModel } = require('./models/worker_models');
 const { userModel } = require('./models/user_model');
 const { getAndCacheUsers, getAndCacheWorkerMedia, getAndCacheWorkerProfiles, getAndCacheWorkers } = require('./utils');
-const { dashboard } = require('./routes/api/dashboard');
+const { dashboard } = require('./routes/dashboard/dashboard');
 const { jobPlanRoute } = require('./routes/api/job_plan_route');
+const { jobs } = require('./routes/api/jobs');
 const limiter = rateLimit({
     windowMs: 5 * 60 * 1000, // 30 minutes
     max: 1000, // Limit each IP to 1000 requests per `window` (here, per 15 minutes)
@@ -44,10 +45,11 @@ const limiter = rateLimit({
         return res.status(429).json({ msg: 'Too many requests from this IP, please try again later', status: 429, success: false, limit: true })
     }
 })
-
+const cors = require('cors')
 // Static files
 app.use(express.static(path.join(__dirname, 'public')));
 app.enable('trust proxy');
+app.use(cors())
 app.set('view engine', 'ejs');
 app.set('views', 'views');
 frontEndApp.use(express.static(path.join(__dirname, 'public')));
@@ -79,9 +81,10 @@ app.use(limiter)
 // vhost (subdomain and domain)
 if (process.env.NODE_ENV === 'production') {
     app.use(vhost('api.easeupgh.tech', api));
+    // app.use(vhost('web-production-1450.up.railway.app', api));
     app.use(vhost('easeupgh.tech', frontEndApp));
-    app.use(vhost('www.easeupgh.tech', frontEndApp));
-    admin.use(vhost('admin.easeupgh.tech', admin));
+    // app.use(vhost('www.easeupgh.tech', frontEndApp));
+    // admin.use(vhost('admin.easeupgh.tech', admin));
     frontEndApp.use('/', HOME)
     // api routes for production
     api.use('/user', USER_ROUTE);
@@ -91,8 +94,10 @@ if (process.env.NODE_ENV === 'production') {
     api.use('/worker', workerRoute)
     api.use('/worker-profile', workerProfileRoute)
     api.use('/room', chatRoute)
+    api.use('/jobs', jobs)
+
     api.use('/jplan', jobPlanRoute)
-    // api.use('/dashboard', dashboard)
+    api.use('/dashboard', dashboard)
     // handle 404
     api.use((req, res, next) => {
         return res.status(404).json({
@@ -129,6 +134,8 @@ else {
     app.use('/worker-profile', workerProfileRoute)
     app.use('/room', chatRoute)
     app.use('/jplan', jobPlanRoute)
+    app.use('/dashboard', dashboard)
+
 
 }
 
@@ -148,21 +155,8 @@ http.listen(PORT, async () => {
         FBadmin.initializeApp({
             credential: FBadmin.credential.cert(serviceAccount)
         });
-        // initial cache
+        console.log("Connected to MongoDB and running")
 
-        // setInterval(async () => {
-        //     Promise.all(
-        //         [
-        //             // Load and cached data
-        //             await getAndCacheUsers(),
-        //             await getAndCacheWorkers(),
-        //             await getAndCacheWorkerProfiles(),
-        //             await getAndCacheWorkerMedia(),
-        //         ]
-        //     );
-        //     console.log('Connected to MongoDB');
-        // }, 15 * 1000 * 60);// 5 minutes
-        // }, 6000);// 5 minutes
     } catch (err) {
         console.error(err)
     }
