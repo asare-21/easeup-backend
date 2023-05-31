@@ -569,7 +569,7 @@ router.put('/booking-status', async (req, res) => {
         }, {
             completed: completed ? completed : false,
             started: started ? started : false,
-            end: Date.now()
+            endTime: Date.now()
         },)
         console.log(booking)
         if (!booking) return commonError(res, 'Booking not found')
