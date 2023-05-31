@@ -674,8 +674,11 @@ router.post('/available-slots/:worker', async (req, res) => {
                 day,
                 cancelled: false,
                 completed: false,
-                started: false,
-                isPaid: true
+                isPaid: true,
+                $or: [
+                    { started: true },
+                    { started: false }
+                ]
             });
 
             if (!slots) return {
