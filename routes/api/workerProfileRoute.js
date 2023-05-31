@@ -675,6 +675,7 @@ router.post('/available-slots/:worker', async (req, res) => {
                 cancelled: false,
                 completed: false,
                 isPaid: true,
+                // Find either started or not started
                 $or: [
                     { started: true },
                     { started: false }
