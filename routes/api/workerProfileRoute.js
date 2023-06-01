@@ -663,36 +663,42 @@ router.get('/worker-review/:worker', async (req, res) => {
 
 router.post('/available-slots/:worker', async (req, res) => {
     try {
-        const { workers, day } = req.body
-        // const { day } = req.query
-        // const date = new Date(start)
+        const { workers, day } = req.body;
         const availableSlots = await Promise.all(workers.map(async (workerId) => {
-            await admin.auth().getUser(workerId); // check if worker is valid
-            // get only pending bookings
-            const slots = await bookingModel.find({
-                worker: workerId,
-                day,
-                cancelled: false,
-                completed: false,
-                isPaid: true,
-                // Find either started or not started
-                $or: [
-                    { started: true },
-                    { started: false }
-                ]
-            });
+            try {
+                await admin.auth().getUser(workerId); // check if worker is valid
 
-            if (!slots) return {
-                workerId,
-                slots: [],
-                slotCount: 0
+                // Get the bookings for the worker on the specified day
+                const slots = await bookingModel.find({
+                    worker: workerId,
+                    day,
+                    cancelled: false,
+                    completed: false,
+                    isPaid: true,
+                });
+
+                // Calculate available slots based on the booked slots
+                const availableHours = [8, 11, 14]; // Allowed hours: 8am, 11am, 2pm
+                const availableSlots = availableHours.filter(hour => {
+                    // Check if the worker has a booking at the hour
+                    return !slots.some(slot => {
+                        const slotHour = new Date(slot.date).getHours();
+                        return slotHour === hour;
+                    });
+                });
+
+                return {
+                    workerId,
+                    slots: availableSlots,
+                    slotCount: availableSlots.length,
+                };
+            } catch (error) {
+                return {
+                    workerId,
+                    slots: [],
+                    slotCount: 0
+                };
             }
-
-            return {
-                workerId,
-                slots,
-                slotCount: slots.length,
-            };
         }));
 
         return res.status(200).json({
@@ -700,17 +706,17 @@ router.post('/available-slots/:worker', async (req, res) => {
             status: 200,
             success: true,
             timeslots: availableSlots,
-        })
-    }
-    catch (e) {
+        });
+    } catch (e) {
         if (e.errorInfo) {
             // User Not Found
-            log.warn(e.message)
-            return returnUnAuthUserError(res, e.message)
+            log.warn(e.message);
+            return returnUnAuthUserError(res, e.message);
         }
-        return commonError(res, e.message)
+        return commonError(res, e.message);
     }
-})
+});
+
 
 router.post('/book-slot', async (req, res) => {
     const { worker, client, skills, name, fee, ref, latlng, image, workerImage, day, photos, clientName, basePrice } = req.body;
