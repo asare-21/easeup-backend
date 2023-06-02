@@ -1231,7 +1231,8 @@ router.get('/popular/:id', async (req, res) => {
         return res.json({
             popularServices,
             highest: sortedWorkers,
-            profiles
+            profiles,
+            success: true
         });
 
     } catch (e) {
