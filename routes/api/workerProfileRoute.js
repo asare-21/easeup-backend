@@ -1148,6 +1148,7 @@ router.patch('/update-date', async (req, res) => {
         return commonError(res, e.message)
     }
 })
+
 router.get("/notify/:worker", async (req, res) => {
     if (!req.params.worker) return commonError(res, "Worker ID not provided")
     try {
@@ -1176,5 +1177,72 @@ router.get("/notify/:worker", async (req, res) => {
         return commonError(res, e.message)
     }
 })
+
+router.get('/popular/:id', async (req, res) => {
+    const { id } = req.params;
+    let profiles = [];
+
+    try {
+        await admin.auth().getUser(id); // check if worker is valid
+
+        const bookings = await bookingModel.find({
+            status: 'completed'
+        });
+        console.log(bookings)
+        // Find the most popular services
+        const serviceCounts = {};
+        const workerCounts = {};
+
+        bookings.forEach(booking => {
+            const service = booking.skills;
+            const workerId = booking.worker;
+
+            if (serviceCounts[service]) {
+                serviceCounts[service]++;
+                workerCounts[workerId]++;
+            } else {
+                serviceCounts[service] = 1;
+                workerCounts[workerId] = 1;
+            }
+        });
+
+        const popularServices = Object.keys(serviceCounts).sort((a, b) => {
+            return serviceCounts[b] - serviceCounts[a];
+        });
+
+        // Find workers with the highest number of completed bookings
+        const sortedWorkers = Object.keys(workerCounts).sort((a, b) => {
+            return workerCounts[b] - workerCounts[a];
+        });
+
+        console.log("worker: ", sortedWorkers)
+
+        // get the profiles of the sorted workers
+        for (const foundWorker of sortedWorkers) {
+            const foundProfile = await workerProfileModel.findOne({
+                worker: foundWorker
+            });
+
+            if (foundProfile) {
+                profiles.push(foundProfile);
+            }
+        }
+
+        return res.json({
+            popularServices,
+            highest: sortedWorkers,
+            profiles
+        });
+
+    } catch (e) {
+        if (e.errorInfo) {
+            // User Not Found
+            console.log(e.message);
+            return returnUnAuthUserError(res, e.message);
+        }
+        return commonError(res, e.message);
+    }
+});
+
 
 module.exports.workerProfileRoute = router
