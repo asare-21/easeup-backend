@@ -176,7 +176,7 @@ module.exports.getPopularWorkersCache = async function getPopularWorkersCache(re
             status: 200,
             success: true,
             popularServices: workerResult.popularServices,
-            profiles: workerResult,
+            profiles: workerResult.profiles,
         })
     }
     console.log('Popular Workers not found in cache');
