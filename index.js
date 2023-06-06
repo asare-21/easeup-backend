@@ -150,7 +150,8 @@ http.listen(PORT, async () => {
         connect(`mongodb+srv://${process.env.easeup_admin_founder_email}:${process.env.easeup_admin_founder_pass}@easeup-cluster.pfxvast.mongodb.net/?retryWrites=true&w=majority`, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
-            dbName: 'easeup'
+            dbName: 'easeup',
+
         })
         FBadmin.initializeApp({
             credential: FBadmin.credential.cert(serviceAccount)

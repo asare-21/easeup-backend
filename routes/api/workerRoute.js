@@ -19,7 +19,7 @@ async function createNotification(worker, title, body, type, token) {
         //check firebase if uid exists
         await admin.auth().getUser(worker)
         // Find the user
-        workerModel.findById(worker, (
+        workerModel.findById(worker, async (
             err,
             user
         ) => {
@@ -31,23 +31,20 @@ async function createNotification(worker, title, body, type, token) {
                 title: title,
                 message: body,
                 type: type,
-
             })
-            notification.save(async (err) => {
-                if (err) return log.error(err.message) // Internal Server Error
-                // Use token to send a notification to the user
-                const message = {
-                    notification: {
-                        title: title,
-                        body: body
-                    },
-                    token: token
-                };
-                await admin.messaging().send(message)
-                log.info('Notification sent to the user')
-                return log.info('Notification created')
 
-            })
+            const message = {
+                notification: {
+                    title: title,
+                    body: body
+                },
+                token: token
+            };
+
+            await Promise.all([
+                admin.messaging().send(message),
+                notification.save()
+            ])
         })
     }
     catch (e) {
@@ -86,6 +83,7 @@ router.get('/:worker', getWorkerCache, async (req, res) => {
         return commonError(res, e.message)
     }
 })
+
 router.get('/token/:worker', getWorkerTokenCache, async (req, res) => {
     const { worker } = req.params
     // check if user is authenticated

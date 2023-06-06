@@ -21,6 +21,7 @@ const { query } = require('express');
 const { mediaCache } = require('../../cache/media_cache');
 const { workerProfileVerificationModel } = require('../../models/worker_profile_verification_model');
 const { findEarliestAvailableTimeSlot, getMissingField } = require('./booking_helper');
+const { getReviewsCache, getCommentsCache, getBookingCache, getUpcomingBookingCache, getInProgressBookingCache, getCompletedBookingCache, getCancelledBookingCache, getWorkerReviewCache, getPopularWorkersCache, getNotificationsCache, getPaidBookingsCache } = require('../../cache/worker_cache');
 
 
 router.get('/:worker', getWorkerProfileCache, async (req, res) => {
@@ -28,8 +29,8 @@ router.get('/:worker', getWorkerProfileCache, async (req, res) => {
     // check if user is authenticated
     try {
         await admin.auth().getUser(worker) // check if uid is valid
-        const promiseWorker = await workerProfileModel.findOne({ worker })
-        const promiseRating = await reviewModel.aggregate([
+        const workerPromise = workerProfileModel.findOne({ worker })
+        const rating = reviewModel.aggregate([
             {
                 $match: { worker }
             },
@@ -40,15 +41,25 @@ router.get('/:worker', getWorkerProfileCache, async (req, res) => {
                 }
             }
         ]).exec()
+        const result = await Promise.all([
+            workerPromise,
+            rating
+        ])
+        const promiseWorker = result[0]
+        const promiseRating = result[1]
+
         let avgRating = 0
 
         if (promiseRating.length > 0) avgRating = promiseRating[0].avgRating ?? 0
+
         const totalReviews = await reviewModel.countDocuments({ worker })
+
         promiseWorker.rating = avgRating
         promiseWorker.totalReviews = totalReviews
         promiseWorker.jobs = totalReviews
         // console.log(foundWorker, avgRating, reviews)
         workerCache.set(`worker-profile/${worker}`, JSON.stringify(promiseWorker))
+
         return res.status(200).json({
             msg: 'Worker Profile',
             status: 200,
@@ -69,13 +80,16 @@ router.get('/:worker', getWorkerProfileCache, async (req, res) => {
     }
 })
 
-router.get('/reviews/:worker', async (req, res) => {
+router.get('/reviews/:worker', getReviewsCache, async (req, res) => {
 
     const { worker } = req.params
     // check if user is authenticated
     try {
         await admin.auth().getUser(worker) // check if uid is valid
         const foundWorker = await reviewModel.find({ worker },)
+
+        if (foundWorker) workerCache.set(`reviews/${worker}`, JSON.stringify(foundWorker))
+
         return res.status(200).json({
             msg: 'Worker Profile',
             status: 200,
@@ -93,13 +107,15 @@ router.get('/reviews/:worker', async (req, res) => {
     }
 })
 
-router.get('/comments/:worker/:post', async (req, res) => {
+router.get('/comments/:worker/:post', getCommentsCache, async (req, res) => {
 
     const { worker, post } = req.params
     // check if user is authenticated
     try {
         await admin.auth().getUser(worker) // check if uid is valid
         const posts = await commentModel.find({ post },)
+        // set cache
+        workerCache.set(`comments/${post}`, JSON.stringify(posts))
         return res.status(200).json({
             msg: 'Comments fetched',
             status: 200,
@@ -403,11 +419,13 @@ router.post('/work-radius', async (req, res) => {
 })
 
 
-router.get('/booking/:worker', async (req, res) => {
+router.get('/booking/:worker', getBookingCache, async (req, res) => {
     const { worker } = req.params
     try {
         await admin.auth().getUser(worker) // check if worker is valid
         const bookings = await bookingModel.find({ worker })
+        // set cache
+        workerCache.set(`booking/${worker}`, JSON.stringify(bookings))
         return res.status(200).json({
             msg: 'Worker Profile Fetched Successfully',
             status: 200,
@@ -424,11 +442,13 @@ router.get('/booking/:worker', async (req, res) => {
     }
 })
 
-router.get('/paid/:user', async (req, res) => {
+router.get('/paid/:user', getPaidBookingsCache, async (req, res) => {
     const { user } = req.params
     try {
         await admin.auth().getUser(user) // check if worker is valid
         const bookings = await bookingModel.find({ client: user, isPaid: true })
+        // set cache
+        workerCache.set(`paid-bookings/${user}`, JSON.stringify(bookings))
         return res.status(200).json({
             msg: 'Worker Profile Fetched Successfully',
             status: 200,
@@ -446,7 +466,7 @@ router.get('/paid/:user', async (req, res) => {
 })
 
 // upcoming
-router.get('/booking-upcoming/:worker', async (req, res) => {
+router.get('/booking-upcoming/:worker', getUpcomingBookingCache, async (req, res) => {
     const { worker } = req.params
     const { user } = req.query
     try {
@@ -454,6 +474,9 @@ router.get('/booking-upcoming/:worker', async (req, res) => {
         // console.log("User variable ", user)
         const bookings = user ? await bookingModel.find({ client: worker, isPaid: true, cancelled: false, started: false }) : await bookingModel.find({ worker: worker, isPaid: true, cancelled: false, started: false })
         console.log("Fetched bookings ", bookings)
+        // set cahce
+        workerCache.set(`upcoming-bookings/${worker}`, JSON.stringify(bookings))
+
         return res.status(200).json({
             msg: 'Worker Profile Fetched Successfully',
             status: 200,
@@ -471,7 +494,7 @@ router.get('/booking-upcoming/:worker', async (req, res) => {
 })
 
 // upcoming
-router.get('/booking-progress/:worker', async (req, res) => {
+router.get('/booking-progress/:worker', getInProgressBookingCache, async (req, res) => {
     const { worker } = req.params
     const { user } = req.query
     try {
@@ -479,6 +502,8 @@ router.get('/booking-progress/:worker', async (req, res) => {
         // console.log("User variable ", user)
         const bookings = user ? await bookingModel.find({ 'client': worker, isPaid: true, completed: false, started: true }) : await bookingModel.find({ worker: worker, isPaid: true, completed: false, started: true })
         console.log("Fetched bookings ", bookings)
+        // set cahce
+        workerCache.set(`in-progress-bookings/${worker}`, JSON.stringify(bookings))
         return res.status(200).json({
             msg: 'Worker Profile Fetched Successfully',
             status: 200,
@@ -496,14 +521,15 @@ router.get('/booking-progress/:worker', async (req, res) => {
 })
 
 // completed
-router.get('/booking-completed/:worker', async (req, res) => {
+router.get('/booking-completed/:worker', getCompletedBookingCache, async (req, res) => {
     const { worker } = req.params
     const { user } = req.query
     try {
         await admin.auth().getUser(worker) // check if worker is valid
         const bookings = await bookingModel.find({ [user ? 'client' : 'worker']: worker, isPaid: true, completed: true, started: true })
 
-
+        // set cache
+        workerCache.set(`completed-bookings/${worker}`, JSON.stringify(bookings))
         return res.status(200).json({
             msg: 'Worker Profile Fetched Successfully',
             status: 200,
@@ -522,7 +548,7 @@ router.get('/booking-completed/:worker', async (req, res) => {
 })
 
 //cancelled
-router.get('/booking-cancelled/:worker', async (req, res) => {
+router.get('/booking-cancelled/:worker', getCancelledBookingCache, async (req, res) => {
     const { worker } = req.params
     const { user } = req.query
     console.log(query)
@@ -530,7 +556,8 @@ router.get('/booking-cancelled/:worker', async (req, res) => {
         await admin.auth().getUser(worker) // check if worker is valid
         // const bookings = await bookingModel.find({ [user == true || 'true' ? 'client' : 'worker']: worker, isPaid: true, completed: false, cancelled: true })
         const bookings = user ? await bookingModel.find({ 'client': worker, isPaid: true, completed: false, cancelled: true }) : await bookingModel.find({ worker, isPaid: true, completed: false, cancelled: true })
-
+        // set cache
+        workerCache.set(`cancelled-bookings/${worker}`, JSON.stringify(bookings))
         return res.status(200).json({
             msg: 'Worker Profile Fetched Successfully',
             status: 200,
@@ -624,13 +651,13 @@ router.post('/worker-review', async (req, res) => {
     }
 })
 // get worker reviews
-router.get('/worker-review/:worker', async (req, res) => {
+router.get('/worker-review/:worker', getWorkerReviewCache, async (req, res) => {
     try {
         const worker = req.params.worker
         await admin.auth().getUser(worker) // check if worker is valid
 
-        const reviews = await reviewModel.find({ worker }).limit(80).sort({ date: -1 })
-        const avgRating = await reviewModel.aggregate([
+        const reviewsPromise = await reviewModel.find({ worker }).limit(80).sort({ date: -1 })
+        const avgRatingPromise = await reviewModel.aggregate([
             {
                 $match: { worker }
             },
@@ -641,9 +668,24 @@ router.get('/worker-review/:worker', async (req, res) => {
                 }
             }
         ]).exec()
-        const totalReviews = await reviewModel.countDocuments({ worker })
+        const totalReviewsPromise = await reviewModel.countDocuments({ worker })
+        const result = await Promise.all([
+            reviewsPromise,
+            avgRatingPromise,
+            totalReviewsPromise
+        ])
+        const reviews = result[0]
+        const avgRating = result[1]
+        const totalReviews = result[2]
+
+        reviews.avgRating = avgRating[0].avgRating ?? 0
+        reviews.total = totalReviews
+
+        // set cache
+        workerCache.set(`worker-review/${worker}`, JSON.stringify(reviews))
+
         return res.status(200).json({
-            msg: 'Reveiw saved',
+            msg: 'Review saved',
             status: 200,
             success: true,
             reviews,
@@ -812,17 +854,8 @@ router.post('/book-slot', async (req, res) => {
 router.post('/verify-payment', async (req, res) => {
     const { event, data } = req.body
     try {
-        console.log("------------ Pay stack webhook request body ------------")
-        console.log(req.body)
-        console.log("------------ Pay stack request headers ------------")
-        console.log(req.headers)
         const hash = crypto.createHmac('sha512', secret).update(JSON.stringify(req.body)).digest('hex');
-        console.log("------------ Pay stack generated hash ------------")
-        console.log(hash)
-        console.log("------------ Pay stack request hash ------------")
-        console.log(req.headers['x-paystack-signature'])
-        console.log("------------ Pay stack hash check equality ------------")
-        console.log(hash === req.headers['x-paystack-signature'])
+
         if (hash === req.headers['x-paystack-signature']) {
             // Retrieve the request's body
             const success = data.gateway_response === 'Approved' || "Successful" && event === 'charge.success'
@@ -957,6 +990,7 @@ router.post('/refund/:ref', async (req, res) => {
         return commonError(res, e.message)
     }
 })
+
 router.post('/cancel/:ref', async (req, res) => {
     // refund payment and cancel booking.
     const { ref } = req.params
@@ -1160,8 +1194,8 @@ router.get("/notify/:worker", async (req, res) => {
                 body: 'You have a new booking request. Please check your dashboard to accept/reject the booking.'
             },
             // token: workerToken.token
-
         })
+        // set cache
         return res.status(200).json({
             msg: 'Notification sent',
             status: 200,
@@ -1178,7 +1212,7 @@ router.get("/notify/:worker", async (req, res) => {
     }
 })
 
-router.get('/popular/:id', async (req, res) => {
+router.get('/popular/:id', getPopularWorkersCache, async (req, res) => {
     const { id } = req.params;
     let profiles = [];
 
@@ -1227,7 +1261,8 @@ router.get('/popular/:id', async (req, res) => {
                 profiles.push(foundProfile);
             }
         }
-
+        // set cache
+        workerCache.set(`popular-workers`, JSON.stringify(profiles))
         return res.json({
             popularServices,
             highest: sortedWorkers,

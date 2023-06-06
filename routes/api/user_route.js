@@ -20,7 +20,7 @@ const options = {
     hostname: "https://api.smsonlinegh.com/v4/message/sms/send",
 
 }
-const { getUserCache, cache } = require('../../cache/user_cache');
+const { getUserCache, cache, getUserNotificationsCache } = require('../../cache/user_cache');
 const { workerModel } = require('../../models/worker_models');
 const userCache = cache;
 
@@ -29,6 +29,7 @@ function returnUnAuthUserError(res, msg) {
 
     return res.status(401).json({ msg: msg, status: 401, success: false })
 }
+
 function commonError(res, msg) {
     console.log(msg)
     return res.status(500).json({ msg, status: 500, success: false })
@@ -161,6 +162,7 @@ router.post('/update/image', (req, res) => {
         return commonError(res, e.message)
     }
 })
+
 router.post('/update/address', (req, res) => {
     try {  // required field : user_id
         const { user_id, address, latlng } = req.body;
@@ -199,6 +201,7 @@ router.post('/update/address', (req, res) => {
         return commonError(res, e.message)
     }
 })
+
 router.post('/update/gender', (req, res) => {
     try {  // required field : user_id
         const { user_id, gender } = req.body;
@@ -234,6 +237,7 @@ router.post('/update/gender', (req, res) => {
         return commonError(res, e.message)
     }
 })
+
 router.post('/update/token', (req, res) => {
     try {  // required field : user_id
         const { user_id, token } = req.body;
@@ -306,6 +310,7 @@ router.post('/update/phone', (req, res) => {
         return commonError(res, e.message)
     }
 })
+
 router.post('/update/ghc', (req, res) => {
     try {  // required field : user_id
         const { user_id, ghc, ghc_n, ghc_exp } = req.body;
@@ -380,6 +385,7 @@ router.post('/update', async (req, res) => {
         return commonError(res, e.message)
     }
 })
+
 router.post('/phone/send-code', async (req, res) => {
     // 
     try {  // required field : user_id
@@ -540,7 +546,7 @@ router.post('/create', async (req, res) => {
     }
 })
 
-router.get('/nofications/:user_id', async (req, res) => {
+router.get('/nofications/:user_id', getUserNotificationsCache, async (req, res) => {
     try {   // required field : user_id
         const { user_id } = req.params;
 
@@ -550,6 +556,8 @@ router.get('/nofications/:user_id', async (req, res) => {
         // Find the user
         notificationModel.find({ user: user_id }, (err, notifications) => {
             if (err) return res.status(500).json({ msg: err.message, status: 500, success: false, }) // Internal Server Error
+            // cache data
+            userCache.set(`notifications/${user_id}`, JSON.stringify(notifications));
             return res.status(200).json({ msg: 'Notifications Found', status: 200, success: true, notifications }) // Notifications Found and returned
         })
 
