@@ -28,7 +28,8 @@ module.exports.getUserNotificationsCache = async function getNotificationsCache(
     if (notifications !== null && notifications !== undefined) {
         console.log('Notifications found in cache');
         return res.status(200).json({
-            msg: 'Notifications Found', status: 200, success: true, notifications
+            msg: 'Notifications Found', status: 200, success: true,
+            notifications: JSON.parse(notifications)
         })
     }
     console.log('Notifications not found in cache');
