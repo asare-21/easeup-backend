@@ -1262,7 +1262,8 @@ router.get('/popular/:id', getPopularWorkersCache, async (req, res) => {
             }
         }
         // set cache
-        workerCache.set(`popular-workers`, JSON.stringify(profiles))
+        workerCache.set(`popular-workers`, JSON.stringify({ profiles, popularServices, highest: sortedWorkers }))
+
         return res.json({
             popularServices,
             highest: sortedWorkers,

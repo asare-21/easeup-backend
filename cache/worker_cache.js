@@ -163,13 +163,19 @@ module.exports.getWorkerReviewCache = async function getWorkerReviewCache(req, r
 // get popoular workers
 module.exports.getPopularWorkersCache = async function getPopularWorkersCache(req, res, next) {
     const workers = myCache.get(`popular-workers`);
+    const highestRated = myCache.get(`popular-workers-sorted`);
 
     console.log('cached popular workers ', workers);
 
     if (workers !== null && workers !== undefined) {
         console.log('Popular Workers found in cache');
         return res.status(200).json({
-            msg: 'Popular Workers Found', status: 200, success: true, workers: JSON.parse(workers)
+            highest: workers.highest,
+            msg: 'Popular Workers Found',
+            status: 200,
+            success: true,
+            popularServices: workers.popularServices,
+            profiles: JSON.parse(workers)
         })
     }
     console.log('Popular Workers not found in cache');
