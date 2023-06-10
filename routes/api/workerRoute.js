@@ -10,6 +10,7 @@ const { locationModel } = require("../../models/workerLocationModel");
 const { getWorkerCache, getWorkerTokenCache } = require('../../cache/worker_cache');
 const { cache } = require('../../cache/user_cache');
 const { userModel } = require('../../models/user_model');
+const { bookingModel } = require('../../models/bookingModel');
 const workerCache = cache;
 
 async function createNotification(worker, title, body, type, token) {
@@ -81,6 +82,36 @@ router.get('/:worker', getWorkerCache, async (req, res) => {
             return returnUnAuthUserError(res, e.message)
         }
         return commonError(res, e.message)
+    }
+})
+
+router.delete('/:worker', async (req, res) => {
+    const { worker } = req.params
+
+    try {
+        await admin.auth().getUser(worker) // check if worker is valid
+
+
+        await Promise.all([
+            workerModel.findByIdAndDelete(worker),
+            // bookingModel.deleteMany({ worker: worker }),
+            workerProfileModel.deleteMany({ worker: worker }),
+            workerProfileVerificationModel.deleteMany({ worker: worker })
+        ])
+        return res.status(200).json({
+            msg: 'Worker Profile Deleted',
+            status: 200,
+            success: true,
+        })
+    }
+    catch (e) {
+        if (e.errorInfo) {
+            // User Not Found
+            log.warn(e.message)
+            return returnUnAuthUserError(res, e.message)
+        }
+        return commonError(res, e.message)
+
     }
 })
 
