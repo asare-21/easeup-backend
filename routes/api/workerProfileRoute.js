@@ -813,6 +813,8 @@ router.post('/book-slot', async (req, res) => {
         });
 
         const result = await newBooking.save(); // save booking
+        // clear cache
+        workerCache.del(`booking/${worker}`);
 
         // Send notifications to the worker and client
         if (workerPhone && clientPhone)
