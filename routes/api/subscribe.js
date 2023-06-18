@@ -22,3 +22,5 @@ router.post('/', async (req, res) => {
 
     }
 })
+
+module.exports.subscribeRoute = router;

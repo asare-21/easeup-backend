@@ -45,7 +45,8 @@ const limiter = rateLimit({
         return res.status(429).json({ msg: 'Too many requests from this IP, please try again later', status: 429, success: false, limit: true })
     }
 })
-const cors = require('cors')
+const cors = require('cors');
+const { subscribeRoute } = require('./routes/api/subscribe');
 // Static files
 app.use(express.static(path.join(__dirname, 'public')));
 app.enable('trust proxy');
@@ -95,6 +96,7 @@ if (process.env.NODE_ENV === 'production') {
     api.use('/worker-profile', workerProfileRoute)
     api.use('/room', chatRoute)
     api.use('/jobs', jobs)
+    api.use('/subscribe', subscribeRoute)
 
     api.use('/jplan', jobPlanRoute)
     api.use('/dashboard', dashboard)
