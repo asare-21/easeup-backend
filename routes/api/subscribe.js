@@ -1,5 +1,5 @@
-const { contactModel } = require('../../models/contact');
-const { subscriberModel } = require('../../models/subscriber_model');
+const { contactModel } = required('../../models/contact');
+const { subscriberModel } = required('../../models/subscriber_model');
 const mailer = required('nodemailer')
 const router = require('express').Router();
 
