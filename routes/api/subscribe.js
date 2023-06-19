@@ -4,6 +4,7 @@ const router = require('express').Router();
 
 
 router.post('/', async (req, res) => {
+
     const { email } = req.body;
     if (!email) {
         return res.redirect('https://easeupgh.tech/')

@@ -815,6 +815,7 @@ router.post('/book-slot', async (req, res) => {
         const result = await newBooking.save(); // save booking
         // clear cache
         workerCache.del(`booking/${worker}`);
+        workerCache.del(`upcoming-bookings/${client}`);
         workerCache.del(`upcoming-bookings/${worker}`);
 
         // Send notifications to the worker and client
