@@ -600,6 +600,9 @@ router.put('/booking-status', async (req, res) => {
         },)
         console.log(booking)
         if (!booking) return commonError(res, 'Booking not found')
+        workerCache.del(`in-progress-bookings/${worker}`)
+        workerCache.del(`upcoming-bookings/${worker}`)
+
         return res.status(200).json({
             msg: 'Booking Updated Successfully',
             status: 200,
@@ -975,6 +978,9 @@ router.post('/refund/:ref', async (req, res) => {
                     cancelledReason: reason,
                     endTime: Date.now()
                 })
+                workerCache.del(`in-progress-bookings/${worker}`)
+                workerCache.del(`upcoming-bookings/${worker}`)
+                workerCache.del(`cancelled-bookings/${worker}`)
                 return res.status(200).json({
                     msg: 'Refund Processed',
                     status: 200,
