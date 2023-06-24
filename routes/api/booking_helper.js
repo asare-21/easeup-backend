@@ -6,11 +6,19 @@ const findEarliestAvailableTimeSlot = async (worker, day) => {
         isPaid: true,
         day,
         cancelled: false,
+        $or: [
+            { pending: true },
+        ]
     }).sort({ date: 1 });
     console.log("Found bookings: ", foundBookings);
     const bookingInterval = 3 * 60 * 60 * 1000; // 3 hours in milliseconds
-    const maxBookingsPerDay = 4;
-    const startOfDay = new Date(day);
+    const maxBookingsPerDay = foundBookings.find((e) => e.pending == true) == undefined ? 4 : 1;
+    const startOfDay = new Date(day)
+
+
+
+
+
     startOfDay.setHours(8, 0, 0, 0); // Set time to 8am on the given day
     let currentTimeSlot = startOfDay;
 
