@@ -21,7 +21,7 @@ const { query } = require('express');
 const { mediaCache } = require('../../cache/media_cache');
 const { workerProfileVerificationModel } = require('../../models/worker_profile_verification_model');
 const { findEarliestAvailableTimeSlot, getMissingField } = require('./booking_helper');
-const { getReviewsCache, getCommentsCache, getBookingCache, getUpcomingBookingCache, getInProgressBookingCache, getCompletedBookingCache, getCancelledBookingCache, getWorkerReviewCache, getPopularWorkersCache, getNotificationsCache, getPaidBookingsCache } = require('../../cache/worker_cache');
+const { getReviewsCache, getCommentsCache, getBookingCache, getUpcomingBookingCache, getInProgressBookingCache, getCompletedBookingCache, getCancelledBookingCache, getWorkerReviewCache, getPopularWorkersCache, getNotificationsCache, getPaidBookingsCache, getPendingBookingCache } = require('../../cache/worker_cache');
 
 
 router.get('/:worker', getWorkerProfileCache, async (req, res) => {
@@ -492,6 +492,33 @@ router.get('/booking-upcoming/:worker', getUpcomingBookingCache, async (req, res
         return commonError(res, e.message)
     }
 })
+// pending
+router.get('/booking-pending/:worker', getPendingBookingCacheCache, async (req, res) => {
+    const { worker } = req.params
+    const { user } = req.query
+    try {
+        await admin.auth().getUser(worker) // check if worker is valid
+        // console.log("User variable ", user)
+        const bookings = user ? await bookingModel.find({ client: worker, isPaid: true, cancelled: false, started: true, pending: true }) : await bookingModel.find({ worker: worker, isPaid: true, cancelled: false, started: false })
+        console.log("Fetched bookings ", bookings)
+        // set cahce
+        workerCache.set(`pending-bookings/${worker}`, JSON.stringify(bookings))
+
+        return res.status(200).json({
+            msg: 'Worker Profile Fetched Successfully',
+            status: 200,
+            success: true,
+            bookings,
+        })
+    } catch (e) {
+        if (e.errorInfo) {
+            // User Not Found
+            log.warn(e.message)
+            return returnUnAuthUserError(res, e.message)
+        }
+        return commonError(res, e.message)
+    }
+})
 
 // upcoming
 router.get('/booking-progress/:worker', getInProgressBookingCache, async (req, res) => {
@@ -622,6 +649,8 @@ router.put('/booking-status', async (req, res) => {
         return commonError(res, e.message)
     }
 })
+
+
 //mark as pending
 router.put('/booking-status/pending', async (req, res) => {
     const { worker, client, ref } = req.body
