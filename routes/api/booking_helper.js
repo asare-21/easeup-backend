@@ -1,18 +1,32 @@
 const { bookingModel } = require('../../models/bookingModel')
 
 const findEarliestAvailableTimeSlot = async (worker, day) => {
-    const foundBookings = await bookingModel.find({
+    const promisefoundBookings = await bookingModel.find({
         worker: worker,
         isPaid: true,
         day,
         cancelled: false,
+        completed: false,
         $or: [
             { pending: true },
         ]
     }).sort({ date: 1 });
+    const promisecheckBookings = await bookingModel.find({
+        worker: worker,
+        isPaid: true,
+        cancelled: false,
+        completed: false,
+        $or: [
+            { pending: true },
+        ]
+    }).sort({ date: 1 });
+
+    const [foundBookings, checkBookings] = await Promise.all([promisefoundBookings, promisecheckBookings]) // get all bookings for the day
     console.log("Found bookings: ", foundBookings);
     const bookingInterval = 3 * 60 * 60 * 1000; // 3 hours in milliseconds
-    const maxBookingsPerDay = foundBookings.find((e) => e.pending == true) == undefined ? 4 : 1;
+    const maxBookingsPerDay = foundBookings.find((e) => e.pending == true) || checkBookings.find((e) => e.pending == true) == undefined ? 4 : 1; // limit booking to 1 if there is a pending booking on that day
+    //limit booking to one if the account has a pending booking
+
     const startOfDay = new Date(day)
 
 
