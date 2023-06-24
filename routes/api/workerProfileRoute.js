@@ -493,7 +493,7 @@ router.get('/booking-upcoming/:worker', getUpcomingBookingCache, async (req, res
     }
 })
 // pending
-router.get('/booking-pending/:worker', getPendingBookingCacheCache, async (req, res) => {
+router.get('/booking-pending/:worker', getPendingBookingCache, async (req, res) => {
     const { worker } = req.params
     const { user } = req.query
     try {
