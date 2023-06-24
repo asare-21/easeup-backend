@@ -596,6 +596,8 @@ router.put('/booking-status', async (req, res) => {
         }, {
             completed: completed ? completed : false,
             started: started ? started : false,
+            pending: false,
+
             endTime: Date.now()
         },)
         console.log(booking)
@@ -608,6 +610,45 @@ router.put('/booking-status', async (req, res) => {
             status: 200,
             success: true,
             booking,
+        })
+
+    } catch (e) {
+        if (e.errorInfo) {
+            // User Not Found
+            log.warn(e.message)
+            return returnUnAuthUserError(res, e.message)
+        }
+
+        return commonError(res, e.message)
+    }
+})
+//mark as pending
+router.put('/booking-status/pending', async (req, res) => {
+    const { worker, client, ref } = req.body
+    const { started, completed } = req.query;
+    try {
+
+        await Promise.all([
+            admin.auth().getUser(worker), // check if worker is valid
+            admin.auth().getUser(client) // check if user is valid
+        ])
+
+        const bookingStarted = await bookingModel.findOne({ worker, client, ref, started: true, completed: false })
+        if (!bookingStarted) return commonError(res, 'Sorry, something went wrong.')
+
+        // update
+        bookingStarted.pending = true
+        bookingStarted.save()
+
+
+        workerCache.del(`in-progress-bookings/${worker}`)
+        workerCache.del(`upcoming-bookings/${worker}`)
+
+        return res.status(200).json({
+            msg: 'Booking Updated Successfully',
+            status: 200,
+            success: true,
+            booking: bookingStarted,
         })
 
     } catch (e) {
