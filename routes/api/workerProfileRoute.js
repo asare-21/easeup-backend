@@ -673,20 +673,22 @@ router.put('/booking-status/pending', async (req, res) => {
 
         workerCache.del(`in-progress-bookings/${worker}`)
         workerCache.del(`upcoming-bookings/${worker}`)
+        workerCache.del(`pending-bookings/${worker}`)
+
         // send notifcation to worker
-        const worker = await workerModel.findById(worker)
+        const workerfuture = await workerModel.findById(worker)
         if (worker) {
             // send notification to worker
             notificationModel
             const notification = new notificationModel({
-                user: worker._id,
+                user: worker,
                 title: 'Booking Pending',
                 body: `Your booking with ${bookingStarted.clientName} has been marked as pending. Please contact the client to resolve the issue.`,
             })
             await notification.save()
             // send notification to client using Firebase Cloud Messaging
 
-            await admin.messaging().send(worker.token, {
+            await admin.messaging().send(workerfuture.token, {
                 notification: {
                     title: 'Booking Pending',
                     body: `Your booking with ${bookingStarted.clientName} has been marked as pending. Please contact the client to resolve the issue.`,
@@ -698,7 +700,7 @@ router.put('/booking-status/pending', async (req, res) => {
             msg: 'Booking Updated Successfully',
             status: 200,
             success: true,
-            booking: bookingStarted,
+            // booking: bookingStarted,
         })
 
     } catch (e) {
