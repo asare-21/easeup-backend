@@ -1362,12 +1362,14 @@ router.get('/popular/:id', getPopularWorkersCache, async (req, res) => {
             const foundProfile = await workerProfileModel.findOne({
                 worker: foundWorker
             });
+            console.log("Found profile", foundProfile)
 
             if (foundProfile) {
                 // get avg rating of worker
+                console.log("Found Worker", foundWorker)
                 const rating = await reviewModel.aggregate([
                     {
-                        $match: { foundWorker }
+                        $match: { worker: foundWorker }
                     },
                     {
                         $group: {
@@ -1376,8 +1378,8 @@ router.get('/popular/:id', getPopularWorkersCache, async (req, res) => {
                         }
                     }
                 ]).exec()
-
-                foundProfile.rating = rating[0].avgRating ?? 0
+                console.log("Rating", rating)
+                if (rating.length > 0) { foundProfile.rating = rating[0].avgRating ?? 0 }
                 profiles.push(foundProfile);
             }
         }
