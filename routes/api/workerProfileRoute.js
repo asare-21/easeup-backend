@@ -796,47 +796,41 @@ router.post('/available-slots/:worker', async (req, res) => {
         const currentTime = currentDate.getHours(); // Get the current hour
 
         const availableSlots = await Promise.all(workers.map(async (workerId) => {
-            try {
-                await admin.auth().getUser(workerId); // check if worker is valid
 
-                // Get the bookings for the worker on the specified day
-                const slots = await bookingModel.find({
-                    worker: workerId,
-                    day,
-                    cancelled: false,
-                    completed: false,
-                    isPaid: true,
-                });
+            await admin.auth().getUser(workerId); // check if worker is valid
 
-                // Calculate available slots based on the booked slots and current time
-                const availableHours = [8, 11, 14]; // Allowed hours: 8am, 11am, 2pm
-                const availableSlots = availableHours.filter(hour => {
-                    // Check if the worker has a booking at the hour and it's after the current time
-                    if (selectedDay.getMonth() === currentDay.getMonth() && selectedDay.getDate() === currentDay.getDate()) {
-                        // check current time
-                        // check if the day has bookings. if it does, check the slots used and return the available slots
-                        const usedHours = slots.map(slot => new Date(slot.date).getHours() - 1);
-                        console.log("Used hours", usedHours)
-                        return !usedHours.includes(hour) && hour > currentTime;
-                    } else {
-                        // check if the day has bookings. if it does, check the slots used and return the available slots
-                        const usedHours = slots.map(slot => new Date(slot.date).getHours() - 1);
-                        console.log("Used hours", usedHours)
-                        return !usedHours.includes(hour);
-                    }
-                });
-                return {
-                    workerId,
-                    slots: availableSlots,
-                    slotCount: availableSlots.length,
-                };
-            } catch (error) {
-                return {
-                    workerId,
-                    slots: [],
-                    slotCount: 0
-                };
-            }
+            // Get the bookings for the worker on the specified day
+            const slots = await bookingModel.find({
+                worker: workerId,
+                day,
+                cancelled: false,
+                completed: false,
+                isPaid: true,
+            });
+
+            // Calculate available slots based on the booked slots and current time
+            const availableHours = [8, 11, 14]; // Allowed hours: 8am, 11am, 2pm
+            const availableSlots = availableHours.filter(hour => {
+                // Check if the worker has a booking at the hour and it's after the current time
+                if (selectedDay.getMonth() === currentDay.getMonth() && selectedDay.getDate() === currentDay.getDate()) {
+                    // check current time
+                    // check if the day has bookings. if it does, check the slots used and return the available slots
+                    const usedHours = slots.map(slot => new Date(slot.date).getHours() - 1);
+                    console.log("Used hours", usedHours)
+                    return !usedHours.includes(hour) && hour > currentTime;
+                } else {
+                    // check if the day has bookings. if it does, check the slots used and return the available slots
+                    const usedHours = slots.map(slot => new Date(slot.date).getHours() - 1);
+                    console.log("Used hours", usedHours)
+                    return !usedHours.includes(hour);
+                }
+            });
+            return {
+                workerId,
+                slots: availableSlots,
+                slotCount: availableSlots.length,
+            };
+
         }));
 
         return res.status(200).json({
