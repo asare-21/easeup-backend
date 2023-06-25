@@ -779,6 +779,8 @@ router.get('/worker-review/:worker', getWorkerReviewCache, async (req, res) => {
 router.post('/available-slots/:worker', async (req, res) => {
     try {
         const { workers, day } = req.body;
+        const currentTime = new Date(); // Get the current time
+
         const availableSlots = await Promise.all(workers.map(async (workerId) => {
             try {
                 await admin.auth().getUser(workerId); // check if worker is valid
@@ -792,13 +794,14 @@ router.post('/available-slots/:worker', async (req, res) => {
                     isPaid: true,
                 });
 
-                // Calculate available slots based on the booked slots
+                // Calculate available slots based on the booked slots and current time
                 const availableHours = [8, 11, 14]; // Allowed hours: 8am, 11am, 2pm
                 const availableSlots = availableHours.filter(hour => {
-                    // Check if the worker has a booking at the hour
+                    // Check if the worker has a booking at the hour and it's after the current time
                     return !slots.some(slot => {
-                        const slotHour = new Date(slot.date).getHours();
-                        return slotHour === hour;
+                        const slotDate = new Date(slot.date);
+                        const slotHour = slotDate.getHours();
+                        return slotHour === hour && slotDate > currentTime;
                     });
                 });
 
