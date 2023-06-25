@@ -499,7 +499,7 @@ router.get('/booking-pending/:worker', getPendingBookingCache, async (req, res) 
     try {
         await admin.auth().getUser(worker) // check if worker is valid
         // console.log("User variable ", user)
-        const bookings = user ? await bookingModel.find({ client: worker, isPaid: true, cancelled: false, started: true, pending: true }) : await bookingModel.find({ worker: worker, isPaid: true, cancelled: false, started: false })
+        const bookings = user ? await bookingModel.find({ client: worker, isPaid: true, cancelled: false, started: true, pending: true }) : await bookingModel.find({ worker: worker, isPaid: true, cancelled: false, started: false, pending: true })
         console.log("Fetched bookings ", bookings)
         // set cahce
         workerCache.set(`pending-bookings/${worker}`, JSON.stringify(bookings))
