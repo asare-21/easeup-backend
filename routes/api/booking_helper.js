@@ -7,7 +7,6 @@ const findEarliestAvailableTimeSlot = async (worker, day) => {
         day,
         cancelled: false,
         completed: false,
-        $or: [{ pending: true }],
     }).sort({ date: 1 });
 
     const promisecheckBookings = await bookingModel.find({
@@ -15,7 +14,7 @@ const findEarliestAvailableTimeSlot = async (worker, day) => {
         isPaid: true,
         cancelled: false,
         completed: false,
-        $or: [{ pending: true }],
+        pending: true,
     }).sort({ date: 1 });
 
     const [foundBookings, checkBookings] = await Promise.all([
@@ -25,34 +24,34 @@ const findEarliestAvailableTimeSlot = async (worker, day) => {
 
     console.log("Found bookings: ", foundBookings);
 
-    const bookingInterval = 3 * 60 * 60 * 1000; // 3 hours in milliseconds
-    const hasPendingBooking = foundBookings.some((booking) => booking.pending === true);
-    const hasBookingsForDay = foundBookings.length > 0 || checkBookings.length > 0;
+    const maxBookingsPerDay = checkBookings.length > 0 ? 1 : 3;
 
-    const maxBookingsPerDay = hasPendingBooking ? 1 : 4;
+    if (foundBookings.length >= maxBookingsPerDay) {
+        return null;
+    }
 
     const startOfDay = new Date(day);
     startOfDay.setHours(8, 0, 0, 0); // Set time to 8am on the given day
 
     let currentTimeSlot = startOfDay;
 
-    if (hasBookingsForDay && foundBookings.length >= maxBookingsPerDay) {
-        // If there are existing bookings and the maximum limit is reached, find the next available slot
-        const lastBooking = foundBookings[foundBookings.length - 1];
-        currentTimeSlot = new Date(lastBooking.date.getTime() + bookingInterval);
-    }
+    for (const booking of foundBookings) {
+        const bookingEnd = new Date(booking.date);
+        const bookingInterval = bookingEnd.getTime() - currentTimeSlot.getTime();
 
-    while (currentTimeSlot.getHours() < 15) {
-        const isSlotAvailable = foundBookings.every((booking) => {
-            const bookingEnd = new Date(booking.date.getTime() + bookingInterval);
-            return currentTimeSlot.getTime() + bookingInterval > bookingEnd.getTime();
-        });
-
-        if (isSlotAvailable) {
+        if (bookingInterval >= 3 * 60 * 60 * 1000) {
+            // The current time slot is before the booking, so return it
             return currentTimeSlot;
         }
 
-        currentTimeSlot = new Date(currentTimeSlot.getTime() + bookingInterval);
+        currentTimeSlot = new Date(bookingEnd.getTime());
+    }
+
+    const endOfDay = new Date(day);
+    endOfDay.setHours(15, 0, 0, 0); // Set time to 3pm on the given day
+
+    if (currentTimeSlot.getTime() < endOfDay.getTime()) {
+        return currentTimeSlot;
     }
 
     // Calculate the next available time slot on the next day
