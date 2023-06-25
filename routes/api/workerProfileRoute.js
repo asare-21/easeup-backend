@@ -22,6 +22,7 @@ const { mediaCache } = require('../../cache/media_cache');
 const { workerProfileVerificationModel } = require('../../models/worker_profile_verification_model');
 const { findEarliestAvailableTimeSlot, getMissingField } = require('./booking_helper');
 const { getReviewsCache, getCommentsCache, getBookingCache, getUpcomingBookingCache, getInProgressBookingCache, getCompletedBookingCache, getCancelledBookingCache, getWorkerReviewCache, getPopularWorkersCache, getNotificationsCache, getPaidBookingsCache, getPendingBookingCache } = require('../../cache/worker_cache');
+const { notificationModel } = require('../../models/nofications');
 
 
 router.get('/:worker', getWorkerProfileCache, async (req, res) => {
@@ -654,7 +655,7 @@ router.put('/booking-status', async (req, res) => {
 //mark as pending
 router.put('/booking-status/pending', async (req, res) => {
     const { worker, client, ref } = req.body
-    const { started, completed } = req.query;
+
     try {
 
         await Promise.all([
@@ -672,6 +673,26 @@ router.put('/booking-status/pending', async (req, res) => {
 
         workerCache.del(`in-progress-bookings/${worker}`)
         workerCache.del(`upcoming-bookings/${worker}`)
+        // send notifcation to worker
+        const worker = await workerModel.findById(worker)
+        if (worker) {
+            // send notification to worker
+            notificationModel
+            const notification = new notificationModel({
+                user: worker._id,
+                title: 'Booking Pending',
+                body: `Your booking with ${bookingStarted.clientName} has been marked as pending. Please contact the client to resolve the issue.`,
+            })
+            await notification.save()
+            // send notification to client using Firebase Cloud Messaging
+
+            await admin.messaging().send(worker.token, {
+                notification: {
+                    title: 'Booking Pending',
+                    body: `Your booking with ${bookingStarted.clientName} has been marked as pending. Please contact the client to resolve the issue.`,
+                }
+            })
+        }
 
         return res.status(200).json({
             msg: 'Booking Updated Successfully',
