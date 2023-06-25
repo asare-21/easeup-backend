@@ -528,7 +528,7 @@ router.get('/booking-progress/:worker', getInProgressBookingCache, async (req, r
     try {
         await admin.auth().getUser(worker) // check if worker is valid
         // console.log("User variable ", user)
-        const bookings = user ? await bookingModel.find({ 'client': worker, isPaid: true, completed: false, started: true, pending: false }) : await bookingModel.find({ worker: worker, isPaid: true, completed: false, started: true, pending: false })
+        const bookings = user === "true" ? await bookingModel.find({ client: worker, isPaid: true, completed: false, started: true, pending: false }) : await bookingModel.find({ worker: worker, isPaid: true, completed: false, started: true, pending: false })
         console.log("Fetched bookings ", bookings)
         // set cahce
         workerCache.set(`in-progress-bookings/${worker}`, JSON.stringify(bookings))
