@@ -38,12 +38,13 @@ const findEarliestAvailableTimeSlot = async (worker, day) => {
 
     if (hasBookingsForDay && foundBookings.length >= maxBookingsPerDay) {
         // If there are existing bookings and the maximum limit is reached, find the next available slot
-        currentTimeSlot = new Date(foundBookings[foundBookings.length - 1].date.getTime() + bookingInterval);
+        const lastBooking = foundBookings[foundBookings.length - 1];
+        currentTimeSlot = new Date(lastBooking.date.getTime() + bookingInterval);
     }
 
     while (currentTimeSlot.getHours() < 15) {
         const isSlotAvailable = foundBookings.every((booking) => {
-            const bookingEnd = new Date(booking.date);
+            const bookingEnd = new Date(booking.date.getTime() + bookingInterval);
             return currentTimeSlot.getTime() + bookingInterval > bookingEnd.getTime();
         });
 
