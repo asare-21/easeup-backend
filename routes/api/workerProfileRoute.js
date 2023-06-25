@@ -779,7 +779,21 @@ router.get('/worker-review/:worker', getWorkerReviewCache, async (req, res) => {
 router.post('/available-slots/:worker', async (req, res) => {
     try {
         const { workers, day } = req.body;
-        const currentTime = new Date(); // Get the current time
+        const currentDate = new Date(); // Get the current date
+        const currentDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate());
+        const selectedDay = new Date(day,); // Get the selected day
+
+        // Check if the selected day is in the past
+        if (selectedDay < currentDay) {
+            return res.status(200).json({
+                msg: 'No available slots',
+                status: 200,
+                success: true,
+                timeslots: [],
+            });
+        }
+
+        const currentTime = currentDate.getHours(); // Get the current hour
 
         const availableSlots = await Promise.all(workers.map(async (workerId) => {
             try {
@@ -798,13 +812,19 @@ router.post('/available-slots/:worker', async (req, res) => {
                 const availableHours = [8, 11, 14]; // Allowed hours: 8am, 11am, 2pm
                 const availableSlots = availableHours.filter(hour => {
                     // Check if the worker has a booking at the hour and it's after the current time
-                    return !slots.some(slot => {
-                        const slotDate = new Date(slot.date);
-                        const slotHour = slotDate.getHours();
-                        return slotHour === hour && slotDate > currentTime;
-                    });
+                    if (selectedDay.getMonth() === currentDay.getMonth() && selectedDay.getDate() === currentDay.getDate()) {
+                        // check current time
+                        // check if the day has bookings. if it does, check the slots used and return the available slots
+                        const usedHours = slots.map(slot => new Date(slot.date).getHours() - 1);
+                        console.log("Used hours", usedHours)
+                        return !usedHours.includes(hour) && hour > currentTime;
+                    } else {
+                        // check if the day has bookings. if it does, check the slots used and return the available slots
+                        const usedHours = slots.map(slot => new Date(slot.date).getHours() - 1);
+                        console.log("Used hours", usedHours)
+                        return !usedHours.includes(hour);
+                    }
                 });
-
                 return {
                     workerId,
                     slots: availableSlots,
@@ -834,6 +854,9 @@ router.post('/available-slots/:worker', async (req, res) => {
         return commonError(res, e.message);
     }
 });
+
+
+
 
 
 router.post('/book-slot', async (req, res) => {

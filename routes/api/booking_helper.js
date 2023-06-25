@@ -1,4 +1,4 @@
-const { bookingModel } = require('../../models/bookingModel')
+const { bookingModel } = require('../../models/bookingModel');
 
 const findEarliestAvailableTimeSlot = async (worker, day) => {
     const promisefoundBookings = await bookingModel.find({
@@ -7,56 +7,51 @@ const findEarliestAvailableTimeSlot = async (worker, day) => {
         day,
         cancelled: false,
         completed: false,
-        $or: [
-            { pending: true },
-        ]
+        $or: [{ pending: true }],
     }).sort({ date: 1 });
+
     const promisecheckBookings = await bookingModel.find({
         worker: worker,
         isPaid: true,
         cancelled: false,
         completed: false,
-        $or: [
-            { pending: true },
-        ]
+        $or: [{ pending: true }],
     }).sort({ date: 1 });
 
-    const [foundBookings, checkBookings] = await Promise.all([promisefoundBookings, promisecheckBookings]) // get all bookings for the day
+    const [foundBookings, checkBookings] = await Promise.all([
+        promisefoundBookings,
+        promisecheckBookings,
+    ]);
+
     console.log("Found bookings: ", foundBookings);
+
     const bookingInterval = 3 * 60 * 60 * 1000; // 3 hours in milliseconds
-    const maxBookingsPerDay = foundBookings.find((e) => e.pending == true) || checkBookings.find((e) => e.pending == true) == undefined ? 4 : 1; // limit booking to 1 if there is a pending booking on that day
-    //limit booking to one if the account has a pending booking
+    const hasPendingBooking = foundBookings.some((booking) => booking.pending === true);
+    const hasBookingsForDay = foundBookings.length > 0 || checkBookings.length > 0;
 
-    const startOfDay = new Date(day)
+    const maxBookingsPerDay = hasPendingBooking ? 1 : 4;
 
-
-
-
-
+    const startOfDay = new Date(day);
     startOfDay.setHours(8, 0, 0, 0); // Set time to 8am on the given day
+
     let currentTimeSlot = startOfDay;
 
-    if (foundBookings.length >= maxBookingsPerDay) {
-        return null;
+    if (hasBookingsForDay && foundBookings.length >= maxBookingsPerDay) {
+        // If there are existing bookings and the maximum limit is reached, find the next available slot
+        currentTimeSlot = new Date(foundBookings[foundBookings.length - 1].date.getTime() + bookingInterval);
     }
 
-    for (const booking of foundBookings) {
-        const bookingEnd = new Date(booking.date);
+    while (currentTimeSlot.getHours() < 15) {
+        const isSlotAvailable = foundBookings.every((booking) => {
+            const bookingEnd = new Date(booking.date);
+            return currentTimeSlot.getTime() + bookingInterval > bookingEnd.getTime();
+        });
 
-        if (currentTimeSlot.getTime() + bookingInterval <= bookingEnd.getTime()) {
-            // The current time slot is before the booking, so return it
+        if (isSlotAvailable) {
             return currentTimeSlot;
         }
 
-        currentTimeSlot = new Date(bookingEnd.getTime() + bookingInterval);
-    }
-
-    // Return the last time slot of the day if there are less than 4 bookings
-    const endOfDay = new Date(day);
-    endOfDay.setHours(15, 0, 0, 0); // Set time to 3pm on the given day
-
-    if (currentTimeSlot.getTime() < endOfDay.getTime()) {
-        return currentTimeSlot;
+        currentTimeSlot = new Date(currentTimeSlot.getTime() + bookingInterval);
     }
 
     // Calculate the next available time slot on the next day
@@ -65,7 +60,6 @@ const findEarliestAvailableTimeSlot = async (worker, day) => {
 
     return findEarliestAvailableTimeSlot(worker, nextDay);
 };
-
 
 // Helper function to validate required fields and return the name of the missing field
 const getMissingField = (fields) => {
