@@ -1364,6 +1364,19 @@ router.get('/popular/:id', getPopularWorkersCache, async (req, res) => {
             });
 
             if (foundProfile) {
+                // get avg rating of worker
+                const rating = await reviewModel.aggregate([
+                    {
+                        $match: { worker }
+                    },
+                    {
+                        $group: {
+                            _id: null,
+                            avgRating: { $avg: "$rating" }
+                        }
+                    }
+                ]).exec()
+                foundProfile.rating = rating[0].avgRating ?? 0
                 profiles.push(foundProfile);
             }
         }
