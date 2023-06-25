@@ -130,7 +130,7 @@ router.get('/profile/:user_id', getUserCache, async (req, res) => {
             return res.status(500).json({ msg: 'Something went wrong', status: 500, success: false }) // Internal Server Error
         // return user data
         return res.status(200).json({
-            msg: 'User Found', status: 200, success: true, userData
+            msg: 'User Found', status: 200, success: true, user: userData
         })
         // userModel.findById(user_id, (err, user) => {
         //     if (err) {
