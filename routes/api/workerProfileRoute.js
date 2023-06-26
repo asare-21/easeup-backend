@@ -494,7 +494,7 @@ router.get('/booking-upcoming/:worker', getUpcomingBookingCache, async (req, res
     }
 })
 // pending
-router.get('/booking-pending/:worker', getPendingBookingCache, async (req, res) => {
+router.get('/booking-pending/:worker', async (req, res) => {
     const { worker } = req.params
     const { user } = req.query
     try {
@@ -503,7 +503,7 @@ router.get('/booking-pending/:worker', getPendingBookingCache, async (req, res) 
         const bookings = await bookingModel.find({ [user === 'true' ? 'client' : 'worker']: worker, isPaid: true, cancelled: false, started: true, pending: true })
         console.log("Fetched bookings ", bookings)
         // set cahce
-        workerCache.set(`pending-bookings/${worker}`, JSON.stringify(bookings))
+
 
         return res.status(200).json({
             msg: 'Worker Profile Fetched Successfully',
@@ -522,7 +522,7 @@ router.get('/booking-pending/:worker', getPendingBookingCache, async (req, res) 
 })
 
 // upcoming
-router.get('/booking-progress/:worker', getInProgressBookingCache, async (req, res) => {
+router.get('/booking-progress/:worker', async (req, res) => {
     const { worker } = req.params
     const { user } = req.query
     try {
@@ -531,7 +531,7 @@ router.get('/booking-progress/:worker', getInProgressBookingCache, async (req, r
         const bookings = await bookingModel.find({ [user === 'true' ? 'client' : 'worker']: worker, isPaid: true, completed: false, started: true, pending: false })
         console.log("Fetched bookings ", bookings)
         // set cahce
-        workerCache.set(`in-progress-bookings/${worker}`, JSON.stringify(bookings))
+
         return res.status(200).json({
             msg: 'Worker Profile Fetched Successfully',
             status: 200,
@@ -583,7 +583,7 @@ router.get('/booking-cancelled/:worker', getCancelledBookingCache, async (req, r
     try {
         await admin.auth().getUser(worker) // check if worker is valid
         // const bookings = await bookingModel.find({ [user == true || 'true' ? 'client' : 'worker']: worker, isPaid: true, completed: false, cancelled: true })
-        const bookings = user ? await bookingModel.find({ 'client': worker, isPaid: true, completed: false, cancelled: true }) : await bookingModel.find({ worker, isPaid: true, completed: false, cancelled: true })
+        const bookings = await bookingModel.find({ [user === 'true' ? 'client' : 'worker']: worker, isPaid: true, completed: false, cancelled: true })
         // set cache
         workerCache.set(`cancelled-bookings/${worker}`, JSON.stringify(bookings))
         return res.status(200).json({
