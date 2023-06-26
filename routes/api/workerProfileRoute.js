@@ -473,7 +473,7 @@ router.get('/booking-upcoming/:worker', getUpcomingBookingCache, async (req, res
     try {
         await admin.auth().getUser(worker) // check if worker is valid
         // console.log("User variable ", user)
-        const bookings = user ? await bookingModel.find({ client: worker, isPaid: true, cancelled: false, started: false }) : await bookingModel.find({ worker: worker, isPaid: true, cancelled: false, started: false })
+        const bookings = await bookingModel.find({ [user === 'true' ? 'client' : 'worker']: worker, isPaid: true, cancelled: false, started: false })
         console.log("Fetched bookings ", bookings)
         // set cahce
         workerCache.set(`upcoming-bookings/${worker}`, JSON.stringify(bookings))
@@ -500,7 +500,7 @@ router.get('/booking-pending/:worker', getPendingBookingCache, async (req, res) 
     try {
         await admin.auth().getUser(worker) // check if worker is valid
         console.log("User variable ", Boolean("false"))
-        const bookings = user === "true" ? await bookingModel.find({ client: worker, isPaid: true, cancelled: false, started: true, pending: true }) : await bookingModel.find({ worker: worker, isPaid: true, cancelled: false, started: false, pending: true })
+        const bookings = await bookingModel.find({ [user === 'true' ? 'client' : 'worker']: worker, isPaid: true, cancelled: false, started: true, pending: true })
         console.log("Fetched bookings ", bookings)
         // set cahce
         workerCache.set(`pending-bookings/${worker}`, JSON.stringify(bookings))
@@ -528,7 +528,7 @@ router.get('/booking-progress/:worker', getInProgressBookingCache, async (req, r
     try {
         await admin.auth().getUser(worker) // check if worker is valid
         // console.log("User variable ", user)
-        const bookings = user === "true" ? await bookingModel.find({ client: worker, isPaid: true, completed: false, started: true, pending: false }) : await bookingModel.find({ worker: worker, isPaid: true, completed: false, started: true, pending: false })
+        const bookings = await bookingModel.find({ [user === 'true' ? 'client' : 'worker']: worker, isPaid: true, completed: false, started: true, pending: false })
         console.log("Fetched bookings ", bookings)
         // set cahce
         workerCache.set(`in-progress-bookings/${worker}`, JSON.stringify(bookings))
@@ -554,7 +554,7 @@ router.get('/booking-completed/:worker', getCompletedBookingCache, async (req, r
     const { user } = req.query
     try {
         await admin.auth().getUser(worker) // check if worker is valid
-        const bookings = await bookingModel.find({ [user ? 'client' : 'worker']: worker, isPaid: true, completed: true, started: true })
+        const bookings = await bookingModel.find({ [user === 'true' ? 'client' : 'worker']: worker, isPaid: true, completed: true, started: true })
 
         // set cache
         workerCache.set(`completed-bookings/${worker}`, JSON.stringify(bookings))
