@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const api = express();
-const frontEndApp = express();
+// const frontEndApp = express();
 const app = express();
 const admin = express();
 const http = require("http").createServer(app);
@@ -48,11 +48,9 @@ const limiter = rateLimit({
 const cors = require('cors');
 const { subscribeRoute } = require('./routes/api/subscribe');
 // Static files
-app.use(express.static(path.join(__dirname, 'public')));
 app.enable('trust proxy');
 app.use(cors())
-app.set('view engine', 'ejs');
-app.set('views', 'views');
+
 
 api.use(compression())
 admin.use(compression())
@@ -62,10 +60,10 @@ admin.use(express.urlencoded({ extended: true }));
 admin.use(morgan('combined'))
 admin.use(limiter)
 admin.disable('x-powered-by');
-frontEndApp.use(helmet())
+// frontEndApp.use(helmet())
 api.use(helmet())
 api.disable('x-powered-by');
-frontEndApp.disable('x-powered-by');
+// frontEndApp.disable('x-powered-by');
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -81,7 +79,7 @@ if (process.env.NODE_ENV === 'production') {
     // app.use(vhost('easeupgh.tech', frontEndApp));
     // app.use(vhost('www.easeupgh.tech', frontEndApp));
     // admin.use(vhost('admin.easeupgh.tech', admin));
-    frontEndApp.use('/', HOME)
+    // frontEndApp.use('/', HOME)
     // api routes for production
     api.use('/user', USER_ROUTE);
     api.use('/search', searchRoute)
@@ -122,7 +120,6 @@ if (process.env.NODE_ENV === 'production') {
 }
 else {
     // Development Routes
-    app.use('/', HOME)
     app.use('/user', USER_ROUTE);
     app.use('/search', searchRoute)
     app.use('/bookmark', bookmarkRoute)
