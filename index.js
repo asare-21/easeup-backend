@@ -53,12 +53,7 @@ app.enable('trust proxy');
 app.use(cors())
 app.set('view engine', 'ejs');
 app.set('views', 'views');
-frontEndApp.use(express.static(path.join(__dirname, 'public')));
-frontEndApp.use(express.static(path.join(__dirname, 'soon/assets')));
-frontEndApp.enable('trust proxy');
-frontEndApp.set('view engine', 'ejs');
-frontEndApp.set('views', 'views');
-frontEndApp.use(compression())
+
 api.use(compression())
 admin.use(compression())
 admin.use(helmet())
