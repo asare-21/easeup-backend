@@ -76,9 +76,9 @@ app.use(limiter)
 
 // vhost (subdomain and domain)
 if (process.env.NODE_ENV === 'production') {
-    app.use(vhost('api.easeupgh.tech', api));
+    // app.use(vhost('api.easeupgh.tech', api));
     // app.use(vhost('web-production-1450.up.railway.app', api));
-    app.use(vhost('easeupgh.tech', frontEndApp));
+    // app.use(vhost('easeupgh.tech', frontEndApp));
     // app.use(vhost('www.easeupgh.tech', frontEndApp));
     // admin.use(vhost('admin.easeupgh.tech', admin));
     frontEndApp.use('/', HOME)
