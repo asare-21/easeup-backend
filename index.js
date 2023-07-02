@@ -35,7 +35,7 @@ const { dashboard } = require('./routes/dashboard/dashboard');
 const { jobPlanRoute } = require('./routes/api/job_plan_route');
 const { jobs } = require('./routes/api/jobs');
 const limiter = rateLimit({
-    windowMs: 1 * 60 * 1000, // 30 minutes
+    windowMs: 100, // 
     max: 1000, // Limit each IP to 1000 requests per `window` (here, per 15 minutes)
     standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
     legacyHeaders: true, // Disable the `X-RateLimit-*` headers
