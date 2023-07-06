@@ -26,6 +26,7 @@ const { workerModel } = require('./models/worker_models');
 const { userModel } = require('./models/user_model');
 const { dashboard } = require('./routes/dashboard/dashboard');
 const { jobPlanRoute } = require('./routes/api/job_plan_route');
+const authRoutes = require("./routes/api/auth");
 const { jobs } = require('./routes/api/jobs');
 const limiter = rateLimit({
     windowMs: 100, // 
@@ -38,6 +39,12 @@ const limiter = rateLimit({
         return res.status(429).json({ msg: 'Too many requests from this IP, please try again later', status: 429, success: false, limit: true })
     }
 })
+
+
+const session = require("express-session");
+const { verifyJWT } = require("./passport/common");
+const passport = require("passport");
+require("./passport/passport");
 const cors = require('cors');
 const { subscribeRoute } = require('./routes/api/subscribe');
 const { recommendationRoute } = require('./routes/api/recommendation');
@@ -50,6 +57,7 @@ app.disable('x-powered-by');
 app.use(express.json());
 app.use(morgan('combined'))
 app.use(limiter)
+app.use("/auth", authRoutes);
 
 app.use('/user', USER_ROUTE);
 app.use('/search', searchRoute)
