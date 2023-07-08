@@ -47,6 +47,7 @@ const limiter = rateLimit({
 })
 const cors = require('cors');
 const { subscribeRoute } = require('./routes/api/subscribe');
+const { recommendationRoute } = require('./routes/api/recommendation');
 // Static files
 app.enable('trust proxy');
 app.use(cors())
@@ -90,6 +91,7 @@ if (process.env.NODE_ENV === 'production') {
     api.use('/room', chatRoute)
     api.use('/jobs', jobs)
     api.use('/subscribe', subscribeRoute)
+    api.use('/recommend', recommendationRoute)
 
     api.use('/jplan', jobPlanRoute)
     api.use('/dashboard', dashboard)
