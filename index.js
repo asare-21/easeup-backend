@@ -141,7 +141,7 @@ else {
 http.listen(PORT, async () => {
     try {
         log.info(`Listening on port ${PORT}`);
-        connect(`mongodb+srv://${process.env.easeup_admin_founder_email}:${process.env.easeup_admin_founder_pass}@easeup-cluster.pfxvast.mongodb.net/?retryWrites=true&w=majority`, {
+        await connect(`mongodb+srv://${process.env.azure_user}:${process.env.azure_pass}@easeup.mongocluster.cosmos.azure.com/?tls=true&authMechanism=SCRAM-SHA-256&retrywrites=false&maxIdleTimeMS=120000`, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
             dbName: 'easeup',
@@ -150,7 +150,7 @@ http.listen(PORT, async () => {
         FBadmin.initializeApp({
             credential: FBadmin.credential.cert(serviceAccount)
         });
-        console.log("Connected to MongoDB and running")
+        log.info("Connected to MongoDB and running")
 
     } catch (err) {
         console.error(err)
