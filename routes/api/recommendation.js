@@ -45,7 +45,8 @@ router.post('/suggest', async (req, res) => {
             rating: recommended[0].rating,
             coords: recommended[0].coords,
             id: recommended[0].uid,
-            basePrice: recommended[0].basePrice
+            basePrice: recommended[0].basePrice,
+            service: recommended[0].service
         }
 
         return res.json({
