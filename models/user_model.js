@@ -15,14 +15,8 @@ const addressSchema = new Schema({
 })
 
 const userSchema = new Schema({
-  _id: {
-    type: String,
-    required: true,
-    unique: true,
-  },
   email: {
     type: String,
-    required: true,
     unique: true,
   },
   token: {
@@ -90,9 +84,17 @@ const userSchema = new Schema({
     type: String,
     default: "",
   },
+  facebookId: {
+    type: String,
+    default: "",
+  },
+  twitterId: {
+    type: String,
+    default: "",
+  },
   displayName: {
-      type: String,
-      default:""
+    type: String,
+    default: "",
   },
 });
 
