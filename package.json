@@ -11,8 +11,6 @@
   "author": "Joseph ASARE",
   "license": "ISC",
   "dependencies": {
-    "@aws-cdk/aws-ec2": "^1.199.0",
-    "@aws-cdk/aws-elasticbeanstalk": "^1.199.0",
     "axios": "^1.2.2",
     "compression": "^1.7.4",
     "cors": "^2.8.5",
