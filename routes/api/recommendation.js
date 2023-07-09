@@ -29,7 +29,13 @@ router.post('/suggest', async (req, res) => {
             },
             service: service
         })
-        console.log("found workers ", foundWorkers.map((worker) => worker.uid))
+
+        // if no worker is found
+        if (foundWorkers.length === 0) return res.json({
+            success: false,
+            message: 'No worker found'
+        })
+
 
         // extract the rejected worker from the found workers
         const filteredWorkers = foundWorkers.filter((worker) => !rejected.includes(worker.uid))

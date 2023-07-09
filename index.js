@@ -1,18 +1,14 @@
 require('dotenv').config();
 const express = require('express');
-// const frontEndApp = express();
 const app = express();
-const admin = express();
 const http = require("http").createServer(app);
 const { Server } = require("socket.io");
 const io = new Server(http);
-const path = require('path');
 const PORT = process.env.PORT || 3000;
 const morgan = require('morgan')
 const { connect } = require('mongoose')
 const rateLimit = require('express-rate-limit')
 const { USER_ROUTE } = require('./routes/api/user_route')
-const { HOME } = require('./routes/api/index')
 const { searchRoute } = require('./routes/api/searchRoute')
 const { workerProfileVerificationRoute } = require('./routes/api/workerProfileVerify')
 const { workerRoute } = require('./routes/api/workerRoute')
@@ -21,7 +17,6 @@ const { bookmarkRoute } = require('./routes/api/bookmarkRoute');
 const log = require('npmlog')
 const serviceAccount = require("./easeup.json");
 const FBadmin = require("firebase-admin");
-const vhost = require('vhost');
 const compression = require('compression')
 const helmet = require('helmet');
 const { chatRoute } = require('./routes/api/chat');
@@ -29,13 +24,12 @@ const { chatRoomModel } = require('./models/chatRoomModel');
 const { chatModel } = require('./models/chat_message_model');
 const { workerModel } = require('./models/worker_models');
 const { userModel } = require('./models/user_model');
-const { getAndCacheUsers, getAndCacheWorkerMedia, getAndCacheWorkerProfiles, getAndCacheWorkers } = require('./utils');
 const { dashboard } = require('./routes/dashboard/dashboard');
 const { jobPlanRoute } = require('./routes/api/job_plan_route');
 const { jobs } = require('./routes/api/jobs');
 const limiter = rateLimit({
     windowMs: 100, // 
-    max: 1000, // Limit each IP to 1000 requests per `window` (here, per 15 minutes)
+    max: 1000,
     standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
     legacyHeaders: true, // Disable the `X-RateLimit-*` headers
     message: { msg: 'Too many requests from this IP, please try again later', status: 429, success: false, limit: true },
