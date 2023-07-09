@@ -143,7 +143,7 @@ else {
 http.listen(PORT, async () => {
     try {
         log.info(`Listening on port ${PORT}`);
-        await connect(`mongodb+srv://${process.env.azure_user}:${process.env.azure_pass}@easeup.mongocluster.cosmos.azure.com/?tls=true&authMechanism=SCRAM-SHA-256&retrywrites=false&maxIdleTimeMS=120000`, {
+        await connect(`mongodb+srv://${process.env.easeup_admin_founder_email}:${process.env.easeup_admin_founder_pass}@easeup-cluster.pfxvast.mongodb.net/?retryWrites=true&w=majority`, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
             dbName: 'easeup',
