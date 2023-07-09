@@ -1,12 +1,25 @@
 const { model, Schema } = require('mongoose')
 
+const pointSchema = Schema({
+    type: {
+        type: String,
+        enum: ['Point'],
+        required: true
+    },
+    coordinates: {
+        type: [Number],
+        required: true
+    }
+});
+
 const workerLocationSchema = new Schema({
     uid: {
         type: String,
         required: true
     },
-    coords: {
-        type: Object,
+    location
+        : {
+        type: pointSchema,
         required: true
     },
     service: {
@@ -30,5 +43,7 @@ const workerLocationSchema = new Schema({
         default: Date.now()
     }
 })
+
+workerLocationSchema.index({ location: '2dsphere' });
 
 module.exports.workerLocation = model('workerLocation', workerLocationSchema)

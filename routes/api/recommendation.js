@@ -14,26 +14,42 @@ router.post('/suggest', async (req, res) => {
         // service - the service the user needs
         // id - the user's id
         const { coords, service, id, rejected } = req.body;
+
         // Find all workers that are close to the user
-        const foundWorkers = await workerLocation.find({ service }).sort({ createdAt: -1 }).aggregate([
-            {
-                $geoNear: {
-                    near: {
-                        type: "Point",
+        const foundWorkers = await workerLocation.find({
+            location: {
+                $near: {
+                    $maxDistance: 10000,
+                    $geometry: {
+                        type: 'Point',
                         coordinates: coords
                     },
-                    distanceField: "dist.calculated",
-                    maxDistance: 10000,
-                    includeLocs: "dist.location",
-                    spherical: true
+
+                }
+            },
+            service: service
+        })
+        console.log("found workers ", foundWorkers.map((worker) => worker.uid))
+
+        // extract the rejected worker from the found workers
+        const filteredWorkers = foundWorkers.filter((worker) => !rejected.includes(worker.uid))
+
+        // sort the workers based on their rating
+        const recommended = filteredWorkers.sort((a, b) => {
+            if (b.rating !== a.rating) {
+                return b.rating - a.rating; // Higher rating first
+            } else {
+                const distanceA = calculateDistance(coords, a.location);
+                const distanceB = calculateDistance(coords, b.location);
+                if (distanceA !== distanceB) {
+                    return distanceA - distanceB; // Closer distance first
+                } else {
+                    return b.createdAt - a.createdAt; // More recent last seen first
                 }
             }
-        ])
-        // extract the rejected worker from the found workers
-        const filteredWorkers = foundWorkers.filter(worker => !rejected.includes(worker.id))
-        // sort the workers based on their rating
-        const recommended = filteredWorkers.sort((a, b) => b.rating - a.rating)
+        });
 
+        console.log("Recommended ", recommended)
         // send only recommended worker name, rating, coords,id, and base price
         if (recommended.length === 0) return res.json({
             success: false,
@@ -43,7 +59,7 @@ router.post('/suggest', async (req, res) => {
         const data = {
             name: recommended[0].name,
             rating: recommended[0].rating,
-            coords: recommended[0].coords,
+            coords: recommended[0].location,
             id: recommended[0].uid,
             basePrice: recommended[0].basePrice,
             service: recommended[0].service
@@ -54,9 +70,39 @@ router.post('/suggest', async (req, res) => {
             data
         })
     }
-    catch (err) {
+    catch (e) {
         return commonError(res, e.message)
     }
 })
+
+function calculateDistance(coords1, coords2) {
+    const [lat1, lon1] = coords1;
+    const [lat2, lon2] = coords2;
+
+    const earthRadius = 6371; // Radius of the Earth in kilometers
+
+    // Convert coordinates to radians
+    const radLat1 = toRadians(lat1);
+    const radLon1 = toRadians(lon1);
+    const radLat2 = toRadians(lat2);
+    const radLon2 = toRadians(lon2);
+
+    // Haversine formula
+    const deltaLat = radLat2 - radLat1;
+    const deltaLon = radLon2 - radLon1;
+    const a =
+        Math.sin(deltaLat / 2) ** 2 +
+        Math.cos(radLat1) * Math.cos(radLat2) * Math.sin(deltaLon / 2) ** 2;
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    // Calculate the distance
+    const distance = earthRadius * c;
+
+    return distance;
+}
+
+function toRadians(degrees) {
+    return degrees * (Math.PI / 180);
+}
 
 module.exports.recommendationRoute = router;

@@ -1,6 +1,5 @@
 require('dotenv').config();
 const express = require('express');
-const api = express();
 // const frontEndApp = express();
 const app = express();
 const admin = express();
@@ -51,89 +50,43 @@ const { recommendationRoute } = require('./routes/api/recommendation');
 // Static files
 app.enable('trust proxy');
 app.use(cors())
-
-
-api.use(compression())
-admin.use(compression())
-admin.use(helmet())
-admin.use(express.json());
-admin.use(express.urlencoded({ extended: true }));
-admin.use(morgan('combined'))
-admin.use(limiter)
-admin.disable('x-powered-by');
-// frontEndApp.use(helmet())
-api.use(helmet())
-api.disable('x-powered-by');
-// frontEndApp.disable('x-powered-by');
-// Middleware
+app.use(compression())
+app.use(helmet())
+app.disable('x-powered-by');
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 app.use(morgan('combined'))
 app.use(limiter)
 
-
-
-// vhost (subdomain and domain)
-if (process.env.NODE_ENV === 'production') {
-    // app.use(vhost('api.easeupgh.tech', api));
-    // app.use(vhost('web-production-1450.up.railway.app', api));
-    // app.use(vhost('easeupgh.tech', frontEndApp));
-    // app.use(vhost('www.easeupgh.tech', frontEndApp));
-    // admin.use(vhost('admin.easeupgh.tech', admin));
-    // frontEndApp.use('/', HOME)
-    // api routes for production
-    api.use('/user', USER_ROUTE);
-    api.use('/search', searchRoute)
-    api.use('/bookmark', bookmarkRoute)
-    api.use('/verify-worker-profile', workerProfileVerificationRoute)
-    api.use('/worker', workerRoute)
-    api.use('/worker-profile', workerProfileRoute)
-    api.use('/room', chatRoute)
-    api.use('/jobs', jobs)
-    api.use('/subscribe', subscribeRoute)
-    api.use('/recommend', recommendationRoute)
-
-    api.use('/jplan', jobPlanRoute)
-    api.use('/dashboard', dashboard)
-    // handle 404
-    api.use((req, res, next) => {
-        return res.status(404).json({
-            msg: 'Undefined route', status: 404, success: false,
-            path: req.path
-        })
+app.use('/user', USER_ROUTE);
+app.use('/search', searchRoute)
+app.use('/bookmark', bookmarkRoute)
+app.use('/verify-worker-profile', workerProfileVerificationRoute)
+app.use('/worker', workerRoute)
+app.use('/worker-profile', workerProfileRoute)
+app.use('/room', chatRoute)
+app.use('/jobs', jobs)
+app.use('/subscribe', subscribeRoute)
+app.use('/recommend', recommendationRoute)
+app.use('/jplan', jobPlanRoute)
+app.use('/dashboard', dashboard)
+// handle 404
+app.use((req, res, next) => {
+    return res.status(404).json({
+        msg: 'Undefined route', status: 404, success: false,
+        path: req.path
     })
+})
 
-    frontEndApp.use((req, res, next) => {
-        return res.render('404',)
-    })
-    // enforce https
-    api.use(function (req, res, next) {
-        if (process.env.NODE_ENV != 'development' && !req.secure) {
-            return res.redirect('https://' + req.headers.host + req.url);
-        }
-        next();
-    })
-    frontEndApp.use(function (req, res, next) {
-        if (process.env.NODE_ENV != 'development' && !req.secure) {
-            return res.redirect('https://' + req.headers.host + req.url);
-        }
-        next();
-    })
-}
-else {
-    // Development Routes
-    app.use('/user', USER_ROUTE);
-    app.use('/search', searchRoute)
-    app.use('/bookmark', bookmarkRoute)
-    app.use('/verify-worker-profile', workerProfileVerificationRoute)
-    app.use('/worker', workerRoute)
-    app.use('/worker-profile', workerProfileRoute)
-    app.use('/room', chatRoute)
-    app.use('/jplan', jobPlanRoute)
-    app.use('/dashboard', dashboard)
+// enforce https
+app.use(function (req, res, next) {
+    if (process.env.NODE_ENV != 'development' && !req.secure) {
+        return res.redirect('https://' + req.headers.host + req.url);
+    }
+    next();
+})
 
 
-}
+
 
 
 
