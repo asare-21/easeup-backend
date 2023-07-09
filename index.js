@@ -87,9 +87,23 @@ app.use(function (req, res, next) {
     next();
 })
 
-
-
-
+//Auth
+app.use(
+  session({
+    secret: "cat",
+  })
+);
+app.use(passport.initialize());
+app.use(passport.session());
+app.use("/auth", authRoutes);
+app.get("/authenticated-route", verifyJWT, (req, res) => {
+  try {
+    console.log(req.user);
+    res.json({ message: "You are autheticated" });
+  } catch (error) {
+    res.status(400).json({ message: error });
+  }
+});
 
 
 
