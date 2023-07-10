@@ -7,7 +7,9 @@ const otpGenerator = require('otp-generator')
 const axios = require('axios')
 const { commonError, returnUnAuthUserError } = require('../api/user_route')
 const { workerProfileModel } = require("../../models/worker_profile_model");
-const { cache } = require('../../cache/user_cache')
+const { cache } = require('../../cache/user_cache');
+const passport = require('passport');
+
 // worker profile verification data
 router.get('/:worker', async (req, res) => {
     const { worker } = req.params

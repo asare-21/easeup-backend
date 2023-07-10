@@ -61,6 +61,7 @@ require("./passport/passport");
 const cors = require("cors");
 const { subscribeRoute } = require("./routes/api/subscribe");
 const { recommendationRoute } = require("./routes/api/recommendation");
+const { servicesModel } = require("./models/services_model");
 
 //Auth
 app.use(
@@ -136,9 +137,10 @@ http.listen(PORT, async () => {
         dbName: "easeup",
       }
     );
-    FBadmin.initializeApp({
+    await FBadmin.initializeApp({
       credential: FBadmin.credential.cert(serviceAccount),
     });
+
     log.info("Connected to MongoDB and running");
   } catch (err) {
     console.error(err);
@@ -279,5 +281,20 @@ async function createNewRoom(_room) {
     console.log("Something went room ", e);
   }
 }
+// migrate data ub firebase to mongodb
+async function migrate() {
+  let data = await FBadmin.firestore().collection("services").doc("3IxGFpl8wT1piNQdT31i").get()
+  data = data.data()
+  // save to mongodb
+  data.services.forEach(async (service) => {
+    const newService = new servicesModel({
+      img: service.img,
+      query: service.query,
+      service: service.service
+    })
+    await newService.save()
+  })
+  console.log(data)
 
+}
 module.exports.admin = FBadmin;
