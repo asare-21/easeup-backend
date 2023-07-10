@@ -65,8 +65,10 @@ const { recommendationRoute } = require("./routes/api/recommendation");
 //Auth
 app.use(
   session({
-    secret: "cat",
+    secret: process.env.JWT_SECRET,
     cookie: { secure: false },
+    resave: false,
+    saveUninitialized: false,
   })
 );
 app.use(passport.initialize());

@@ -24,7 +24,6 @@ router.post('/suggest', async (req, res) => {
                         type: 'Point',
                         coordinates: coords
                     },
-
                 }
             },
             service: service
@@ -42,11 +41,12 @@ router.post('/suggest', async (req, res) => {
 
         // sort the workers based on their rating
         const recommended = filteredWorkers.sort((a, b) => {
+            console.log("a ", a)
             if (b.rating !== a.rating) {
                 return b.rating - a.rating; // Higher rating first
             } else {
-                const distanceA = calculateDistance(coords, a.location);
-                const distanceB = calculateDistance(coords, b.location);
+                const distanceA = calculateDistance(coords, a.location.coordinates);
+                const distanceB = calculateDistance(coords, b.location.coordinates);
                 if (distanceA !== distanceB) {
                     return distanceA - distanceB; // Closer distance first
                 } else {
