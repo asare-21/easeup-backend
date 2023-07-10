@@ -11,7 +11,6 @@ router.post('/notifications', async (req, res) => {
     }
     // validate worker
     try {
-        await admin.auth().getUser(worker)
         // send notification
         const booking = await
             bookingModel.findOneAndUpdate({ worker, ref }, { contactedCustomer: true })

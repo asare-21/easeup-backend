@@ -29,7 +29,7 @@ router.get('/:worker', getWorkerProfileCache, async (req, res) => {
     const { worker } = req.params
     // check if user is authenticated
     try {
-        await admin.auth().getUser(worker) // check if uid is valid
+        // check if uid is valid
         const workerPromise = workerProfileModel.findOne({ worker })
         const rating = reviewModel.aggregate([
             {
@@ -86,7 +86,7 @@ router.get('/reviews/:worker', getReviewsCache, async (req, res) => {
     const { worker } = req.params
     // check if user is authenticated
     try {
-        await admin.auth().getUser(worker) // check if uid is valid
+        // check if uid is valid
         const foundWorker = await reviewModel.find({ worker },)
 
         if (foundWorker) workerCache.set(`reviews/${worker}`, JSON.stringify(foundWorker))
@@ -113,7 +113,7 @@ router.get('/comments/:worker/:post', getCommentsCache, async (req, res) => {
     const { worker, post } = req.params
     // check if user is authenticated
     try {
-        await admin.auth().getUser(worker) // check if uid is valid
+        // check if uid is valid
         const posts = await commentModel.find({ post },)
         // set cache
         workerCache.set(`comments/${post}`, JSON.stringify(posts))
@@ -144,7 +144,7 @@ router.post('/comments/:worker', async (req, res) => {
         if (!from) return commonError(res, 'No from provided')
         if (!image) return commonError(res, 'No image provided')
         if (!name) return commonError(res, 'No name provided')
-        await admin.auth().getUser(worker) // check if uid is valid
+        // check if uid is valid
         const newComment = new commentModel({
             comment,
             image,
@@ -187,7 +187,7 @@ router.post('/charge', async (req, res) => {
     const { worker, charge } = req.body
     try {
         if (!charge) return commonError(res, 'No skills provided')
-        await admin.auth().getUser(worker) // check if worker is valid
+        // check if worker is valid
         const foundWorker = await workerProfileModel.findOneAndUpdate({ worker }, {
             base_price: charge
         })
@@ -213,7 +213,7 @@ router.post('/skills', async (req, res) => {
     const { worker, skills } = req.body
     try {
         if (!skills) return commonError(res, 'No skills provided')
-        await admin.auth().getUser(worker) // check if worker is valid
+        // check if worker is valid
         const foundWorker = await workerProfileModel.findOneAndUpdate({ worker }, {
             $set: {
                 skills
@@ -241,7 +241,7 @@ router.post('/bio', async (req, res) => {
     const { worker, bio } = req.body
     try {
         if (!bio) return commonError(res, 'No bio provided')
-        await admin.auth().getUser(worker) // check if worker is valid
+        // check if worker is valid
         const foundWorker = await workerProfileModel.findOneAndUpdate({ worker }, {
             $set: {
                 bio
@@ -269,7 +269,7 @@ router.post('/instagram', async (req, res) => {
     const { worker, ig } = req.body
     try {
         if (!ig) return commonError(res, 'No username provided')
-        await admin.auth().getUser(worker) // check if worker is valid
+        // check if worker is valid
         const foundWorker = await workerProfileModel.findOneAndUpdate({ worker }, {
             $set: {
                 'links.instagram': ig
@@ -298,7 +298,7 @@ router.post('/twitter', async (req, res) => {
     const { worker, twitter } = req.body
     try {
         if (!twitter) return commonError(res, 'No username provided')
-        await admin.auth().getUser(worker) // check if worker is valid
+        // check if worker is valid
         const foundWorker = await workerProfileModel.findOneAndUpdate({ worker }, {
             $set: {
                 'links.twitter':
@@ -329,7 +329,7 @@ router.post('/portfolio', async (req, res) => {
     const { worker, media, description, thumbnail, image } = req.body
     try {
         if (!media && !description) return commonError(res, 'No media provided');
-        await admin.auth().getUser(worker) // check if worker is valid
+        // check if worker is valid
         const newMedia = new mediaModel({
             worker,
             url: media,
@@ -366,7 +366,7 @@ router.get('/portfolio/:worker/:page', mediaCache, async (req, res) => {
     const { worker, page } = req.params
     const pageSize = 10
     try {
-        await admin.auth().getUser(worker) // check if worker is valid
+        // check if worker is valid
         const posts = await mediaModel.find({ worker }).limit(pageSize).skip((page - 1) * pageSize) // get 5 posts per page
         if (!posts) return commonError(res, 'No portfolio found')
         workerCache.set(`portfolio/${page}/${worker}`, JSON.stringify(posts))
@@ -392,7 +392,7 @@ router.post('/work-radius', async (req, res) => {
     const { worker, radius } = req.body
     try {
         if (!radius) return commonError(res, 'No radius provided')
-        await admin.auth().getUser(worker) // check if worker is valid
+        // check if worker is valid
         if (radius.radius > 50 || radius.radius < 5) return commonError(res, 'Radius must be between 5 and 50')
         workerProfileModel.findOneAndUpdate({ worker }, {
             work_radius: radius
@@ -423,7 +423,7 @@ router.post('/work-radius', async (req, res) => {
 router.get('/booking/:worker', getBookingCache, async (req, res) => {
     const { worker } = req.params
     try {
-        await admin.auth().getUser(worker) // check if worker is valid
+        // check if worker is valid
         const bookings = await bookingModel.find({ worker })
         // set cache
         workerCache.set(`booking/${worker}`, JSON.stringify(bookings))
@@ -471,7 +471,7 @@ router.get('/booking-upcoming/:worker', getUpcomingBookingCache, async (req, res
     const { worker } = req.params
     const { user } = req.query
     try {
-        await admin.auth().getUser(worker) // check if worker is valid
+        // check if worker is valid
         // console.log("User variable ", user)
         const bookings = await bookingModel.find({ [user === 'true' ? 'client' : 'worker']: worker, isPaid: true, cancelled: false, started: false })
         console.log("Fetched bookings ", bookings)
@@ -498,7 +498,7 @@ router.get('/booking-pending/:worker', async (req, res) => {
     const { worker } = req.params
     const { user } = req.query
     try {
-        await admin.auth().getUser(worker) // check if worker is valid
+        // check if worker is valid
         console.log("User variable ", Boolean("false"))
         const bookings = await bookingModel.find({ [user === 'true' ? 'client' : 'worker']: worker, isPaid: true, cancelled: false, started: true, pending: true })
         console.log("Fetched bookings ", bookings)
@@ -526,7 +526,7 @@ router.get('/booking-progress/:worker', async (req, res) => {
     const { worker } = req.params
     const { user } = req.query
     try {
-        await admin.auth().getUser(worker) // check if worker is valid
+        // check if worker is valid
         // console.log("User variable ", user)
         const bookings = await bookingModel.find({ [user === 'true' ? 'client' : 'worker']: worker, isPaid: true, completed: false, started: true, pending: false })
         console.log("Fetched bookings ", bookings)
@@ -553,7 +553,7 @@ router.get('/booking-completed/:worker', getCompletedBookingCache, async (req, r
     const { worker } = req.params
     const { user } = req.query
     try {
-        await admin.auth().getUser(worker) // check if worker is valid
+        // check if worker is valid
         const bookings = await bookingModel.find({ [user === 'true' ? 'client' : 'worker']: worker, isPaid: true, completed: true, started: true })
 
         // set cache
@@ -581,7 +581,7 @@ router.get('/booking-cancelled/:worker', getCancelledBookingCache, async (req, r
     const { user } = req.query
     console.log(query)
     try {
-        await admin.auth().getUser(worker) // check if worker is valid
+        // check if worker is valid
         // const bookings = await bookingModel.find({ [user == true || 'true' ? 'client' : 'worker']: worker, isPaid: true, completed: false, cancelled: true })
         const bookings = await bookingModel.find({ [user === 'true' ? 'client' : 'worker']: worker, isPaid: true, completed: false, cancelled: true })
         // set cache
@@ -718,7 +718,7 @@ router.put('/booking-status/pending', async (req, res) => {
 router.post('/worker-review', async (req, res) => {
     const { worker, user, rating, review, userImage, name } = req.body
     try {
-        await admin.auth().getUser(worker) // check if worker is valid
+        // check if worker is valid
         await admin.auth().getUser(user) // check if user is valid
         const reviewM = new reviewModel({
             worker,
@@ -750,7 +750,7 @@ router.post('/worker-review', async (req, res) => {
 router.get('/worker-review/:worker', getWorkerReviewCache, async (req, res) => {
     try {
         const worker = req.params.worker
-        await admin.auth().getUser(worker) // check if worker is valid
+        // check if worker is valid
 
         const reviewsPromise = await reviewModel.find({ worker }).limit(80).sort({ date: -1 })
         const avgRatingPromise = await reviewModel.aggregate([
@@ -889,7 +889,7 @@ router.post('/book-slot', async (req, res) => {
 
 
         await admin.auth().getUser(worker); // check if worker is valid
-        await admin.auth().getUser(client); // check if client is valid
+        ; // check if client is valid
 
         const start = await findEarliestAvailableTimeSlot(worker, day); // find earliest availble timeslor
         console.log("Generated start time ", start)
@@ -1195,8 +1195,8 @@ router.patch('/update-location', async (req, res) => {
     const { worker, client, location, ref } = req.body
 
     try {
-        await admin.auth().getUser(worker) // check if worker is valid
-        await admin.auth().getUser(client) // check if worker is valid
+        // check if worker is valid
+        // check if worker is valid
         const bookings = await bookingModel.findOneAndUpdate({
             worker,
             client,
@@ -1252,8 +1252,8 @@ router.patch('/update-date', async (req, res) => {
     const { worker, client, date, day, ref } = req.body
 
     try {
-        await admin.auth().getUser(worker) // check if worker is valid
-        await admin.auth().getUser(client) // check if worker is valid
+        // check if worker is valid
+        // check if worker is valid
         const bookings = await bookingModel.findOneAndUpdate({
             worker,
             client,

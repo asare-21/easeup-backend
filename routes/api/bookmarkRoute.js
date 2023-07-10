@@ -22,7 +22,7 @@ router.get("/", async (req, res) => {
 
     // check if user is authenticated
     try {
-        await admin.auth().getUser(uid) // check if uid is valid
+
         bookmarkModel.find({ user: uid }, (err, bookmarks) => {
             if (err) {
                 return commonError(res, err.message)
@@ -63,7 +63,7 @@ router.delete("/delete", async (req, res) => {
     const { uid, boookmark_id } = req.body
     // check if user is authenticated   
     try {
-        await admin.auth().getUser(uid) // check if uid is valid
+
         bookmarkModel.deleteOne({ _id: bookmark_id }, (err, bookmark) => {
             if (err) {
                 return commonError(res, err.message)
@@ -104,7 +104,7 @@ router.post("/add", async (req, res) => {
 
     const { uid, worker_id } = req.body
     try {
-        await admin.auth().getUser(uid) // check if uid is valid
+
         workerProfileModel.findOne({ _id: worker_id }, (err, worker_profile) => {
             if (err) {
                 return commonError(res, err.message)

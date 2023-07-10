@@ -13,7 +13,7 @@ router.get('/:worker', async (req, res) => {
     const { worker } = req.params
     // check if user is authenticated
     try {
-        await admin.auth().getUser(worker) // check if worker is valid
+        // check if worker is valid
         workerProfileVerificationModel.findOne({ worker }, (err, worker) => {
             if (err) {
                 return commonError(res, err.message)
@@ -41,7 +41,7 @@ router.post('/update/image', (req, res) => {
         const { worker, selfie } = req.body;
         if (!worker) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID is required
         //check firebase if uid exists
-        admin.auth().getUser(worker)
+
         // check for required fields
         if (!selfie) return res.status(400).json({ msg: 'Bad Request. Missing fields', status: 400, success: false }) // At least one field is required
         // Find the user
@@ -89,7 +89,7 @@ router.post('/update/ghc-images', (req, res) => {
         const { worker, gh_card_image_back, gh_card_image_front, gh_card_to_face } = req.body;
         if (!worker) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID is required
         //check firebase if uid exists
-        admin.auth().getUser(worker)
+
         // check for required fields
         if (!gh_card_image_back && !gh_card_image_front && !gh_card_to_face) return res.status(400).json({ msg: 'Bad Request. Missing fields. ghc_back and ghc_front are required', status: 400, success: false }) // At least one field is required
         // Find the user
@@ -125,7 +125,7 @@ router.post('/update/age-verify', (req, res) => {
         const { worker, age_doc } = req.body;
         if (!worker) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID is required
         //check firebase if uid exists
-        admin.auth().getUser(worker)
+
         // check for required fields
         if (!age_doc) return res.status(400).json({ msg: 'Bad Request. Missing fields. ghc_back and ghc_front are required', status: 400, success: false }) // At least one field is required
         // Find the user
@@ -160,7 +160,7 @@ router.post('/update/pos', (req, res) => {
         const { worker, proof_skill } = req.body;
         if (!worker) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID is required
         //check firebase if uid exists
-        admin.auth().getUser(worker)
+
         // check for required fields
         if (!proof_skill) return res.status(400).json({ msg: 'Bad Request. Missing fields', status: 400, success: false }) // At least one field is required
         // Find the user
@@ -195,7 +195,7 @@ router.post('/update/insurance', (req, res) => {
         const { worker, insurance_doc } = req.body;
         if (!worker) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID is required
         //check firebase if uid exists
-        admin.auth().getUser(worker)
+
         // check for required fields
         if (!insurance_doc) return res.status(400).json({ msg: 'Bad Request. Missing fields', status: 400, success: false }) // At least one field is required
         // Find the user
@@ -231,7 +231,7 @@ router.post('/update/address', (req, res) => {
         const { worker, address, latlng } = req.body;
         if (!worker) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID is required
         //check firebase if uid exists
-        admin.auth().getUser(worker)
+
         // check for required fields
         if (!address) return res.status(400).json({ msg: 'Bad Request. Missing fields', status: 400, success: false }) // At least one field is required
         // Find the user
@@ -270,7 +270,7 @@ router.post('/update/gender', (req, res) => {
         const { worker, gender } = req.body;
         if (!worker) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID is required
         //check firebase if uid exists
-        admin.auth().getUser(worker)
+
         // check for required fields
         if (!gender) return res.status(400).json({ msg: 'Bad Request. Missing fields', status: 400, success: false }) // At least one field is required
         // Find the user
@@ -307,7 +307,7 @@ router.post('/phone/send-code', async (req, res) => {
         const { worker, phone } = req.body;
         if (!worker) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID is required
         //check firebase if uid exists
-        await admin.auth().getUser(worker)
+
         // check for required fields
         if (!phone) return res.status(400).json({ msg: 'Bad Request. Missing fields. phone field is required', status: 400, success: false }) // At least one field is required
         // check if the phone number is equal to the one in the database
@@ -354,7 +354,7 @@ router.post('/phone/verify-code', async (req, res) => {
         const { worker, phone, code } = req.body;
         if (!worker) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID is required
         //check firebase if uid exists
-        await admin.auth().getUser(worker)
+
         // check for required fields
         if (!phone && !code) return res.status(400).json({ msg: 'Bad Request. Missing fields. phone and code fields are required', status: 400, success: false }) // At least one field is required
 

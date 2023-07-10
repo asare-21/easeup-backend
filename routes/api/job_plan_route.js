@@ -6,7 +6,7 @@ const { cache } = require('../../cache/user_cache');
 
 router.get("/:client", jobPlanCache, async (req, res) => {
     // used to get job plans
-    await admin.auth().getUser(req.params.client) // check if uid is valid
+
     const jobPlans = await jobModel.find({ client: req.params.client })
     console.log("Found job plans: ", jobPlans)
     if (jobPlans.length === 0) {
@@ -28,7 +28,7 @@ router.get("/:client", jobPlanCache, async (req, res) => {
 
 router.get("/:client/:job_id", singleJobPlanCache, async (req, res) => {
     // get job plan by id
-    await admin.auth().getUser(req.params.client) // check if uid is valid
+
     const jobPlan = await jobModel.findById(req.params.job_id)
     if (!jobPlan) {
         return res.status(404).json({
@@ -102,7 +102,7 @@ router.post("/:client", async (req, res) => {
 })
 
 router.delete("/:client/:job_id", async (req, res) => {
-    await admin.auth().getUser(req.params.client) // check if uid is valid
+
     const deleteJobPlan = await jobModel.findByIdAndDelete(req.params.job_id)
 
     if (!deleteJobPlan) {

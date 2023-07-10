@@ -40,7 +40,7 @@ async function createNotification(user_id, title, body, type, token) {
 
         if (!user_id) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID is required
         //check firebase if uid exists
-        await admin.auth().getUser(user_id)
+
         // Find the user
         userModel.findById(user_id, (
             err,
@@ -120,7 +120,7 @@ router.get('/profile/:user_id', getUserCache, async (req, res) => {
         const user_id = req.params.user_id;
         if (!user_id) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID is required
         //check firebase if uid exists
-        await admin.auth().getUser(user_id)
+
         // Find the user
         const userData = await userModel.findById(user_id)
         // cache data
@@ -386,7 +386,7 @@ router.post('/update', async (req, res) => {
         const { user_id, gender, dob, phone, address } = req.body;
         if (!user_id) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID is required
         //check firebase if uid exists
-        await admin.auth().getUser(user_id)
+
         // check for required fields
         if (!req.body.profile_name && !req.body.phone && !req.body.address && !req.body.profile_picture) return res.status(400).json({ msg: 'Bad Request. Missing fields', status: 400, success: false }) // At least one field is required
         // Find the user
@@ -422,7 +422,7 @@ router.post('/phone/send-code', async (req, res) => {
         const { user_id, phone } = req.body;
         if (!user_id) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID is required
         //check firebase if uid exists
-        await admin.auth().getUser(user_id)
+
         // check for required fields
         if (!phone) return res.status(400).json({ msg: 'Bad Request. Missing fields. phone field is required', status: 400, success: false }) // At least one field is required
         // check if the phone number is equal to the one in the database
@@ -484,7 +484,7 @@ router.post('/phone/verify-code', async (req, res) => {
         const { user_id, phone, code } = req.body;
         if (!user_id) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID is required
         //check firebase if uid exists
-        await admin.auth().getUser(user_id)
+
         // check for required fields
         if (!phone && !code) return res.status(400).json({ msg: 'Bad Request. Missing fields. phone and code fields are required', status: 400, success: false }) // At least one field is required
 
@@ -517,7 +517,7 @@ router.post('/create', async (req, res) => {
         console.log(req.body)
         if (!user_id) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID is required
         // required field : email, profile_name, last_login
-        await admin.auth().getUser(user_id)
+
         const required_fields = ["email", "profile_name", "last_login", "token", "user_id"]
         var missing_fields = []
         // check for required fields
@@ -582,7 +582,7 @@ router.get('/nofications/:user_id', getUserNotificationsCache, async (req, res) 
 
         if (!user_id) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID is required
         //check firebase if uid exists
-        await admin.auth().getUser(user_id)
+
         // Find the user
         notificationModel.find({ user: user_id }, (err, notifications) => {
             if (err) return res.status(500).json({ msg: err.message, status: 500, success: false, }) // Internal Server Error
@@ -610,7 +610,7 @@ router.post('/nofications/update/:user_id', async (req, res) => {
 
         if (!user_id) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID is required
         //check firebase if uid exists
-        await admin.auth().getUser(user_id)
+
         // Find the user
         notificationModel.findOneAndUpdate({ user: user_id, _id: id }, {
             read: true
@@ -636,7 +636,7 @@ router.get('/bookmarks', async (req, res) => {
         const { user_id } = req.body;
         if (!user_id) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID is required
         //check firebase if uid exists
-        await admin.auth().getUser(user_id)
+
         // Find the user
         userModel.findById(user_id, (err, user) => {
             if (err) return res.status(500).json({ msg: 'Internal Server Error', status: 500, success: false }) // Internal Server Error
@@ -666,7 +666,7 @@ router.delete('/bookmarks/delete', async (req, res) => {
         const { user_id, bookmark_id } = req.body;
         if (!user_id || !bookmark_id) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID and Bookmark ID are required
         //check firebase if uid exists
-        await admin.auth().getUser(user_id)
+
         // Find the user
         userModel.findById(user_id, (err, user) => {
             if (err) return res.status(500).json({ msg: 'Internal Server Error', status: 500, success: false }) // Internal Server Error

@@ -45,7 +45,7 @@ router.post('/', async (req, res) => {
     const { service, uid, page, radius, location } = req.body
     // check if user is authenticated
     try {
-        await admin.auth().getUser(uid) // check if uid is valid
+
         // search for workers in the service
         await workerProfileModel.find({
             // skills: {

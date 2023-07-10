@@ -18,7 +18,7 @@ async function createNotification(worker, title, body, type, token) {
 
         if (!worker) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID is required
         //check firebase if uid exists
-        await admin.auth().getUser(worker)
+
         // Find the user
         workerModel.findById(worker, async (
             err,
@@ -63,7 +63,7 @@ router.get('/:worker', getWorkerCache, async (req, res) => {
     const { worker } = req.params
     // check if user is authenticated
     try {
-        await admin.auth().getUser(worker) // check if worker is valid
+        // check if worker is valid
         const result = await workerModel.findById(worker)
 
         workerCache.set(`worker/${worker._id}`, result); //cache results
@@ -89,7 +89,7 @@ router.delete('/:worker', async (req, res) => {
     const { worker } = req.params
 
     try {
-        await admin.auth().getUser(worker) // check if worker is valid
+        // check if worker is valid
 
 
         await Promise.all([
@@ -119,7 +119,7 @@ router.get('/token/:worker', getWorkerTokenCache, async (req, res) => {
     const { worker } = req.params
     // check if user is authenticated
     try {
-        await admin.auth().getUser(worker) // check if worker is valid
+        // check if worker is valid
         const result = await workerModel.findById(worker)
 
         workerCache.set(`worker-token/${result._id}`, result.token); //cache results
@@ -165,7 +165,7 @@ router.post('/create', async (req, res) => {
         // console.log(req.body)
         if (!worker) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID is required
         // required field : email, profile_name, last_login
-        await admin.auth().getUser(worker)
+
 
         // check if user already exists
         const userExists = await workerModel
@@ -268,7 +268,7 @@ router.post('/location', async (req, res) => {
         }
         if (missing_fields.length > 0) return res.status(400).json({ msg: 'Bad Request. Missing fields', status: 400, success: false, missing_fields }) // At least one field is required
         const { worker, updates } = req.body;
-        await admin.auth().getUser(worker)
+
         locationModel.findOneAndUpdate({ worker }, {
             $push: {
                 logs: updates
@@ -303,7 +303,7 @@ router.post('/update/token', (req, res) => {
         const { user_id, token } = req.body;
         if (!user_id) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID is required
         //check firebase if uid exists
-        admin.auth().getUser(user_id)
+
         // check for required fields
         if (!token) return res.status(400).json({ msg: 'Bad Request. Missing fields', status: 400, success: false }) // At least one field is required
         // Find the user
@@ -340,7 +340,7 @@ router.post('/update/ghc', (req, res) => {
         console.log(req.body)
         if (!user_id) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID is required
         //check firebase if uid exists
-        admin.auth().getUser(user_id)
+
         // check for required fields
         if (!ghc) return res.status(400).json({ msg: 'Bad Request. Missing fields', status: 400, success: false }) // At least one field is required
         // Find the user
@@ -383,12 +383,12 @@ router.get('/nofications/:user_id', async (req, res) => {
 
         if (!user_id) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID is required
         //check firebase if uid exists
-        await admin.auth().getUser(user_id)
-        // Find the user
-        notificationModel.find({ user: user_id }, (err, notifications) => {
-            if (err) return res.status(500).json({ msg: err.message, status: 500, success: false, }) // Internal Server Error
-            return res.status(200).json({ msg: 'Notifications Found', status: 200, success: true, notifications }) // Notifications Found and returned
-        })
+        await
+            // Find the user
+            notificationModel.find({ user: user_id }, (err, notifications) => {
+                if (err) return res.status(500).json({ msg: err.message, status: 500, success: false, }) // Internal Server Error
+                return res.status(200).json({ msg: 'Notifications Found', status: 200, success: true, notifications }) // Notifications Found and returned
+            })
 
     }
     catch (e) {
@@ -409,14 +409,14 @@ router.post('/nofications/update/:user_id', async (req, res) => {
 
         if (!user_id) return res.status(400).json({ msg: 'Bad Request', status: 400, success: false }) // User ID is required
         //check firebase if uid exists
-        await admin.auth().getUser(user_id)
-        // Find the user
-        notificationModel.findOneAndUpdate({ user: user_id, _id: id }, {
-            read: true
-        }, (err, notification) => {
-            if (err) return res.status(500).json({ msg: err.message, status: 500, success: false, }) // Internal Server Error
-            return res.status(200).json({ msg: 'Notification updated', status: 200, success: true, notification }) // Notifications Found and returned
-        })
+        await
+            // Find the user
+            notificationModel.findOneAndUpdate({ user: user_id, _id: id }, {
+                read: true
+            }, (err, notification) => {
+                if (err) return res.status(500).json({ msg: err.message, status: 500, success: false, }) // Internal Server Error
+                return res.status(200).json({ msg: 'Notification updated', status: 200, success: true, notification }) // Notifications Found and returned
+            })
 
     }
     catch (e) {
