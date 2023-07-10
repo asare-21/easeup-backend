@@ -19,8 +19,9 @@ const verifyJWT = async (req, res, next) => {
       const user = await validateAuthToken(token);
       req.user = user;
       next();
-    } catch (error) {
-      res.status(403).json({ error: error });
+    } catch (error) { 
+      console.log(error)
+      res.status(401).json("You are not authorized to access this resource");
     }
   }
 };

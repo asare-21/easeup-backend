@@ -73,15 +73,6 @@ app.use(
 );
 app.use(passport.initialize());
 app.use(passport.session());
-app.use("/auth", authRoutes);
-app.get("/authenticated-route", verifyJWT, (req, res) => {
-  try {
-    console.log(req.user);
-    res.json({ message: "You are autheticated", success: true });
-  } catch (error) {
-    res.status(400).json({ message: error, success: false });
-  }
-});
 
 // Static files
 app.enable("trust proxy");
