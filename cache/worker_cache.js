@@ -96,6 +96,19 @@ module.exports.getUpcomingBookingCache = async function getUpcomingBookingCache(
     console.log('Upcoming Booking not found in cache');
     next();
 }
+// get Pending booking cache
+module.exports.getPendingBookingCache = async function getPendingBookingCache(req, res, next) {
+    const booking = myCache.get(`pending-bookings/${req.params.worker}`);
+    console.log('cached upcoming booking ', booking);
+    if (booking !== null && booking !== undefined) {
+        console.log('Pending Booking found in cache');
+        return res.status(200).json({
+            msg: 'Pending Booking Found', status: 200, success: true, bookings: JSON.parse(booking)
+        })
+    }
+    console.log('Pending Booking not found in cache');
+    next();
+}
 
 // get in progress booking cache
 module.exports.getInProgressBookingCache = async function getInProgressBookingCache(req, res, next) {

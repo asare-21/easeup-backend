@@ -516,7 +516,6 @@ cron.schedule('*/15 * * * *', async () => {
         const verifiedProfiles = await workerProfileVerificationModel.find({
             gh_card_verified: true,
             selfie_verified: true,
-            // insurance_verified: true,
             skill_verified: true,
             notified: false,
         });

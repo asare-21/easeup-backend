@@ -87,6 +87,34 @@ async function createNotification(user_id, title, body, type, token) {
 router.use(bodyParser.urlencoded({ extended: false }));
 router.use(express.json());
 
+router.delete('/:user', async (req, res) => {
+    const { user } = req.params
+
+    try {
+        await admin.auth().getUser(user) // check if user is valid
+
+
+        await Promise.all([
+            userModel.findByIdAndDelete(user),
+
+        ])
+        return res.status(200).json({
+            msg: 'user Profile Deleted',
+            status: 200,
+            success: true,
+        })
+    }
+    catch (e) {
+        if (e.errorInfo) {
+            // User Not Found
+            log.warn(e.message)
+            return returnUnAuthUserError(res, e.message)
+        }
+        return commonError(res, e.message)
+
+    }
+})
+
 router.get('/profile/:user_id', getUserCache, async (req, res) => {
     try {    // required field : user_id
         const user_id = req.params.user_id;
@@ -104,7 +132,7 @@ router.get('/profile/:user_id', getUserCache, async (req, res) => {
 
         // return user data
         return res.status(200).json({
-            msg: 'User Found', status: 200, success: true, userData
+            msg: 'User Found', status: 200, success: true, user: userData
         })
         // userModel.findById(user_id, (err, user) => {
         //     if (err) {

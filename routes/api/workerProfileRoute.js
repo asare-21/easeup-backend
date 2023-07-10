@@ -21,7 +21,8 @@ const { query } = require('express');
 const { mediaCache } = require('../../cache/media_cache');
 const { workerProfileVerificationModel } = require('../../models/worker_profile_verification_model');
 const { findEarliestAvailableTimeSlot, getMissingField } = require('./booking_helper');
-const { getReviewsCache, getCommentsCache, getBookingCache, getUpcomingBookingCache, getInProgressBookingCache, getCompletedBookingCache, getCancelledBookingCache, getWorkerReviewCache, getPopularWorkersCache, getNotificationsCache, getPaidBookingsCache } = require('../../cache/worker_cache');
+const { getReviewsCache, getCommentsCache, getBookingCache, getUpcomingBookingCache, getInProgressBookingCache, getCompletedBookingCache, getCancelledBookingCache, getWorkerReviewCache, getPopularWorkersCache, getNotificationsCache, getPaidBookingsCache, getPendingBookingCache } = require('../../cache/worker_cache');
+const { notificationModel } = require('../../models/nofications');
 
 
 router.get('/:worker', getWorkerProfileCache, async (req, res) => {
@@ -472,7 +473,7 @@ router.get('/booking-upcoming/:worker', getUpcomingBookingCache, async (req, res
     try {
         await admin.auth().getUser(worker) // check if worker is valid
         // console.log("User variable ", user)
-        const bookings = user ? await bookingModel.find({ client: worker, isPaid: true, cancelled: false, started: false }) : await bookingModel.find({ worker: worker, isPaid: true, cancelled: false, started: false })
+        const bookings = await bookingModel.find({ [user === 'true' ? 'client' : 'worker']: worker, isPaid: true, cancelled: false, started: false })
         console.log("Fetched bookings ", bookings)
         // set cahce
         workerCache.set(`upcoming-bookings/${worker}`, JSON.stringify(bookings))
@@ -492,18 +493,45 @@ router.get('/booking-upcoming/:worker', getUpcomingBookingCache, async (req, res
         return commonError(res, e.message)
     }
 })
+// pending
+router.get('/booking-pending/:worker', async (req, res) => {
+    const { worker } = req.params
+    const { user } = req.query
+    try {
+        await admin.auth().getUser(worker) // check if worker is valid
+        console.log("User variable ", Boolean("false"))
+        const bookings = await bookingModel.find({ [user === 'true' ? 'client' : 'worker']: worker, isPaid: true, cancelled: false, started: true, pending: true })
+        console.log("Fetched bookings ", bookings)
+        // set cahce
+
+
+        return res.status(200).json({
+            msg: 'Worker Profile Fetched Successfully',
+            status: 200,
+            success: true,
+            bookings,
+        })
+    } catch (e) {
+        if (e.errorInfo) {
+            // User Not Found
+            log.warn(e.message)
+            return returnUnAuthUserError(res, e.message)
+        }
+        return commonError(res, e.message)
+    }
+})
 
 // upcoming
-router.get('/booking-progress/:worker', getInProgressBookingCache, async (req, res) => {
+router.get('/booking-progress/:worker', async (req, res) => {
     const { worker } = req.params
     const { user } = req.query
     try {
         await admin.auth().getUser(worker) // check if worker is valid
         // console.log("User variable ", user)
-        const bookings = user ? await bookingModel.find({ 'client': worker, isPaid: true, completed: false, started: true }) : await bookingModel.find({ worker: worker, isPaid: true, completed: false, started: true })
+        const bookings = await bookingModel.find({ [user === 'true' ? 'client' : 'worker']: worker, isPaid: true, completed: false, started: true, pending: false })
         console.log("Fetched bookings ", bookings)
         // set cahce
-        workerCache.set(`in-progress-bookings/${worker}`, JSON.stringify(bookings))
+
         return res.status(200).json({
             msg: 'Worker Profile Fetched Successfully',
             status: 200,
@@ -526,7 +554,7 @@ router.get('/booking-completed/:worker', getCompletedBookingCache, async (req, r
     const { user } = req.query
     try {
         await admin.auth().getUser(worker) // check if worker is valid
-        const bookings = await bookingModel.find({ [user ? 'client' : 'worker']: worker, isPaid: true, completed: true, started: true })
+        const bookings = await bookingModel.find({ [user === 'true' ? 'client' : 'worker']: worker, isPaid: true, completed: true, started: true })
 
         // set cache
         workerCache.set(`completed-bookings/${worker}`, JSON.stringify(bookings))
@@ -555,7 +583,7 @@ router.get('/booking-cancelled/:worker', getCancelledBookingCache, async (req, r
     try {
         await admin.auth().getUser(worker) // check if worker is valid
         // const bookings = await bookingModel.find({ [user == true || 'true' ? 'client' : 'worker']: worker, isPaid: true, completed: false, cancelled: true })
-        const bookings = user ? await bookingModel.find({ 'client': worker, isPaid: true, completed: false, cancelled: true }) : await bookingModel.find({ worker, isPaid: true, completed: false, cancelled: true })
+        const bookings = await bookingModel.find({ [user === 'true' ? 'client' : 'worker']: worker, isPaid: true, completed: false, cancelled: true })
         // set cache
         workerCache.set(`cancelled-bookings/${worker}`, JSON.stringify(bookings))
         return res.status(200).json({
@@ -596,15 +624,83 @@ router.put('/booking-status', async (req, res) => {
         }, {
             completed: completed ? completed : false,
             started: started ? started : false,
+            pending: false,
+
             endTime: Date.now()
         },)
         console.log(booking)
         if (!booking) return commonError(res, 'Booking not found')
+        workerCache.del(`in-progress-bookings/${worker}`)
+        workerCache.del(`upcoming-bookings/${worker}`)
+
         return res.status(200).json({
             msg: 'Booking Updated Successfully',
             status: 200,
             success: true,
             booking,
+        })
+
+    } catch (e) {
+        if (e.errorInfo) {
+            // User Not Found
+            log.warn(e.message)
+            return returnUnAuthUserError(res, e.message)
+        }
+
+        return commonError(res, e.message)
+    }
+})
+
+
+//mark as pending
+router.put('/booking-status/pending', async (req, res) => {
+    const { worker, client, ref } = req.body
+
+    try {
+
+        await Promise.all([
+            admin.auth().getUser(worker), // check if worker is valid
+            admin.auth().getUser(client) // check if user is valid
+        ])
+
+        const bookingStarted = await bookingModel.findOne({ worker, client, ref, started: true, completed: false })
+        if (!bookingStarted) return commonError(res, 'Sorry, something went wrong.')
+
+        // update
+        bookingStarted.pending = true
+        bookingStarted.save()
+
+
+        workerCache.del(`in-progress-bookings/${worker}`)
+        workerCache.del(`upcoming-bookings/${worker}`)
+        workerCache.del(`pending-bookings/${worker}`)
+
+        // send notifcation to worker
+        const workerfuture = await workerModel.findById(worker)
+        if (worker) {
+            // send notification to worker
+            notificationModel
+            const notification = new notificationModel({
+                user: worker,
+                title: 'Booking Pending',
+                body: `Your booking with ${bookingStarted.clientName} has been marked as pending. Please contact the client to resolve the issue.`,
+            })
+            await notification.save()
+            // send notification to client using Firebase Cloud Messaging
+
+            await admin.messaging().send(workerfuture.token, {
+                notification: {
+                    title: 'Booking Pending',
+                    body: `Your booking with ${bookingStarted.clientName} has been marked as pending. Please contact the client to resolve the issue.`,
+                }
+            })
+        }
+
+        return res.status(200).json({
+            msg: 'Booking Updated Successfully',
+            status: 200,
+            success: true,
+            // booking: bookingStarted,
         })
 
     } catch (e) {
@@ -706,41 +802,58 @@ router.get('/worker-review/:worker', getWorkerReviewCache, async (req, res) => {
 router.post('/available-slots/:worker', async (req, res) => {
     try {
         const { workers, day } = req.body;
+        const currentDate = new Date(); // Get the current date
+        const currentDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate());
+        const selectedDay = new Date(day,); // Get the selected day
+
+        // Check if the selected day is in the past
+        if (selectedDay < currentDay) {
+            return res.status(200).json({
+                msg: 'No available slots',
+                status: 200,
+                success: true,
+                timeslots: [],
+            });
+        }
+
+        const currentTime = currentDate.getHours(); // Get the current hour
+
         const availableSlots = await Promise.all(workers.map(async (workerId) => {
-            try {
-                await admin.auth().getUser(workerId); // check if worker is valid
 
-                // Get the bookings for the worker on the specified day
-                const slots = await bookingModel.find({
-                    worker: workerId,
-                    day,
-                    cancelled: false,
-                    completed: false,
-                    isPaid: true,
-                });
+            await admin.auth().getUser(workerId); // check if worker is valid
 
-                // Calculate available slots based on the booked slots
-                const availableHours = [8, 11, 14]; // Allowed hours: 8am, 11am, 2pm
-                const availableSlots = availableHours.filter(hour => {
-                    // Check if the worker has a booking at the hour
-                    return !slots.some(slot => {
-                        const slotHour = new Date(slot.date).getHours();
-                        return slotHour === hour;
-                    });
-                });
+            // Get the bookings for the worker on the specified day
+            const slots = await bookingModel.find({
+                worker: workerId,
+                day,
+                cancelled: false,
+                completed: false,
+                isPaid: true,
+            });
 
-                return {
-                    workerId,
-                    slots: availableSlots,
-                    slotCount: availableSlots.length,
-                };
-            } catch (error) {
-                return {
-                    workerId,
-                    slots: [],
-                    slotCount: 0
-                };
-            }
+            // Calculate available slots based on the booked slots and current time
+            const availableHours = [8, 11, 14]; // Allowed hours: 8am, 11am, 2pm
+            const availableSlots = availableHours.filter(hour => {
+                // Check if the worker has a booking at the hour and it's after the current time
+                if (selectedDay.getMonth() === currentDay.getMonth() && selectedDay.getDate() === currentDay.getDate()) {
+                    // check current time
+                    // check if the day has bookings. if it does, check the slots used and return the available slots
+                    const usedHours = slots.map(slot => new Date(slot.date).getHours() - 1);
+                    console.log("Used hours", usedHours)
+                    return !usedHours.includes(hour) && hour > currentTime;
+                } else {
+                    // check if the day has bookings. if it does, check the slots used and return the available slots
+                    const usedHours = slots.map(slot => new Date(slot.date).getHours() - 1);
+                    console.log("Used hours", usedHours)
+                    return !usedHours.includes(hour);
+                }
+            });
+            return {
+                workerId,
+                slots: availableSlots,
+                slotCount: availableSlots.length,
+            };
+
         }));
 
         return res.status(200).json({
@@ -758,6 +871,9 @@ router.post('/available-slots/:worker', async (req, res) => {
         return commonError(res, e.message);
     }
 });
+
+
+
 
 
 router.post('/book-slot', async (req, res) => {
@@ -813,6 +929,10 @@ router.post('/book-slot', async (req, res) => {
         });
 
         const result = await newBooking.save(); // save booking
+        // clear cache
+        workerCache.del(`booking/${worker}`);
+        workerCache.del(`upcoming-bookings/${client}`);
+        workerCache.del(`upcoming-bookings/${worker}`);
 
         // Send notifications to the worker and client
         if (workerPhone && clientPhone)
@@ -971,6 +1091,9 @@ router.post('/refund/:ref', async (req, res) => {
                     cancelledReason: reason,
                     endTime: Date.now()
                 })
+                workerCache.del(`in-progress-bookings/${worker}`)
+                workerCache.del(`upcoming-bookings/${worker}`)
+                workerCache.del(`cancelled-bookings/${worker}`)
                 return res.status(200).json({
                     msg: 'Refund Processed',
                     status: 200,
@@ -1256,8 +1379,24 @@ router.get('/popular/:id', getPopularWorkersCache, async (req, res) => {
             const foundProfile = await workerProfileModel.findOne({
                 worker: foundWorker
             });
+            console.log("Found profile", foundProfile)
 
             if (foundProfile) {
+                // get avg rating of worker
+                console.log("Found Worker", foundWorker)
+                const rating = await reviewModel.aggregate([
+                    {
+                        $match: { worker: foundWorker }
+                    },
+                    {
+                        $group: {
+                            _id: null,
+                            avgRating: { $avg: "$rating" }
+                        }
+                    }
+                ]).exec()
+                console.log("Rating", rating)
+                if (rating.length > 0) { foundProfile.rating = rating[0].avgRating ?? 0 }
                 profiles.push(foundProfile);
             }
         }

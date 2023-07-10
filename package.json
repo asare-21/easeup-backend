@@ -4,15 +4,11 @@
   "description": "Easeu Backend",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "pm2-runtime start ecosystem.config.js --env production",
-    "build:digitalocean": "npm run start"
+    "start": "pm2-runtime start ecosystem.config.js --env production"
   },
   "author": "Joseph ASARE",
   "license": "ISC",
   "dependencies": {
-    "@aws-cdk/aws-ec2": "^1.199.0",
-    "@aws-cdk/aws-elasticbeanstalk": "^1.199.0",
     "axios": "^1.2.2",
     "compression": "^1.7.4",
     "cors": "^2.8.5",
@@ -21,16 +17,17 @@
     "ejs": "^3.1.8",
     "express": "^4.18.2",
     "express-rate-limit": "^6.7.0",
-    "firebase-admin": "^11.4.0",
+    "firebase-admin": "^10.0.2",
     "graphql": "^16.6.0",
     "helmet": "^6.0.1",
     "mongoose": "^6.8.0",
     "morgan": "^1.10.0",
     "node-cache": "^5.1.2",
     "node-cron": "^3.0.2",
+    "nodemailer": "^6.9.3",
     "npmlog": "^7.0.1",
     "otp-generator": "^4.0.0",
-    "pm2": "^5.2.2",
+    "pm2": "^2.10.4",
     "socket.io": "^4.5.4",
     "vhost": "^3.0.2"
   }
