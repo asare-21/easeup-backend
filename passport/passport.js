@@ -16,13 +16,13 @@ passport.use(
     async function (accessToken, refreshToken, profile, cb) {
       try {
         // check if user exist with the profile id
-        const userExist = await userModel.findOne({
+        let user = await userModel.findOne({
           email: profile.email,
         });
 
         // store user in database if user does not exist
-        if (!userExist) {
-          await userModel.create({
+        if (!user) {
+          user = await userModel.create({
             email: profile.email,
             displayName: profile.displayName,
             last_login: Date.now(),
@@ -30,14 +30,14 @@ passport.use(
             googleId: profile.id,
             profile_name: profile.displayName,
           });
-        } else if (userExist && !userExist.facebookId) {
-          await userModel.updateOne({
+        } else if (user && !user.facebookId) {
+          user = await userModel.updateOne({
             last_login: Date.now(),
             token: accessToken,
             googleId: profile.id,
           });
         }
-        return cb(null, profile);
+        return cb(null, user);
       } catch (error) {
         console.log(error);
       }
@@ -56,12 +56,12 @@ passport.use(
     async function (accessToken, refreshToken, profile, cb) {
       try {
         // check if user exist with the profile id
-        const userExist = await userModel.findOne({
+        let user = await userModel.findOne({
           email: profile.emails[0].value,
         });
         // store user in database if user does not exist
-        if (!userExist) {
-          await userModel.create({
+        if (!user) {
+          user = await userModel.create({
             displayName: profile.displayName,
             last_login: Date.now(),
             email: profile.emails[0].value,
@@ -69,15 +69,15 @@ passport.use(
             facebookId: profile.id,
             profile_name: profile.displayName,
           });
-        } else if (userExist && !userExist.facebookId) {
-          await userModel.updateOne({
+        } else if (user && !user.facebookId) {
+          user = await userModel.updateOne({
             last_login: Date.now(),
             token: accessToken,
             facebookId: profile.id,
           });
         }
 
-        return cb(null, profile);
+        return cb(null, user);
       } catch (error) {
         console.log(error);
       }
@@ -96,13 +96,13 @@ passport.use(
     async function (accessToken, refreshToken, profile, cb) {
       try {
         // check if user exist with the profile id
-        const userExist = await userModel.findOne({
+        let user = await userModel.findOne({
           email: profile.emails[0].value,
         });
 
         // store user in database if user does not exist
-        if (!userExist) {
-          await userModel.create({
+        if (!user) {
+          user = await userModel.create({
             displayName: profile.displayName,
             last_login: Date.now(),
             token: accessToken,
@@ -110,14 +110,14 @@ passport.use(
             profile_name: profile.displayName,
             email: profile.emails[0].value,
           });
-        } else if (userExist && !userExist.twitterId) {
-          await userModel.updateOne({
+        } else if (user && !user.twitterId) {
+          user = await userModel.updateOne({
             last_login: Date.now(),
             token: accessToken,
             twitterId: profile.id,
           });
         }
-        return cb(null, profile);
+        return cb(null, user);
       } catch (error) {
         console.log(error);
       }

@@ -23,10 +23,7 @@ router.get(
   }
 );
 
-router.get(
-  "/facebook",
-  passport.authenticate("facebook")
-);
+router.get("/facebook", passport.authenticate("facebook"));
 
 router.get(
   "/facebook/callback",
@@ -51,7 +48,6 @@ router.get(
   passport.authenticate("twitter", { failureRedirect: "/login" }),
   (req, res) => {
     const user = req.user;
-
     const token = generateToken(user);
 
     // Redirect or send response with the token
