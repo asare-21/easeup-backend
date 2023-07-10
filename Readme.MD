@@ -15,7 +15,7 @@
 ### Facebook
 
 
-1 Login to this url {BASE_URL}/auth/google and login with facebook credentials
+1 Login to this url {BASE_URL}/auth/facebook and login with facebook credentials
 
 
 2 After authentication, the callback url will be called by facebook if login was successful.
@@ -29,7 +29,7 @@
 ### Twitter
 
 
-1 Login to this url {BASE_URL}/auth/google and login with twitter credentials
+1 Login to this url {BASE_URL}/auth/twitter and login with twitter credentials
 
 
 2 After authentication, the callback url will be called by twitter if login was successful.
