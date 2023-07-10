@@ -96,10 +96,12 @@ router.get('/profile/:user_id', getUserCache, async (req, res) => {
         // Find the user
         const userData = await userModel.findById(user_id)
         // cache data
-        userCache.set(`user/${user_id}`, userData);
 
         if (!userData)
-            return res.status(500).json({ msg: 'Something went wrong', status: 500, success: false }) // Internal Server Error
+            return res.status(500).json({ msg: 'Something went wrong. User not found', status: 500, success: false }) // Internal Server Error
+
+        userCache.set(`user/${user_id}`, userData);
+
         // return user data
         return res.status(200).json({
             msg: 'User Found', status: 200, success: true, userData
