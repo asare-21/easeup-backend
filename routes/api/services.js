@@ -4,9 +4,10 @@ const router = require('express').Router();
 router.get('/', async (req, res) => {
     try {
         const services = await servicesModel.find()
-        res.status(200).json({ services: services })
+        if (!services) return res.status(400).json({ message: 'No services found', success: false })
+        return res.status(200).json({ services, success: true })
     } catch (error) {
-        res.status(400).json({ message: error })
+        return res.status(400).json({ message: error, success: false })
     }
 })
 
