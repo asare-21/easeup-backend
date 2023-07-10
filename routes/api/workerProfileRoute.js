@@ -446,7 +446,7 @@ router.get('/booking/:worker', getBookingCache, async (req, res) => {
 router.get('/paid/:user', getPaidBookingsCache, async (req, res) => {
     const { user } = req.params
     try {
-        await admin.auth().getUser(user) // check if worker is valid
+
         const bookings = await bookingModel.find({ client: user, isPaid: true })
         // set cache
         workerCache.set(`paid-bookings/${user}`, JSON.stringify(bookings))
@@ -608,10 +608,7 @@ router.put('/booking-status', async (req, res) => {
     const { started, completed } = req.query;
     try {
 
-        await Promise.all([
-            admin.auth().getUser(worker), // check if worker is valid
-            admin.auth().getUser(client) // check if user is valid
-        ])
+
         if (!completed) {
             // check if any bookng has been started but not completed 
             const bookingStarted = await bookingModel.findOne({ worker, client, ref, started: true, completed: false })
@@ -658,10 +655,7 @@ router.put('/booking-status/pending', async (req, res) => {
 
     try {
 
-        await Promise.all([
-            admin.auth().getUser(worker), // check if worker is valid
-            admin.auth().getUser(client) // check if user is valid
-        ])
+
 
         const bookingStarted = await bookingModel.findOne({ worker, client, ref, started: true, completed: false })
         if (!bookingStarted) return commonError(res, 'Sorry, something went wrong.')
@@ -719,7 +713,6 @@ router.post('/worker-review', async (req, res) => {
     const { worker, user, rating, review, userImage, name } = req.body
     try {
         // check if worker is valid
-        await admin.auth().getUser(user) // check if user is valid
         const reviewM = new reviewModel({
             worker,
             user,
@@ -820,7 +813,6 @@ router.post('/available-slots/:worker', async (req, res) => {
 
         const availableSlots = await Promise.all(workers.map(async (workerId) => {
 
-            await admin.auth().getUser(workerId); // check if worker is valid
 
             // Get the bookings for the worker on the specified day
             const slots = await bookingModel.find({
@@ -888,8 +880,7 @@ router.post('/book-slot', async (req, res) => {
         }
 
 
-        await admin.auth().getUser(worker); // check if worker is valid
-        ; // check if client is valid
+
 
         const start = await findEarliestAvailableTimeSlot(worker, day); // find earliest availble timeslor
         console.log("Generated start time ", start)
@@ -1309,7 +1300,7 @@ router.patch('/update-date', async (req, res) => {
 router.get("/notify/:worker", async (req, res) => {
     if (!req.params.worker) return commonError(res, "Worker ID not provided")
     try {
-        admin.auth().getUser(req.params.worker)
+
         const workerToken = await workerModel.findById(req.params.worker)
         admin.messaging().sendToDevice(workerToken.token, {
             notification: {
@@ -1340,7 +1331,7 @@ router.get('/popular/:id', getPopularWorkersCache, async (req, res) => {
     let profiles = [];
 
     try {
-        await admin.auth().getUser(id); // check if worker is valid
+
 
         const bookings = await bookingModel.find({
             status: 'completed'

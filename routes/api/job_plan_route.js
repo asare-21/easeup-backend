@@ -50,7 +50,7 @@ router.post("/:client", async (req, res) => {
     const { jobDescription, location, skills, photos } = req.body;
     const client = req.params.client;
     try {
-        await admin.auth().getUser(client) // check if uid is valid
+
         // check if a job plan with the same description exists
         const existingPlan = await jobModel.findOne({ jobDescription, skills })
         if (!existingPlan) console.log('Plan does not exist')
@@ -127,7 +127,7 @@ router.delete("/:client/:job_id", async (req, res) => {
 
 router.put("/:client/:job_id", async (req, res) => {
     const { client, jobDescription, location, skills, photos } = req.body;
-    await admin.auth().getUser(client) // check if uid is valid
+
     const updateJobPlan = await jobModel.findByIdAndUpdate(req.params.job_id, {
         jobDescription,
         location,
