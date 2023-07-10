@@ -12,14 +12,13 @@ router.get(
   passport.authenticate("google", { failureRedirect: "/login" }),
   (req, res) => {
     const user = req.user;
-
     const token = generateToken(user);
 
     // Redirect or send response with the token
     res.cookie("token", token, {
       httpOnly: true,
     });
-    res.redirect(`http://localhost:3000/?token=${token}`);
+    res.redirect(`${process.env.GOOGLE_CALLBACK_URL}/?token=${token}`);
   }
 );
 
@@ -37,7 +36,7 @@ router.get(
     res.cookie("token", token, {
       httpOnly: true,
     });
-    res.redirect(`http://localhost:3000/?token=${token}`);
+    res.redirect(`${process.env.FACEBOOK_CALLBACK_URL}/?token=${token}`);
   }
 );
 
@@ -54,7 +53,7 @@ router.get(
     res.cookie("token", token, {
       httpOnly: true,
     });
-    res.redirect(`http://localhost:3000/?token=${token}`);
+    res.redirect(`${process.env.TWITTER_CALLBACK_URL}/?token=${token}`);
   }
 );
 

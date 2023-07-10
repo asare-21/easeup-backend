@@ -26,16 +26,21 @@ passport.use(
             email: profile.email,
             displayName: profile.displayName,
             last_login: Date.now(),
-            token: accessToken,
+            token: accessToken, // this key is used to send notification to the user.
             googleId: profile.id,
             profile_name: profile.displayName,
           });
+          console.log("user not found", user._id)
+
         } else if (user && !user.facebookId) {
-          user = await userModel.updateOne({
+
+          user = await userModel.findByIdAndUpdate(user._id, {
             last_login: Date.now(),
             token: accessToken,
             googleId: profile.id,
           });
+          console.log("user found ", user._id)
+
         }
         return cb(null, user);
       } catch (error) {
@@ -70,7 +75,7 @@ passport.use(
             profile_name: profile.displayName,
           });
         } else if (user && !user.facebookId) {
-          user = await userModel.updateOne({
+          user = await userModel.findByIdAndUpdate(user._id, {
             last_login: Date.now(),
             token: accessToken,
             facebookId: profile.id,
@@ -111,7 +116,7 @@ passport.use(
             email: profile.emails[0].value,
           });
         } else if (user && !user.twitterId) {
-          user = await userModel.updateOne({
+          user = await userModel.findByIdAndUpdate(user._id, {
             last_login: Date.now(),
             token: accessToken,
             twitterId: profile.id,
