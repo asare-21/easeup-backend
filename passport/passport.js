@@ -30,7 +30,7 @@ passport.use(
             googleId: profile.id,
             profile_name: profile.displayName,
           });
-          console.log("user not found", user._id)
+          console.log("user not found", user)
 
         } else if (user && !user.facebookId) {
 
@@ -38,8 +38,8 @@ passport.use(
             last_login: Date.now(),
             token: accessToken,
             googleId: profile.id,
-          });
-          console.log("user found ", user._id)
+          }, { new: true });
+          console.log("user found ", user)
 
         }
         return cb(null, user);
@@ -79,7 +79,7 @@ passport.use(
             last_login: Date.now(),
             token: accessToken,
             facebookId: profile.id,
-          });
+          }, { new: true });
         }
 
         return cb(null, user);
@@ -120,7 +120,7 @@ passport.use(
             last_login: Date.now(),
             token: accessToken,
             twitterId: profile.id,
-          });
+          }, { new: true });
         }
         return cb(null, user);
       } catch (error) {
