@@ -62,6 +62,7 @@ const cors = require("cors");
 const { subscribeRoute } = require("./routes/api/subscribe");
 const { recommendationRoute } = require("./routes/api/recommendation");
 const { servicesModel } = require("./models/services_model");
+const { servicesRoute } = require("./routes/api/services");
 
 //Auth
 app.use(
@@ -107,6 +108,7 @@ app.use("/subscribe", subscribeRoute);
 app.use("/recommend", recommendationRoute);
 app.use("/jplan", jobPlanRoute);
 app.use("/dashboard", dashboard);
+app.use("/services", servicesRoute)
 // handle 404
 app.use((req, res, next) => {
   return res.status(404).json({
