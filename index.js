@@ -77,9 +77,9 @@ app.use("/auth", authRoutes);
 app.get("/authenticated-route", verifyJWT, (req, res) => {
   try {
     console.log(req.user);
-    res.json({ message: "You are autheticated" });
+    res.json({ message: "You are autheticated", success: true });
   } catch (error) {
-    res.status(400).json({ message: error });
+    res.status(400).json({ message: error, success: false });
   }
 });
 
