@@ -17,6 +17,13 @@ const {
 const { cache } = require("../../cache/user_cache");
 const { userModel } = require("../../models/user_model");
 const { bookingModel } = require("../../models/bookingModel");
+const {
+  createWorkerValidator,
+  updateWorkerLocationValidator,
+  updateWorkerTokenValidator,
+  updateWorkerGhcValidator,
+  updateUserNotificationsValidator,
+} = require("../validators/worker.validator");
 const workerCache = cache;
 
 async function createNotification(worker, title, body, type, token) {
@@ -151,43 +158,31 @@ router.get(
   }
 );
 
-router.post("/create", verifyJWT, async (req, res) => {
+router.post("/create", async (req, res) => {
   try {
-    // required field : worker
-    const required_fields = [
-      "email",
-      "profile_name",
-      "last_login",
-      "token",
-      "worker",
-    ];
-    var missing_fields = [];
-    // check for required fields
-    for (let i = 0; i < required_fields.length; i++) {
-      if (!req.body[required_fields[i]]) {
-        missing_fields.push(required_fields[i]);
-      }
+    // validating request body submitted
+    const validationResults = await createWorkerValidator(req.body);
+
+    if (validationResults.status !== 200) {
+      return res.status(400).json({
+        msg: "Bad Request. Missing fields",
+        status: 400,
+        success: false,
+        validationResults,
+      });
     }
-    if (missing_fields.length > 0)
-      return res
-        .status(400)
-        .json({
-          msg: "Bad Request. Missing fields",
-          status: 400,
-          success: false,
-          missing_fields,
-        }); // At least one field is required
-    const existingUser = await userModel.findById(req.body.worker);
-    if (existingUser)
-      return res
-        .status(400)
-        .json({
-          msg: "An account with this email exists as a client. Sign in request denied.",
-          status: 400,
-          success: false,
-        }); // At least one field is required
+
     const { worker, email, profile_name, last_login, token } = req.body;
-    // console.log(req.body)
+
+    const existingUser = await userModel.findById(worker);
+    if (existingUser)
+      return res.status(400).json({
+        msg: "An account with this email exists as a client. Sign in request denied.",
+        status: 400,
+        success: false,
+      });
+    // At least one field is required
+
     if (!worker)
       return res
         .status(400)
@@ -196,17 +191,15 @@ router.post("/create", verifyJWT, async (req, res) => {
 
     // check if user already exists
     const userExists = await workerModel.findOne({ _id: worker }).exec();
-    console.log(userExists);
+
     if (userExists) {
       // User Already Exists
-      return res
-        .status(200)
-        .json({
-          user: userExists,
-          msg: "An account with this email exists as a client. Sign in request denied.",
-          status: 200,
-          success: true,
-        });
+      return res.status(200).json({
+        user: userExists,
+        msg: "An account with this email exists as a client. Sign in request denied.",
+        status: 200,
+        success: true,
+      });
     } // User Already Exists
     // Create the user
     const user = new workerModel({
@@ -299,23 +292,18 @@ router.post("/location", verifyJWT, async (req, res) => {
     'accuracy': Number,
     'timestamp': Date.now
         * */
-    const required_fields = ["updates", "worker"];
-    var missing_fields = [];
-    // check for required fields
-    for (let i = 0; i < required_fields.length; i++) {
-      if (!req.body[required_fields[i]]) {
-        missing_fields.push(required_fields[i]);
-      }
+    // validating request body submitted
+    const validationResults = await updateWorkerLocationValidator(req.body);
+
+    if (validationResults.status !== 200) {
+      return res.status(400).json({
+        msg: "Bad Request. Missing fields",
+        status: 400,
+        success: false,
+        validationResults,
+      });
     }
-    if (missing_fields.length > 0)
-      return res
-        .status(400)
-        .json({
-          msg: "Bad Request. Missing fields",
-          status: 400,
-          success: false,
-          missing_fields,
-        }); // At least one field is required
+
     const { worker, updates } = req.body;
 
     locationModel.findOneAndUpdate(
@@ -350,25 +338,20 @@ router.post("/location", verifyJWT, async (req, res) => {
   }
 });
 
-router.post("/update/token", verifyJWT, (req, res) => {
+router.post("/update/token", verifyJWT, async (req, res) => {
   try {
     // required field : user_id
-    const { user_id, token } = req.body;
-    if (!user_id)
-      return res
-        .status(400)
-        .json({ msg: "Bad Request", status: 400, success: false }); // User ID is required
-    //check firebase if uid exists
+    const validationResults = await updateWorkerTokenValidator(req.body);
 
-    // check for required fields
-    if (!token)
-      return res
-        .status(400)
-        .json({
-          msg: "Bad Request. Missing fields",
-          status: 400,
-          success: false,
-        }); // At least one field is required
+    if (validationResults.status !== 200) {
+      return res.status(400).json({
+        msg: "Bad Request. Missing fields",
+        status: 400,
+        success: false,
+        validationResults,
+      });
+    }
+
     // Find the user
     workerModel.findByIdAndUpdate(
       user_id,
@@ -406,26 +389,20 @@ router.post("/update/token", verifyJWT, (req, res) => {
   }
 });
 
-router.post("/update/ghc", verifyJWT, (req, res) => {
+router.post("/update/ghc", verifyJWT, async (req, res) => {
   try {
     // required field : user_id
-    const { user_id, ghc, ghc_n, ghc_exp } = req.body;
-    console.log(req.body);
-    if (!user_id)
-      return res
-        .status(400)
-        .json({ msg: "Bad Request", status: 400, success: false }); // User ID is required
-    //check firebase if uid exists
+    const validationResults = await updateWorkerGhcValidator(req.body);
 
-    // check for required fields
-    if (!ghc)
-      return res
-        .status(400)
-        .json({
-          msg: "Bad Request. Missing fields",
-          status: 400,
-          success: false,
-        }); // At least one field is required
+    if (validationResults.status !== 200) {
+      return res.status(400).json({
+        msg: "Bad Request. Missing fields",
+        status: 400,
+        success: false,
+        validationResults,
+      });
+    }
+    const { user_id, ghc, ghc_n, ghc_exp } = req.body;
     // Find the user
     workerProfileVerificationModel.findOneAndUpdate(
       { worker: user_id },
@@ -485,14 +462,12 @@ router.get("/nofications/:user_id", verifyJWT, async (req, res) => {
         return res
           .status(500)
           .json({ msg: err.message, status: 500, success: false }); // Internal Server Error
-      return res
-        .status(200)
-        .json({
-          msg: "Notifications Found",
-          status: 200,
-          success: true,
-          notifications,
-        }); // Notifications Found and returned
+      return res.status(200).json({
+        msg: "Notifications Found",
+        status: 200,
+        success: true,
+        notifications,
+      }); // Notifications Found and returned
     });
   } catch (e) {
     if (e.errorInfo) {
@@ -508,6 +483,16 @@ router.get("/nofications/:user_id", verifyJWT, async (req, res) => {
 router.post("/nofications/update/:user_id", verifyJWT, async (req, res) => {
   try {
     // required field : user_id
+    const validationResults = await updateUserNotificationsValidator(req.body);
+
+    if (validationResults.status !== 200) {
+      return res.status(400).json({
+        msg: "Bad Request. Missing fields",
+        status: 400,
+        success: false,
+        validationResults,
+      });
+    }
     const { user_id } = req.params;
     const { id } = req.body;
 
@@ -527,14 +512,12 @@ router.post("/nofications/update/:user_id", verifyJWT, async (req, res) => {
           return res
             .status(500)
             .json({ msg: err.message, status: 500, success: false }); // Internal Server Error
-        return res
-          .status(200)
-          .json({
-            msg: "Notification updated",
-            status: 200,
-            success: true,
-            notification,
-          }); // Notifications Found and returned
+        return res.status(200).json({
+          msg: "Notification updated",
+          status: 200,
+          success: true,
+          notification,
+        }); // Notifications Found and returned
       }
     );
   } catch (e) {

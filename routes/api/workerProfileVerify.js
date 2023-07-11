@@ -11,6 +11,17 @@ const { verifyJWT } = require("../../passport/common");
 const { commonError, returnUnAuthUserError } = require("../api/user_route");
 const { workerProfileModel } = require("../../models/worker_profile_model");
 const { cache } = require("../../cache/user_cache");
+const {
+  updateWorkerProfileImageValidator,
+  updateWorkerGhImagesValidator,
+  updateWorkerAgeValidator,
+  updateWorkerProofOfSkillValidator,
+  updateWorkerInsuranceValidator,
+  updateWorkerAddressValidator,
+  updateWorkerGenderValidator,
+  updateWorkerPhoneValidator,
+  updateWorkerPhoneVerifyCodeValidator,
+} = require("../validators/workerProfileVerify.validator");
 // worker profile verification data
 router.get("/:worker", verifyJWT, async (req, res) => {
   const { worker } = req.params;
@@ -38,25 +49,22 @@ router.get("/:worker", verifyJWT, async (req, res) => {
   }
 });
 // update selfie
-router.post("/update/image", verifyJWT, (req, res) => {
+router.post("/update/image", verifyJWT, async (req, res) => {
   try {
     // required field : user_id
-    const { worker, selfie } = req.body;
-    if (!worker)
-      return res
-        .status(400)
-        .json({ msg: "Bad Request", status: 400, success: false }); // User ID is required
-    //check firebase if uid exists
+    const validationResults = await updateWorkerProfileImageValidator(req.body);
 
-    // check for required fields
-    if (!selfie)
-      return res
-        .status(400)
-        .json({
-          msg: "Bad Request. Missing fields",
-          status: 400,
-          success: false,
-        }); // At least one field is required
+    if (validationResults.status !== 200) {
+      return res.status(400).json({
+        msg: "Bad Request. Missing fields",
+        status: 400,
+        success: false,
+        validationResults,
+      });
+    }
+
+    const { worker, selfie } = req.body;
+
     // Find the user
     workerProfileVerificationModel.findOneAndUpdate(
       { worker },
@@ -112,24 +120,22 @@ router.post("/update/image", verifyJWT, (req, res) => {
 //accepts url of front and back of ghana card
 // update ghc front
 // update ghc back
-router.post("/update/ghc-images", verifyJWT, (req, res) => {
+router.post("/update/ghc-images", verifyJWT, async (req, res) => {
   try {
     // required field : user_id
-    const { worker, gh_card_image_back, gh_card_image_front, gh_card_to_face } =
-      req.body;
-    if (!worker)
-      return res
-        .status(400)
-        .json({ msg: "Bad Request", status: 400, success: false }); // User ID is required
-    //check firebase if uid exists
+    const validationResults = await updateWorkerGhImagesValidator(req.body);
 
-    // check for required fields
-    if (!gh_card_image_back && !gh_card_image_front && !gh_card_to_face)
+    if (validationResults.status !== 200) {
       return res.status(400).json({
-        msg: "Bad Request. Missing fields. ghc_back and ghc_front are required",
+        msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-      }); // At least one field is required
+        validationResults,
+      });
+    }
+    const { worker, gh_card_image_back, gh_card_image_front, gh_card_to_face } =
+      req.body;
+
     // Find the user
     workerProfileVerificationModel.findOneAndUpdate(
       { worker },
@@ -167,23 +173,20 @@ router.post("/update/ghc-images", verifyJWT, (req, res) => {
   }
 });
 // update age doc
-router.post("/update/age-verify", verifyJWT, (req, res) => {
+router.post("/update/age-verify", verifyJWT, async (req, res) => {
   try {
     // required field : user_id
-    const { worker, age_doc } = req.body;
-    if (!worker)
-      return res
-        .status(400)
-        .json({ msg: "Bad Request", status: 400, success: false }); // User ID is required
-    //check firebase if uid exists
+    const validationResults = await updateWorkerAgeValidator(req.body);
 
-    // check for required fields
-    if (!age_doc)
+    if (validationResults.status !== 200) {
       return res.status(400).json({
-        msg: "Bad Request. Missing fields. ghc_back and ghc_front are required",
+        msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-      }); // At least one field is required
+        validationResults,
+      });
+    }
+    const { worker, age_doc } = req.body;
     // Find the user
     workerProfileVerificationModel.findOneAndUpdate(
       { worker },
@@ -219,23 +222,21 @@ router.post("/update/age-verify", verifyJWT, (req, res) => {
   }
 });
 // update proof of skill
-router.post("/update/pos", verifyJWT, (req, res) => {
+router.post("/update/pos", verifyJWT, async (req, res) => {
   try {
     // required field : user_id
-    const { worker, proof_skill } = req.body;
-    if (!worker)
-      return res
-        .status(400)
-        .json({ msg: "Bad Request", status: 400, success: false }); // User ID is required
-    //check firebase if uid exists
+    const validationResults = await updateWorkerProofOfSkillValidator(req.body);
 
-    // check for required fields
-    if (!proof_skill)
+    if (validationResults.status !== 200) {
       return res.status(400).json({
         msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-      }); // At least one field is required
+        validationResults,
+      });
+    }
+    const { worker, proof_skill } = req.body;
+
     // Find the user
     workerProfileVerificationModel.findOneAndUpdate(
       { worker },
@@ -271,23 +272,21 @@ router.post("/update/pos", verifyJWT, (req, res) => {
   }
 });
 // insurance
-router.post("/update/insurance", verifyJWT, (req, res) => {
+router.post("/update/insurance", verifyJWT, async (req, res) => {
   try {
     // required field : user_id
-    const { worker, insurance_doc } = req.body;
-    if (!worker)
-      return res
-        .status(400)
-        .json({ msg: "Bad Request", status: 400, success: false }); // User ID is required
-    //check firebase if uid exists
+    const validationResults = await updateWorkerInsuranceValidator(req.body);
 
-    // check for required fields
-    if (!insurance_doc)
+    if (validationResults.status !== 200) {
       return res.status(400).json({
         msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-      }); // At least one field is required
+        validationResults,
+      });
+    }
+    const { worker, insurance_doc } = req.body;
+
     // Find the user
     workerProfileVerificationModel.findOneAndUpdate(
       { worker },
@@ -324,23 +323,21 @@ router.post("/update/insurance", verifyJWT, (req, res) => {
   }
 });
 // update address
-router.post("/update/address", verifyJWT, (req, res) => {
+router.post("/update/address", verifyJWT, async (req, res) => {
   try {
     // required field : user_id
-    const { worker, address, latlng } = req.body;
-    if (!worker)
-      return res
-        .status(400)
-        .json({ msg: "Bad Request", status: 400, success: false }); // User ID is required
-    //check firebase if uid exists
+    const validationResults = await updateWorkerAddressValidator(req.body);
 
-    // check for required fields
-    if (!address)
+    if (validationResults.status !== 200) {
       return res.status(400).json({
         msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-      }); // At least one field is required
+        validationResults,
+      });
+    }
+    const { worker, address, latlng } = req.body;
+
     // Find the user
     workerProfileVerificationModel.findOneAndUpdate(
       { worker },
@@ -380,23 +377,21 @@ router.post("/update/address", verifyJWT, (req, res) => {
   }
 });
 // update gender
-router.post("/update/gender", verifyJWT, (req, res) => {
+router.post("/update/gender", verifyJWT, async (req, res) => {
   try {
     // required field : worker
-    const { worker, gender } = req.body;
-    if (!worker)
-      return res
-        .status(400)
-        .json({ msg: "Bad Request", status: 400, success: false }); // User ID is required
-    //check firebase if uid exists
+    const validationResults = await updateWorkerGenderValidator(req.body);
 
-    // check for required fields
-    if (!gender)
+    if (validationResults.status !== 200) {
       return res.status(400).json({
         msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-      }); // At least one field is required
+        validationResults,
+      });
+    }
+    const { worker, gender } = req.body;
+
     // Find the user
     workerProfileVerificationModel.findOneAndUpdate(
       { worker },
@@ -432,25 +427,23 @@ router.post("/update/gender", verifyJWT, (req, res) => {
     return commonError(res, e.message);
   }
 });
+
 // send verifcatioin code
 router.post("/phone/send-code", verifyJWT, async (req, res) => {
   //
   try {
     // required field : user_id
-    const { worker, phone } = req.body;
-    if (!worker)
-      return res
-        .status(400)
-        .json({ msg: "Bad Request", status: 400, success: false }); // User ID is required
-    //check firebase if uid exists
+    const validationResults = await updateWorkerPhoneValidator(req.body);
 
-    // check for required fields
-    if (!phone)
+    if (validationResults.status !== 200) {
       return res.status(400).json({
-        msg: "Bad Request. Missing fields. phone field is required",
+        msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-      }); // At least one field is required
+        validationResults,
+      });
+    }
+    const { worker, phone } = req.body;
     // check if the phone number is equal to the one in the database
     const user = await workerProfileVerificationModel.findOne({ worker });
     if (user.phone.toString() === phone.toString())
@@ -520,21 +513,17 @@ router.post("/phone/verify-code", verifyJWT, async (req, res) => {
   //
   try {
     // required field : user_id
-    const { worker, phone, code } = req.body;
-    if (!worker)
-      return res
-        .status(400)
-        .json({ msg: "Bad Request", status: 400, success: false }); // User ID is required
-    //check firebase if uid exists
+    const validationResults = await updateWorkerPhoneVerifyCodeValidator(req.body);
 
-    // check for required fields
-    if (!phone && !code)
+    if (validationResults.status !== 200) {
       return res.status(400).json({
-        msg: "Bad Request. Missing fields. phone and code fields are required",
+        msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-      }); // At least one field is required
-
+        validationResults,
+      });
+    }
+    const { worker, phone, code } = req.body;
     // Find the user
     workerProfileVerificationModel.findOne({ worker }, async (err, user) => {
       if (err)

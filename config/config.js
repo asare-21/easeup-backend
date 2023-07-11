@@ -3,6 +3,12 @@ const path = require("path");
 
 dotenv.config({ path: path.join(__dirname, "../../.env") });
 module.exports = {
+  joiOptions: {
+    errors: {
+      wrap: { label: "" },
+    },
+    abortEarly: true,
+  },
   port: process.env.PORT,
   mongoUri: process.env.MONGO_URI,
   jwtSecret: process.env.JWT_SECRET,
