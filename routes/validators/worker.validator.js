@@ -3,10 +3,11 @@ const { JoiValidator } = require("../../joi.validator");
 
 const createWorkerValidator = (params) => {
   const schema = Joi.object({
-    email: Joi.string().optional().label("Email"),
-    profile_name: Joi.string().optional().label("Profile Name"),
-    last_login: Joi.string().optional().label("Last login"),
+    email: Joi.string().required().label("Email"),
+    profile_name: Joi.string().required().label("Profile Name"),
+    last_login: Joi.string().required().label("Last login"),
     worker: Joi.string().required().label("Worker"),
+    token: Joi.string().required().label("Worker"),
   }).strict();
 
   const joiValidationResult = JoiValidator.validate(schema, params);

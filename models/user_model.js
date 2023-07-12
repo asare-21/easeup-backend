@@ -1,20 +1,21 @@
-const {
-    Schema,
-    model
-} = require('mongoose');
+const { Schema, model } = require("mongoose");
 
 const addressSchema = new Schema({
-    address: {
-        type: String,
-        default: ''
-    },
-    latlng: {
-        type: Array,
-        default: []
-    }
-})
+  address: {
+    type: String,
+    default: "",
+  },
+  latlng: {
+    type: Array,
+    default: [],
+  },
+});
 
 const userSchema = new Schema({
+  _id: {
+    type: String,
+    required: true,
+  },
   email: {
     type: String,
     unique: true,
@@ -98,4 +99,4 @@ const userSchema = new Schema({
   },
 });
 
-module.exports.userModel = model('User', userSchema);
+module.exports.userModel = model("User", userSchema);

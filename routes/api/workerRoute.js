@@ -175,6 +175,7 @@ router.post("/create", verifyJWT, async (req, res) => {
     const { worker, email, profile_name, last_login, token } = req.body;
 
     const existingUser = await userModel.findById(worker);
+
     if (existingUser)
       return res.status(400).json({
         msg: "An account with this email exists as a client. Sign in request denied.",
@@ -182,12 +183,6 @@ router.post("/create", verifyJWT, async (req, res) => {
         success: false,
       });
     // At least one field is required
-
-    if (!worker)
-      return res
-        .status(400)
-        .json({ msg: "Bad Request", status: 400, success: false }); // User ID is required
-    // required field : email, profile_name, last_login
 
     // check if user already exists
     const userExists = await workerModel.findOne({ _id: worker }).exec();
@@ -260,7 +255,7 @@ router.post("/create", verifyJWT, async (req, res) => {
         "welcome",
         token
       );
-      // // send notification to update user profile
+      // send notification to update user profile
       await createNotification(
         worker,
         "Update your profile",
