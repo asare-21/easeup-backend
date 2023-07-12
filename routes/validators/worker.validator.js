@@ -12,7 +12,7 @@ const createWorkerValidator = (params) => {
   const joiValidationResult = JoiValidator.validate(schema, params);
 
   if (joiValidationResult) {
-    return joiValidationResult;
+    return { status: 400, msg: joiValidationResult };
   }
 
   return { status: 200, msg: "success" };
@@ -27,7 +27,7 @@ const updateWorkerLocationValidator = (params) => {
   const joiValidationResult = JoiValidator.validate(schema, params);
 
   if (joiValidationResult) {
-    return joiValidationResult;
+    return { status: 400, msg: joiValidationResult };
   }
 
   return { status: 200, msg: "success" };
@@ -42,7 +42,7 @@ const updateWorkerTokenValidator = (params) => {
   const joiValidationResult = JoiValidator.validate(schema, params);
 
   if (joiValidationResult) {
-    return joiValidationResult;
+    return { status: 400, msg: joiValidationResult };
   }
 
   return { status: 200, msg: "success" };
@@ -59,7 +59,7 @@ const updateWorkerGhcValidator = (params) => {
   const joiValidationResult = JoiValidator.validate(schema, params);
 
   if (joiValidationResult) {
-    return joiValidationResult;
+    return { status: 400, msg: joiValidationResult };
   }
 
   return { status: 200, msg: "success" };
@@ -73,7 +73,7 @@ const updateUserNotificationsValidator = (params) => {
   const joiValidationResult = JoiValidator.validate(schema, params);
 
   if (joiValidationResult) {
-    return joiValidationResult;
+    return { status: 400, msg: joiValidationResult };
   }
 
   return { status: 200, msg: "success" };

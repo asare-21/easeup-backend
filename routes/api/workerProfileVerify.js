@@ -59,7 +59,7 @@ router.post("/update/image", verifyJWT, async (req, res) => {
         msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-        validationResults,
+        validationResults:validationResults.msg
       });
     }
 
@@ -130,7 +130,7 @@ router.post("/update/ghc-images", verifyJWT, async (req, res) => {
         msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-        validationResults,
+        validationResults:validationResults.msg
       });
     }
     const { worker, gh_card_image_back, gh_card_image_front, gh_card_to_face } =
@@ -183,7 +183,7 @@ router.post("/update/age-verify", verifyJWT, async (req, res) => {
         msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-        validationResults,
+        validationResults:validationResults.msg
       });
     }
     const { worker, age_doc } = req.body;
@@ -232,7 +232,7 @@ router.post("/update/pos", verifyJWT, async (req, res) => {
         msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-        validationResults,
+        validationResults:validationResults.msg
       });
     }
     const { worker, proof_skill } = req.body;
@@ -282,7 +282,7 @@ router.post("/update/insurance", verifyJWT, async (req, res) => {
         msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-        validationResults,
+        validationResults:validationResults.msg
       });
     }
     const { worker, insurance_doc } = req.body;
@@ -333,7 +333,7 @@ router.post("/update/address", verifyJWT, async (req, res) => {
         msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-        validationResults,
+        validationResults:validationResults.msg
       });
     }
     const { worker, address, latlng } = req.body;
@@ -387,7 +387,7 @@ router.post("/update/gender", verifyJWT, async (req, res) => {
         msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-        validationResults,
+        validationResults:validationResults.msg
       });
     }
     const { worker, gender } = req.body;
@@ -440,7 +440,7 @@ router.post("/phone/send-code", verifyJWT, async (req, res) => {
         msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-        validationResults,
+        validationResults:validationResults.msg
       });
     }
     const { worker, phone } = req.body;
@@ -520,7 +520,7 @@ router.post("/phone/verify-code", verifyJWT, async (req, res) => {
         msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-        validationResults,
+        validationResults:validationResults.msg
       });
     }
     const { worker, phone, code } = req.body;

@@ -10,7 +10,7 @@ const updateWorkerProfileImageValidator = (params) => {
   const joiValidationResult = JoiValidator.validate(schema, params);
 
   if (joiValidationResult) {
-    return joiValidationResult;
+    return { status: 400, msg: joiValidationResult };
   }
 
   return { status: 200, msg: "success" };
@@ -27,7 +27,7 @@ const updateWorkerGhImagesValidator = (params) => {
   const joiValidationResult = JoiValidator.validate(schema, params);
 
   if (joiValidationResult) {
-    return joiValidationResult;
+    return { status: 400, msg: joiValidationResult };
   }
 
   return { status: 200, msg: "success" };
@@ -42,7 +42,7 @@ const updateWorkerAgeValidator = (params) => {
   const joiValidationResult = JoiValidator.validate(schema, params);
 
   if (joiValidationResult) {
-    return joiValidationResult;
+    return { status: 400, msg: joiValidationResult };
   }
 
   return { status: 200, msg: "success" };
@@ -57,7 +57,7 @@ const updateWorkerProofOfSkillValidator = (params) => {
   const joiValidationResult = JoiValidator.validate(schema, params);
 
   if (joiValidationResult) {
-    return joiValidationResult;
+    return { status: 400, msg: joiValidationResult };
   }
 
   return { status: 200, msg: "success" };
@@ -72,7 +72,7 @@ const updateWorkerInsuranceValidator = (params) => {
   const joiValidationResult = JoiValidator.validate(schema, params);
 
   if (joiValidationResult) {
-    return joiValidationResult;
+    return { status: 400, msg: joiValidationResult };
   }
 
   return { status: 200, msg: "success" };
@@ -82,13 +82,13 @@ const updateWorkerAddressValidator = (params) => {
   const schema = Joi.object({
     worker: Joi.string().required().label("Worker"),
     address: Joi.string().required().label("Address"),
-    latlng: Joi.string().optional().label("Latlng"),
+    latlng: Joi.array().optional().label("Latlng"),
   }).strict();
 
   const joiValidationResult = JoiValidator.validate(schema, params);
 
   if (joiValidationResult) {
-    return joiValidationResult;
+    return { status: 400, msg: joiValidationResult };
   }
 
   return { status: 200, msg: "success" };
@@ -103,7 +103,7 @@ const updateWorkerGenderValidator = (params) => {
   const joiValidationResult = JoiValidator.validate(schema, params);
 
   if (joiValidationResult) {
-    return joiValidationResult;
+    return { status: 400, msg: joiValidationResult };
   }
 
   return { status: 200, msg: "success" };
@@ -118,7 +118,7 @@ const updateWorkerPhoneValidator = (params) => {
   const joiValidationResult = JoiValidator.validate(schema, params);
 
   if (joiValidationResult) {
-    return joiValidationResult;
+    return { status: 400, msg: joiValidationResult };
   }
 
   return { status: 200, msg: "success" };
@@ -134,7 +134,7 @@ const updateWorkerPhoneVerifyCodeValidator = (params) => {
   const joiValidationResult = JoiValidator.validate(schema, params);
 
   if (joiValidationResult) {
-    return joiValidationResult;
+    return { status: 400, msg: joiValidationResult };
   }
 
   return { status: 200, msg: "success" };
@@ -151,4 +151,3 @@ module.exports = {
   updateWorkerPhoneValidator,
   updateWorkerPhoneVerifyCodeValidator,
 };
-

@@ -26,6 +26,19 @@ const {
   getUserNotificationsCache,
 } = require("../../cache/user_cache");
 const { workerModel } = require("../../models/worker_models");
+const {
+  updateImageValidator,
+  updateAddressValidator,
+  updateGenderValidator,
+  updateTokenValidator,
+  updatePhoneValidator,
+  updateGhcValidator,
+  updateUserValidator,
+  sendCodeValidator,
+  verifyCodeValidator,
+  createUserValidator,
+  updateUserNotificationValidator,
+} = require("../validators/user.validator");
 const userCache = cache;
 
 function returnUnAuthUserError(res, msg) {
@@ -161,23 +174,19 @@ router.get("/profile/:user_id", verifyJWT, getUserCache, async (req, res) => {
   }
 });
 
-router.post("/update/image", verifyJWT, (req, res) => {
+router.post("/update/image", verifyJWT, async (req, res) => {
   try {
     // required field : user_id
-    const { user_id, profile_picture } = req.body;
-    if (!user_id)
-      return res
-        .status(400)
-        .json({ msg: "Bad Request", status: 400, success: false }); // User ID is required
-    //check firebase if uid exists
-
-    // check for required fields
-    if (!profile_picture)
+    const validationResults = await updateImageValidator(req.body);
+    if (validationResults.status !== 200) {
       return res.status(400).json({
         msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-      }); // At least one field is required
+        validationResults:validationResults.msg
+      });
+    }
+    const { user_id, profile_picture } = req.body;
     // Find the user
     userModel.findByIdAndUpdate(
       user_id,
@@ -216,23 +225,20 @@ router.post("/update/image", verifyJWT, (req, res) => {
   }
 });
 
-router.post("/update/address", verifyJWT, (req, res) => {
+router.post("/update/address", verifyJWT, async (req, res) => {
   try {
-    // required field : user_id
-    const { user_id, address, latlng } = req.body;
-    if (!user_id)
-      return res
-        .status(400)
-        .json({ msg: "Bad Request", status: 400, success: false }); // User ID is required
-    //check firebase if uid exists
-
-    // check for required fields
-    if (!address)
+    // validate endpoint
+    const validationResults = await updateAddressValidator(req.body);
+    if (validationResults.status !== 200) {
       return res.status(400).json({
         msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-      }); // At least one field is required
+        validationResults:validationResults.msg
+      });
+    }
+    const { user_id, address, latlng } = req.body;
+
     // Find the user
     userModel.findByIdAndUpdate(
       user_id,
@@ -273,23 +279,20 @@ router.post("/update/address", verifyJWT, (req, res) => {
   }
 });
 
-router.post("/update/gender", verifyJWT, (req, res) => {
+router.post("/update/gender", verifyJWT, async (req, res) => {
   try {
-    // required field : user_id
-    const { user_id, gender } = req.body;
-    if (!user_id)
-      return res
-        .status(400)
-        .json({ msg: "Bad Request", status: 400, success: false }); // User ID is required
-    //check firebase if uid exists
-
-    // check for required fields
-    if (!gender)
+    // update gender
+    const validationResults = await updateGenderValidator(req.body);
+    if (validationResults.status !== 200) {
       return res.status(400).json({
         msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-      }); // At least one field is required
+        validationResults:validationResults.msg
+      });
+    }
+    const { user_id, gender } = req.body;
+
     // Find the user
     userModel.findByIdAndUpdate(
       user_id,
@@ -327,23 +330,19 @@ router.post("/update/gender", verifyJWT, (req, res) => {
   }
 });
 
-router.post("/update/token", verifyJWT, (req, res) => {
+router.post("/update/token", verifyJWT, async (req, res) => {
   try {
     // required field : user_id
-    const { user_id, token } = req.body;
-    if (!user_id)
-      return res
-        .status(400)
-        .json({ msg: "Bad Request", status: 400, success: false }); // User ID is required
-    //check firebase if uid exists
-
-    // check for required fields
-    if (!token)
+    const validationResults = await updateTokenValidator(req.body);
+    if (validationResults.status !== 200) {
       return res.status(400).json({
         msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-      }); // At least one field is required
+        validationResults:validationResults.msg
+      });
+    }
+    const { user_id, token } = req.body;
     // Find the user
     userModel.findByIdAndUpdate(
       user_id,
@@ -381,23 +380,20 @@ router.post("/update/token", verifyJWT, (req, res) => {
   }
 });
 
-router.post("/update/phone", verifyJWT, (req, res) => {
+router.post("/update/phone", verifyJWT, async (req, res) => {
   try {
     // required field : user_id
-    const { user_id, phone } = req.body;
-    if (!user_id)
-      return res
-        .status(400)
-        .json({ msg: "Bad Request", status: 400, success: false }); // User ID is required
-    //check firebase if uid exists
-
-    // check for required fields
-    if (!phone)
+    const validationResults = await updatePhoneValidator(req.body);
+    if (validationResults.status !== 200) {
       return res.status(400).json({
         msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-      }); // At least one field is required
+        validationResults:validationResults.msg
+      });
+    }
+    const { user_id, phone } = req.body;
+
     // Find the user
     userModel.findByIdAndUpdate(
       user_id,
@@ -436,24 +432,20 @@ router.post("/update/phone", verifyJWT, (req, res) => {
   }
 });
 
-router.post("/update/ghc", verifyJWT, (req, res) => {
+router.post("/update/ghc", verifyJWT, async (req, res) => {
   try {
     // required field : user_id
-    const { user_id, ghc, ghc_n, ghc_exp } = req.body;
-    console.log(req.body);
-    if (!user_id)
-      return res
-        .status(400)
-        .json({ msg: "Bad Request", status: 400, success: false }); // User ID is required
-    //check firebase if uid exists
-
-    // check for required fields
-    if (!ghc)
+    const validationResults = await updateGhcValidator(req.body);
+    if (validationResults.status !== 200) {
       return res.status(400).json({
         msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-      }); // At least one field is required
+        validationResults:validationResults.msg
+      });
+    }
+    const { user_id, ghc, ghc_n, ghc_exp } = req.body;
+
     // Find the user
     userModel.findByIdAndUpdate(
       user_id,
@@ -497,25 +489,17 @@ router.post("/update/ghc", verifyJWT, (req, res) => {
 router.post("/update", verifyJWT, async (req, res) => {
   try {
     // required field : user_id
-    const { user_id, gender, dob, phone, address } = req.body;
-    if (!user_id)
-      return res
-        .status(400)
-        .json({ msg: "Bad Request", status: 400, success: false }); // User ID is required
-    //check firebase if uid exists
-
-    // check for required fields
-    if (
-      !req.body.profile_name &&
-      !req.body.phone &&
-      !req.body.address &&
-      !req.body.profile_picture
-    )
+    const validationResults = await updateUserValidator(req.body);
+    if (validationResults.status !== 200) {
       return res.status(400).json({
         msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-      }); // At least one field is required
+        validationResults:validationResults.msg
+      });
+    }
+    const { user_id, gender, dob, phone, address } = req.body;
+
     // Find the user
     userModel.findByIdAndUpdate(
       user_id,
@@ -559,20 +543,17 @@ router.post("/phone/send-code", verifyJWT, async (req, res) => {
   //
   try {
     // required field : user_id
-    const { user_id, phone } = req.body;
-    if (!user_id)
-      return res
-        .status(400)
-        .json({ msg: "Bad Request", status: 400, success: false }); // User ID is required
-    //check firebase if uid exists
-
-    // check for required fields
-    if (!phone)
+    const validationResults = await sendCodeValidator(req.body);
+    if (validationResults.status !== 200) {
       return res.status(400).json({
-        msg: "Bad Request. Missing fields. phone field is required",
+        msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-      }); // At least one field is required
+        validationResults:validationResults.msg
+      });
+    }
+    const { user_id, phone } = req.body;
+
     // check if the phone number is equal to the one in the database
     const user = await userModel.findById(user_id);
     if (user.phone.toString() === phone.toString())
@@ -657,20 +638,16 @@ router.post("/phone/verify-code", verifyJWT, async (req, res) => {
   //
   try {
     // required field : user_id
-    const { user_id, phone, code } = req.body;
-    if (!user_id)
-      return res
-        .status(400)
-        .json({ msg: "Bad Request", status: 400, success: false }); // User ID is required
-    //check firebase if uid exists
-
-    // check for required fields
-    if (!phone && !code)
+    const validationResults = await verifyCodeValidator(req.body);
+    if (validationResults.status !== 200) {
       return res.status(400).json({
-        msg: "Bad Request. Missing fields. phone and code fields are required",
+        msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-      }); // At least one field is required
+        validationResults:validationResults.msg
+      });
+    }
+    const { user_id, phone, code } = req.body;
 
     // Find the user
     userModel.findById(user_id, async (err, user) => {
@@ -712,35 +689,17 @@ router.post("/phone/verify-code", verifyJWT, async (req, res) => {
 router.post("/create", verifyJWT, async (req, res) => {
   try {
     // required field : user_id
-    const { user_id, email, profile_name, last_login, token } = req.body;
-    console.log(req.body);
-    if (!user_id)
-      return res
-        .status(400)
-        .json({ msg: "Bad Request", status: 400, success: false }); // User ID is required
-    // required field : email, profile_name, last_login
-
-    const required_fields = [
-      "email",
-      "profile_name",
-      "last_login",
-      "token",
-      "user_id",
-    ];
-    var missing_fields = [];
-    // check for required fields
-    for (let i = 0; i < required_fields.length; i++) {
-      if (!req.body[required_fields[i]]) {
-        missing_fields.push(required_fields[i]);
-      }
-    }
-    if (missing_fields.length > 0)
+    const validationResults = await createUserValidator(req.body);
+    if (validationResults.status !== 200) {
       return res.status(400).json({
         msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-        missing_fields,
-      }); // At least one field is required
+        validationResults:validationResults.msg
+      });
+    }
+    const { user_id, email, profile_name, last_login, token } = req.body;
+
     const existingWorker = await workerModel.findById(user_id).exec();
     if (existingWorker) {
       // Worker Already Exists
@@ -862,6 +821,15 @@ router.get(
 router.post("/nofications/update/:user_id", verifyJWT, async (req, res) => {
   try {
     // required field : user_id
+    const validationResults = await updateUserNotificationValidator(req.body);
+    if (validationResults.status !== 200) {
+      return res.status(400).json({
+        msg: "Bad Request. Missing fields",
+        status: 400,
+        success: false,
+        validationResults:validationResults.msg
+      });
+    }
     const { user_id } = req.params;
     const { id } = req.body;
 

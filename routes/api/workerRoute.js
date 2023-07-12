@@ -158,7 +158,7 @@ router.get(
   }
 );
 
-router.post("/create", async (req, res) => {
+router.post("/create", verifyJWT, async (req, res) => {
   try {
     // validating request body submitted
     const validationResults = await createWorkerValidator(req.body);
@@ -168,7 +168,7 @@ router.post("/create", async (req, res) => {
         msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-        validationResults,
+        validationResults: validationResults.msg,
       });
     }
 
@@ -300,7 +300,7 @@ router.post("/location", verifyJWT, async (req, res) => {
         msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-        validationResults,
+        validationResults: validationResults.msg,
       });
     }
 
@@ -348,7 +348,7 @@ router.post("/update/token", verifyJWT, async (req, res) => {
         msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-        validationResults,
+        validationResults: validationResults.msg,
       });
     }
 
@@ -399,7 +399,7 @@ router.post("/update/ghc", verifyJWT, async (req, res) => {
         msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-        validationResults,
+        validationResults: validationResults.msg,
       });
     }
     const { user_id, ghc, ghc_n, ghc_exp } = req.body;
@@ -490,7 +490,7 @@ router.post("/nofications/update/:user_id", verifyJWT, async (req, res) => {
         msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-        validationResults,
+        validationResults: validationResults.msg,
       });
     }
     const { user_id } = req.params;
