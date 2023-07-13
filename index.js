@@ -31,8 +31,8 @@ const { jobPlanRoute } = require("./routes/api/job_plan_route");
 const authRoutes = require("./routes/api/auth");
 const { jobs } = require("./routes/api/jobs");
 const limiter = rateLimit({
-  windowMs: 100, //
-  max: 1000,
+  windowMs: 600000, //
+  max: 10000,
   standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
   legacyHeaders: true, // Disable the `X-RateLimit-*` headers
   message: {
@@ -55,7 +55,6 @@ const limiter = rateLimit({
 });
 
 const session = require("express-session");
-const { verifyJWT } = require("./passport/common");
 const passport = require("passport");
 require("./passport/passport");
 const cors = require("cors");
@@ -63,6 +62,7 @@ const { subscribeRoute } = require("./routes/api/subscribe");
 const { recommendationRoute } = require("./routes/api/recommendation");
 const { servicesModel } = require("./models/services_model");
 const { servicesRoute } = require("./routes/api/services");
+const { jobRequestRoute } = require("./routes/api/job_requests_route");
 
 //Auth
 app.use(
@@ -100,6 +100,7 @@ app.use("/recommend", recommendationRoute);
 app.use("/jplan", jobPlanRoute);
 app.use("/dashboard", dashboard);
 app.use("/services", servicesRoute)
+app.use("/j-requests", jobRequestRoute)
 // handle 404
 app.use((req, res, next) => {
   return res.status(404).json({
