@@ -4,7 +4,14 @@ const { verifyJWT } = require("../passport/common");
 
 router.get(
   "/:worker",
+  verifyJWT,
   workerProfileVerifyController.getWorkerProfileVerification
+);
+
+router.post(
+  "/update/image",
+  verifyJWT,
+  workerProfileVerifyController.updateWorkerSelfie
 );
 
 module.exports.workerProfileVerificationRoute = router;

@@ -9,6 +9,11 @@ class WorkerProfileVerifyController {
       );
     res.status(status).send(responseData);
   };
+  updateWorkerSelfie = async (req, res, next) => {
+    const { status, ...responseData } =
+      await WorkerProfileVerificationService.updateWorkerSelfie(req, res);
+    res.status(status).send(responseData);
+  };
 }
 
 module.exports = new WorkerProfileVerifyController();
