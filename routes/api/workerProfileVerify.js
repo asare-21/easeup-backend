@@ -59,7 +59,7 @@ router.post("/update/image", verifyJWT, async (req, res) => {
         msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-        validationResults:validationResults.msg
+        validationResults: validationResults.msg
       });
     }
 
@@ -75,7 +75,7 @@ router.post("/update/image", verifyJWT, async (req, res) => {
         if (err) {
           log.warn(err.message);
           return res
-            .status(500)
+
             .json({ msg: err.message, status: 500, success: false }); // Internal Server Error
         }
         if (!user)
@@ -93,7 +93,7 @@ router.post("/update/image", verifyJWT, async (req, res) => {
             if (err) {
               log.warn(err.message);
               return res
-                .status(500)
+
                 .json({ msg: err.message, status: 500, success: false }); // Internal Server Error
             }
             cache.del(`worker-profile/${worker}`);
@@ -130,7 +130,7 @@ router.post("/update/ghc-images", verifyJWT, async (req, res) => {
         msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-        validationResults:validationResults.msg
+        validationResults: validationResults.msg
       });
     }
     const { worker, gh_card_image_back, gh_card_image_front, gh_card_to_face } =
@@ -148,7 +148,7 @@ router.post("/update/ghc-images", verifyJWT, async (req, res) => {
         if (err) {
           log.warn(err.message);
           return res
-            .status(500)
+
             .json({ msg: err.message, status: 500, success: false }); // Internal Server Error
         }
         if (!user)
@@ -183,7 +183,7 @@ router.post("/update/age-verify", verifyJWT, async (req, res) => {
         msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-        validationResults:validationResults.msg
+        validationResults: validationResults.msg
       });
     }
     const { worker, age_doc } = req.body;
@@ -197,7 +197,7 @@ router.post("/update/age-verify", verifyJWT, async (req, res) => {
         if (err) {
           log.warn(err.message);
           return res
-            .status(500)
+
             .json({ msg: err.message, status: 500, success: false }); // Internal Server Error
         }
         if (!user)
@@ -232,7 +232,7 @@ router.post("/update/pos", verifyJWT, async (req, res) => {
         msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-        validationResults:validationResults.msg
+        validationResults: validationResults.msg
       });
     }
     const { worker, proof_skill } = req.body;
@@ -247,7 +247,7 @@ router.post("/update/pos", verifyJWT, async (req, res) => {
         if (err) {
           log.warn(err.message);
           return res
-            .status(500)
+
             .json({ msg: err.message, status: 500, success: false }); // Internal Server Error
         }
         if (!user)
@@ -282,7 +282,7 @@ router.post("/update/insurance", verifyJWT, async (req, res) => {
         msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-        validationResults:validationResults.msg
+        validationResults: validationResults.msg
       });
     }
     const { worker, insurance_doc } = req.body;
@@ -297,7 +297,7 @@ router.post("/update/insurance", verifyJWT, async (req, res) => {
         if (err) {
           log.warn(err.message);
           return res
-            .status(500)
+
             .json({ msg: err.message, status: 500, success: false }); // Internal Server Error
         }
         if (!user)
@@ -333,7 +333,7 @@ router.post("/update/address", verifyJWT, async (req, res) => {
         msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-        validationResults:validationResults.msg
+        validationResults: validationResults.msg
       });
     }
     const { worker, address, latlng } = req.body;
@@ -351,7 +351,7 @@ router.post("/update/address", verifyJWT, async (req, res) => {
         if (err) {
           log.warn(err.message);
           return res
-            .status(500)
+
             .json({ msg: err.message, status: 500, success: false }); // Internal Server Error
         }
         if (!user)
@@ -387,7 +387,7 @@ router.post("/update/gender", verifyJWT, async (req, res) => {
         msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-        validationResults:validationResults.msg
+        validationResults: validationResults.msg
       });
     }
     const { worker, gender } = req.body;
@@ -402,7 +402,7 @@ router.post("/update/gender", verifyJWT, async (req, res) => {
         if (err) {
           log.warn(err.message);
           return res
-            .status(500)
+
             .json({ msg: err.message, status: 500, success: false }); // Internal Server Error
         }
         if (!user)
@@ -440,7 +440,7 @@ router.post("/phone/send-code", verifyJWT, async (req, res) => {
         msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-        validationResults:validationResults.msg
+        validationResults: validationResults.msg
       });
     }
     const { worker, phone } = req.body;
@@ -482,7 +482,7 @@ router.post("/phone/send-code", verifyJWT, async (req, res) => {
       },
       async (err, user) => {
         if (err)
-          return res.status(500).json({
+          return res.json({
             msg: "Internal Server Error",
             status: 500,
             success: false,
@@ -520,7 +520,7 @@ router.post("/phone/verify-code", verifyJWT, async (req, res) => {
         msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-        validationResults:validationResults.msg
+        validationResults: validationResults.msg
       });
     }
     const { worker, phone, code } = req.body;
@@ -528,7 +528,7 @@ router.post("/phone/verify-code", verifyJWT, async (req, res) => {
     workerProfileVerificationModel.findOne({ worker }, async (err, user) => {
       if (err)
         return res
-          .status(500)
+
           .json({ msg: "Internal Server Error", status: 500, success: false }); // Internal Server Error
       if (!user)
         return res

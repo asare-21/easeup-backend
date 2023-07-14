@@ -49,7 +49,7 @@ function returnUnAuthUserError(res, msg) {
 
 function commonError(res, msg) {
   console.log(msg);
-  return res.status(500).json({ msg, status: 500, success: false });
+  return res.json({ msg, success: false });
 }
 
 async function createNotification(user_id, title, body, type, token) {
@@ -137,7 +137,7 @@ router.get("/profile/:user_id", verifyJWT, getUserCache, async (req, res) => {
     // cache data
 
     if (!userData)
-      return res.status(500).json({
+      return res.json({
         msg: "Something went wrong. User not found",
         status: 500,
         success: false,
@@ -155,7 +155,7 @@ router.get("/profile/:user_id", verifyJWT, getUserCache, async (req, res) => {
     // userModel.findById(user_id, (err, user) => {
     //     if (err) {
     //         log.warn(err.message)
-    //         return res.status(500).json({ msg: err.message, status: 500, success: false }) // Internal Server Error
+    //         return res.json({ msg: err.message, status: 500, success: false }) // Internal Server Error
     //     }
     //     if (!user) return res.status(404).json({ msg: 'User Not Found', status: 404, success: false }) // User Not Found
     //     userCache.set(`user/${user_id}`, user);
@@ -183,7 +183,7 @@ router.post("/update/image", verifyJWT, async (req, res) => {
         msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-        validationResults:validationResults.msg
+        validationResults: validationResults.msg
       });
     }
     const { user_id, profile_picture } = req.body;
@@ -197,7 +197,7 @@ router.post("/update/image", verifyJWT, async (req, res) => {
         if (err) {
           log.warn(err.message);
           return res
-            .status(500)
+
             .json({ msg: err.message, status: 500, success: false }); // Internal Server Error
         }
         if (!user)
@@ -234,7 +234,7 @@ router.post("/update/address", verifyJWT, async (req, res) => {
         msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-        validationResults:validationResults.msg
+        validationResults: validationResults.msg
       });
     }
     const { user_id, address, latlng } = req.body;
@@ -252,7 +252,7 @@ router.post("/update/address", verifyJWT, async (req, res) => {
         if (err) {
           log.warn(err.message);
           return res
-            .status(500)
+
             .json({ msg: err.message, status: 500, success: false }); // Internal Server Error
         }
         if (!user)
@@ -288,7 +288,7 @@ router.post("/update/gender", verifyJWT, async (req, res) => {
         msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-        validationResults:validationResults.msg
+        validationResults: validationResults.msg
       });
     }
     const { user_id, gender } = req.body;
@@ -303,7 +303,7 @@ router.post("/update/gender", verifyJWT, async (req, res) => {
         if (err) {
           log.warn(err.message);
           return res
-            .status(500)
+
             .json({ msg: err.message, status: 500, success: false }); // Internal Server Error
         }
         if (!user)
@@ -339,7 +339,7 @@ router.post("/update/token", verifyJWT, async (req, res) => {
         msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-        validationResults:validationResults.msg
+        validationResults: validationResults.msg
       });
     }
     const { user_id, token } = req.body;
@@ -353,7 +353,7 @@ router.post("/update/token", verifyJWT, async (req, res) => {
         if (err) {
           log.warn(err.message);
           return res
-            .status(500)
+
             .json({ msg: err.message, status: 500, success: false }); // Internal Server Error
         }
         if (!user)
@@ -389,7 +389,7 @@ router.post("/update/phone", verifyJWT, async (req, res) => {
         msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-        validationResults:validationResults.msg
+        validationResults: validationResults.msg
       });
     }
     const { user_id, phone } = req.body;
@@ -404,7 +404,7 @@ router.post("/update/phone", verifyJWT, async (req, res) => {
         if (err) {
           log.warn(err.message);
           return res
-            .status(500)
+
             .json({ msg: err.message, status: 500, success: false }); // Internal Server Error
         }
         if (!user)
@@ -441,7 +441,7 @@ router.post("/update/ghc", verifyJWT, async (req, res) => {
         msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-        validationResults:validationResults.msg
+        validationResults: validationResults.msg
       });
     }
     const { user_id, ghc, ghc_n, ghc_exp } = req.body;
@@ -458,7 +458,7 @@ router.post("/update/ghc", verifyJWT, async (req, res) => {
         if (err) {
           log.warn(err.message);
           return res
-            .status(500)
+
             .json({ msg: err.message, status: 500, success: false }); // Internal Server Error
         }
         if (!user)
@@ -495,7 +495,7 @@ router.post("/update", verifyJWT, async (req, res) => {
         msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-        validationResults:validationResults.msg
+        validationResults: validationResults.msg
       });
     }
     const { user_id, gender, dob, phone, address } = req.body;
@@ -513,7 +513,7 @@ router.post("/update", verifyJWT, async (req, res) => {
       },
       (err, user) => {
         if (err)
-          return res.status(500).json({
+          return res.json({
             msg: "Internal Server Error",
             status: 500,
             success: false,
@@ -549,7 +549,7 @@ router.post("/phone/send-code", verifyJWT, async (req, res) => {
         msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-        validationResults:validationResults.msg
+        validationResults: validationResults.msg
       });
     }
     const { user_id, phone } = req.body;
@@ -605,7 +605,7 @@ router.post("/phone/send-code", verifyJWT, async (req, res) => {
       },
       async (err, user) => {
         if (err)
-          return res.status(500).json({
+          return res.json({
             msg: "Internal Server Error",
             status: 500,
             success: false,
@@ -644,7 +644,7 @@ router.post("/phone/verify-code", verifyJWT, async (req, res) => {
         msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-        validationResults:validationResults.msg
+        validationResults: validationResults.msg
       });
     }
     const { user_id, phone, code } = req.body;
@@ -653,7 +653,7 @@ router.post("/phone/verify-code", verifyJWT, async (req, res) => {
     userModel.findById(user_id, async (err, user) => {
       if (err)
         return res
-          .status(500)
+
           .json({ msg: "Internal Server Error", status: 500, success: false }); // Internal Server Error
       if (!user)
         return res
@@ -695,7 +695,7 @@ router.post("/create", verifyJWT, async (req, res) => {
         msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-        validationResults:validationResults.msg
+        validationResults: validationResults.msg
       });
     }
     const { user_id, email, profile_name, last_login, token } = req.body;
@@ -738,7 +738,7 @@ router.post("/create", verifyJWT, async (req, res) => {
       console.log(err);
       if (err)
         return res
-          .status(500)
+
           .json({ msg: err.message, status: 500, success: false }); // Internal Server Error
 
       // create notification
@@ -792,7 +792,7 @@ router.get(
       notificationModel.find({ user: user_id }, (err, notifications) => {
         if (err)
           return res
-            .status(500)
+
             .json({ msg: err.message, status: 500, success: false }); // Internal Server Error
         // cache data
         userCache.set(
@@ -827,7 +827,7 @@ router.post("/nofications/update/:user_id", verifyJWT, async (req, res) => {
         msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-        validationResults:validationResults.msg
+        validationResults: validationResults.msg
       });
     }
     const { user_id } = req.params;
@@ -848,7 +848,7 @@ router.post("/nofications/update/:user_id", verifyJWT, async (req, res) => {
       (err, notification) => {
         if (err)
           return res
-            .status(500)
+
             .json({ msg: err.message, status: 500, success: false }); // Internal Server Error
         return res.status(200).json({
           msg: "Notification updated",
@@ -883,7 +883,7 @@ router.get("/bookmarks", verifyJWT, async (req, res) => {
     userModel.findById(user_id, (err, user) => {
       if (err)
         return res
-          .status(500)
+
           .json({ msg: "Internal Server Error", status: 500, success: false }); // Internal Server Error
       if (!user)
         return res
@@ -892,7 +892,7 @@ router.get("/bookmarks", verifyJWT, async (req, res) => {
       // Find the bookmarks
       bookmarkModel.find({ user: user_id }, (err, bookmarks) => {
         if (err)
-          return res.status(500).json({
+          return res.json({
             msg: "Internal Server Error",
             status: 500,
             success: false,
@@ -930,7 +930,7 @@ router.delete("/bookmarks/delete", verifyJWT, async (req, res) => {
     userModel.findById(user_id, (err, user) => {
       if (err)
         return res
-          .status(500)
+
           .json({ msg: "Internal Server Error", status: 500, success: false }); // Internal Server Error
       if (!user)
         return res
@@ -939,7 +939,7 @@ router.delete("/bookmarks/delete", verifyJWT, async (req, res) => {
       // Find the bookmark and delete it
       bookmarkModel.findByIdAndDelete(bookmark_id, (err) => {
         if (err)
-          return res.status(500).json({
+          return res.json({
             msg: "Internal Server Error",
             status: 500,
             success: false,

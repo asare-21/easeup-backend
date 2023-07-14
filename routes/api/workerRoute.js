@@ -219,7 +219,7 @@ router.post("/create", verifyJWT, async (req, res) => {
       if (err) {
         console.log(err);
         return res
-          .status(500)
+
           .json({ msg: err.message, status: 500, success: false }); // Internal Server Error
       }
       workerCache.set(`worker/${worker}`, {
@@ -237,14 +237,14 @@ router.post("/create", verifyJWT, async (req, res) => {
         if (err) {
           console.log(err);
           await workerModel.findOneAndDelete({ worker });
-          // return res.status(500).json({ msg: err.message, status: 500, success: false }) // Internal Server Error
+          // return res.json({ msg: err.message, status: 500, success: false }) // Internal Server Error
         }
       });
       await userVerification.save(async (err) => {
         if (err) {
           console.log(err);
           await workerModel.findOneAndDelete({ worker });
-          await workerProfileModel.findByIdAndDelete({ worker }); // return res.status(500).json({ msg: err.message, status: 500, success: false }) // Internal Server Error
+          await workerProfileModel.findByIdAndDelete({ worker }); // return res.json({ msg: err.message, status: 500, success: false }) // Internal Server Error
         }
       });
       // create notification
@@ -357,7 +357,7 @@ router.post("/update/token", verifyJWT, async (req, res) => {
         if (err) {
           log.warn(err.message);
           return res
-            .status(500)
+
             .json({ msg: err.message, status: 500, success: false }); // Internal Server Error
         }
         if (!user)
@@ -413,7 +413,7 @@ router.post("/update/ghc", verifyJWT, async (req, res) => {
         if (err) {
           log.warn(err.message);
           return res
-            .status(500)
+
             .json({ msg: err.message, status: 500, success: false }); // Internal Server Error
         }
         if (!user)
@@ -452,18 +452,18 @@ router.get("/nofications/:user_id", verifyJWT, async (req, res) => {
         .json({ msg: "Bad Request", status: 400, success: false }); // User ID is required
     //check firebase if uid exists
     await // Find the user
-    notificationModel.find({ user: user_id }, (err, notifications) => {
-      if (err)
-        return res
-          .status(500)
-          .json({ msg: err.message, status: 500, success: false }); // Internal Server Error
-      return res.status(200).json({
-        msg: "Notifications Found",
-        status: 200,
-        success: true,
-        notifications,
-      }); // Notifications Found and returned
-    });
+      notificationModel.find({ user: user_id }, (err, notifications) => {
+        if (err)
+          return res
+
+            .json({ msg: err.message, status: 500, success: false }); // Internal Server Error
+        return res.status(200).json({
+          msg: "Notifications Found",
+          status: 200,
+          success: true,
+          notifications,
+        }); // Notifications Found and returned
+      });
   } catch (e) {
     if (e.errorInfo) {
       // User Not Found
@@ -497,24 +497,24 @@ router.post("/nofications/update/:user_id", verifyJWT, async (req, res) => {
         .json({ msg: "Bad Request", status: 400, success: false }); // User ID is required
     //check firebase if uid exists
     await // Find the user
-    notificationModel.findOneAndUpdate(
-      { user: user_id, _id: id },
-      {
-        read: true,
-      },
-      (err, notification) => {
-        if (err)
-          return res
-            .status(500)
-            .json({ msg: err.message, status: 500, success: false }); // Internal Server Error
-        return res.status(200).json({
-          msg: "Notification updated",
-          status: 200,
-          success: true,
-          notification,
-        }); // Notifications Found and returned
-      }
-    );
+      notificationModel.findOneAndUpdate(
+        { user: user_id, _id: id },
+        {
+          read: true,
+        },
+        (err, notification) => {
+          if (err)
+            return res
+
+              .json({ msg: err.message, status: 500, success: false }); // Internal Server Error
+          return res.status(200).json({
+            msg: "Notification updated",
+            status: 200,
+            success: true,
+            notification,
+          }); // Notifications Found and returned
+        }
+      );
   } catch (e) {
     if (e.errorInfo) {
       // User Not Found
