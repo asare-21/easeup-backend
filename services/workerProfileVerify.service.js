@@ -50,12 +50,12 @@ class WorkerProfileVerificationService {
       );
 
       if (validationResults.status !== 200) {
-        return res.status(400).json({
+        return {
           msg: "Bad Request. Missing fields",
           status: 400,
           success: false,
           validationResults: validationResults.msg,
-        });
+        };
       }
 
       const { worker, selfie } = req.body;
@@ -101,12 +101,12 @@ class WorkerProfileVerificationService {
       const validationResults = await updateWorkerGhImagesValidator(req.body);
 
       if (validationResults.status !== 200) {
-        return res.status(400).json({
+        return {
           msg: "Bad Request. Missing fields",
           status: 400,
           success: false,
           validationResults: validationResults.msg,
-        });
+        };
       }
 
       // destruct the request body
@@ -154,12 +154,12 @@ class WorkerProfileVerificationService {
       const validationResults = await updateWorkerAgeValidator(req.body);
 
       if (validationResults.status !== 200) {
-        return res.status(400).json({
+        return {
           msg: "Bad Request. Missing fields",
           status: 400,
           success: false,
           validationResults: validationResults.msg,
-        });
+        };
       }
       const { worker, age_doc } = req.body;
 
@@ -202,12 +202,12 @@ class WorkerProfileVerificationService {
       );
 
       if (validationResults.status !== 200) {
-        return res.status(400).json({
+        return {
           msg: "Bad Request. Missing fields",
           status: 400,
           success: false,
           validationResults: validationResults.msg,
-        });
+        };
       }
       const { worker, proof_skill } = req.body;
 
@@ -248,12 +248,12 @@ class WorkerProfileVerificationService {
       const validationResults = await updateWorkerInsuranceValidator(req.body);
 
       if (validationResults.status !== 200) {
-        return res.status(400).json({
+        return {
           msg: "Bad Request. Missing fields",
           status: 400,
           success: false,
           validationResults: validationResults.msg,
-        });
+        };
       }
       const { worker, insurance_doc } = req.body;
 
@@ -294,12 +294,12 @@ class WorkerProfileVerificationService {
       const validationResults = await updateWorkerAddressValidator(req.body);
 
       if (validationResults.status !== 200) {
-        return res.status(400).json({
+        return {
           msg: "Bad Request. Missing fields",
           status: 400,
           success: false,
           validationResults: validationResults.msg,
-        });
+        };
       }
       const { worker, address, latlng } = req.body;
 
@@ -343,12 +343,12 @@ class WorkerProfileVerificationService {
       const validationResults = await updateWorkerGenderValidator(req.body);
 
       if (validationResults.status !== 200) {
-        return res.status(400).json({
+        return {
           msg: "Bad Request. Missing fields",
           status: 400,
           success: false,
           validationResults: validationResults.msg,
-        });
+        };
       }
       const { worker, gender } = req.body;
 
@@ -388,12 +388,12 @@ class WorkerProfileVerificationService {
       const validationResults = await updateWorkerPhoneValidator(req.body);
 
       if (validationResults.status !== 200) {
-        return res.status(400).json({
+        return {
           msg: "Bad Request. Missing fields",
           status: 400,
           success: false,
           validationResults: validationResults.msg,
-        });
+        };
       }
       const { worker, phone } = req.body;
       // check if the phone number is equal to the one in the database
@@ -459,12 +459,12 @@ class WorkerProfileVerificationService {
       );
 
       if (validationResults.status !== 200) {
-        return res.status(400).json({
+        return {
           msg: "Bad Request. Missing fields",
           status: 400,
           success: false,
           validationResults: validationResults.msg,
-        });
+        };
       }
       const { worker, phone, code } = req.body;
       // Find the user

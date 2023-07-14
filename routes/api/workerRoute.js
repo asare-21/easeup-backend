@@ -70,9 +70,9 @@ async function createNotification(worker, title, body, type, token) {
 }
 
 router.get("/:worker", verifyJWT, getWorkerCache, async (req, res) => {
-  const { worker } = req.params;
-  // check if user is authenticated
   try {
+    const { worker } = req.params;
+    // check if user is authenticated
     // check if worker is valid
     const result = await workerModel.findById(worker);
 
@@ -95,9 +95,8 @@ router.get("/:worker", verifyJWT, getWorkerCache, async (req, res) => {
 });
 
 router.delete("/:worker", verifyJWT, async (req, res) => {
-  const { worker } = req.params;
-
   try {
+    const { worker } = req.params;
     // check if worker is valid
 
     await Promise.all([
