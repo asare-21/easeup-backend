@@ -136,6 +136,145 @@ class WorkerProfileVerificationService {
       return { status: 500, msg: e.message, success: false };
     }
   }
+  async updateWorkerAge(req, res) {
+    try {
+      // required field : user_id
+      const validationResults = await updateWorkerAgeValidator(req.body);
+
+      if (validationResults.status !== 200) {
+        return res.status(400).json({
+          msg: "Bad Request. Missing fields",
+          status: 400,
+          success: false,
+          validationResults: validationResults.msg,
+        });
+      }
+      const { worker, age_doc } = req.body;
+
+      // check if user exist
+      const userExist = await workerProfileVerificationModel.findOne({
+        worker,
+      });
+
+      if (!userExist) {
+        return { status: 404, msg: "worker not found", success: false };
+      }
+
+      // Find the user
+      const updatedWorkerAge =
+        await workerProfileVerificationModel.findOneAndUpdate(
+          { worker },
+          {
+            age_verification_document: age_doc,
+          }
+        );
+
+      return {
+        msg: "Profile updated",
+        status: 200,
+        success: true,
+        data: updatedWorkerAge,
+      };
+    } catch (e) {
+      log.warn(e.message);
+      console.log(e);
+      return { status: 500, msg: e.message, success: false };
+    }
+  }
+
+  async updateWorkerProofOfSkill(req, res) {
+    try {
+      // required field : user_id
+      const validationResults = await updateWorkerProofOfSkillValidator(
+        req.body
+      );
+
+      if (validationResults.status !== 200) {
+        return res.status(400).json({
+          msg: "Bad Request. Missing fields",
+          status: 400,
+          success: false,
+          validationResults: validationResults.msg,
+        });
+      }
+      const { worker, proof_skill } = req.body;
+
+      // check if user exist
+      const userExist = await workerProfileVerificationModel.findOne({
+        worker,
+      });
+
+      if (!userExist) {
+        return { status: 404, msg: "worker not found", success: false };
+      }
+
+      // Update worker proof of skill
+      const updatedWorkerPos =
+        await workerProfileVerificationModel.findOneAndUpdate(
+          { worker },
+          {
+            proof_skill,
+          }
+        );
+
+      return {
+        msg: "Profile updated",
+        status: 200,
+        success: true,
+        data: updatedWorkerPos,
+      };
+    } catch (e) {
+      log.warn(e.message);
+      console.log(e);
+      return { status: 500, msg: e.message, success: false };
+    }
+  }
+
+  async updateWorkerInsurance(req, res) {
+    try {
+      // required field : user_id
+      const validationResults = await updateWorkerInsuranceValidator(req.body);
+
+      if (validationResults.status !== 200) {
+        return res.status(400).json({
+          msg: "Bad Request. Missing fields",
+          status: 400,
+          success: false,
+          validationResults: validationResults.msg,
+        });
+      }
+      const { worker, insurance_doc } = req.body;
+
+      // check if user exist
+      const userExist = await workerProfileVerificationModel.findOne({
+        worker,
+      });
+
+      if (!userExist) {
+        return { status: 404, msg: "worker not found", success: false };
+      }
+
+      // Update worker insurance
+      const updatedWorkerInsurance =
+        await workerProfileVerificationModel.findOneAndUpdate(
+          { worker },
+          {
+            insurance_document: insurance_doc,
+          }
+        );
+
+      return {
+        msg: "Profile updated",
+        status: 200,
+        success: true,
+        data: updatedWorkerInsurance,
+      };
+    } catch (e) {
+      log.warn(e.message);
+      console.log(e);
+      return { status: 500, msg: e.message, success: false };
+    }
+  }
 }
 
 module.exports = new WorkerProfileVerificationService();

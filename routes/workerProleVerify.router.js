@@ -20,4 +20,22 @@ router.post(
   workerProfileVerifyController.updateWorkerGhc
 );
 
+router.post(
+  "/update/ghc-images",
+  verifyJWT,
+  workerProfileVerifyController.workerAgeVerify
+);
+
+router.post(
+  "/update/ghc-images",
+  verifyJWT,
+  workerProfileVerifyController.updateWorkerPos
+);
+
+router.post(
+  "/update/ghc-images",
+  verifyJWT,
+  workerProfileVerifyController.updateWorkerInsurance
+);
+
 module.exports.workerProfileVerificationRoute = router;
