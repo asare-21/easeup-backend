@@ -14,4 +14,10 @@ router.post(
   workerProfileVerifyController.updateWorkerSelfie
 );
 
+router.post(
+  "/update/ghc-images",
+  verifyJWT,
+  workerProfileVerifyController.updateWorkerGhc
+);
+
 module.exports.workerProfileVerificationRoute = router;
