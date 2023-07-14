@@ -1,5 +1,5 @@
 const Joi = require("joi");
-const { JoiValidator } = require("../../joi.validator");
+const { JoiValidator } = require("../joi.validator");
 
 const createWorkerValidator = (params) => {
   const schema = Joi.object({

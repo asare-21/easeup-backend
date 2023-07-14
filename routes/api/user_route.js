@@ -38,7 +38,7 @@ const {
   verifyCodeValidator,
   createUserValidator,
   updateUserNotificationValidator,
-} = require("../validators/user.validator");
+} = require("../../validators/user.validator");
 const userCache = cache;
 
 function returnUnAuthUserError(res, msg) {

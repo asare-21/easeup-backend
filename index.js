@@ -12,7 +12,7 @@ const { USER_ROUTE } = require("./routes/api/user_route");
 const { searchRoute } = require("./routes/api/searchRoute");
 const {
   workerProfileVerificationRoute,
-} = require("./routes/api/workerProfileVerify");
+} = require("./routes/workerProleVerify.router");
 const { workerRoute } = require("./routes/api/workerRoute");
 const { workerProfileRoute } = require("./routes/api/workerProfileRoute");
 const { bookmarkRoute } = require("./routes/api/bookmarkRoute");

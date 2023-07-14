@@ -21,7 +21,7 @@ const {
   updateWorkerGenderValidator,
   updateWorkerPhoneValidator,
   updateWorkerPhoneVerifyCodeValidator,
-} = require("../validators/workerProfileVerify.validator");
+} = require("../../validators/workerProfileVerify.validator");
 // worker profile verification data
 router.get("/:worker", verifyJWT, async (req, res) => {
   const { worker } = req.params;

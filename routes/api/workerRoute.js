@@ -23,7 +23,7 @@ const {
   updateWorkerTokenValidator,
   updateWorkerGhcValidator,
   updateUserNotificationsValidator,
-} = require("../validators/worker.validator");
+} = require("../../validators/worker.validator");
 const workerCache = cache;
 
 async function createNotification(worker, title, body, type, token) {
