@@ -9,7 +9,7 @@ router.get(
 
 router.get(
   "/google/callback",
-  passport.authenticate("google", { failureRedirect: "/google" }),
+  passport.authenticate("google", { failureRedirect: "/auth/google" }),
   (req, res) => {
     const user = req.user;
     const token = generateToken(user);
@@ -26,7 +26,7 @@ router.get("/facebook", passport.authenticate("facebook"));
 
 router.get(
   "/facebook/callback",
-  passport.authenticate("facebook", { failureRedirect: "/facebook" }),
+  passport.authenticate("facebook", { failureRedirect: "/auth/facebook" }),
   (req, res) => {
     const user = req.user;
 
@@ -44,7 +44,7 @@ router.get("/twitter", passport.authenticate("twitter"));
 
 router.get(
   "/twitter/callback",
-  passport.authenticate("twitter", { failureRedirect: "/twitter" }),
+  passport.authenticate("twitter", { failureRedirect: "/auth/twitter" }),
   (req, res) => {
     const user = req.user;
     const token = generateToken(user);
