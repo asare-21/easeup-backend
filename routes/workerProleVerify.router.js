@@ -21,21 +21,45 @@ router.post(
 );
 
 router.post(
-  "/update/ghc-images",
+  "/update/age-verify",
   verifyJWT,
   workerProfileVerifyController.workerAgeVerify
 );
 
 router.post(
-  "/update/ghc-images",
+  "/update/pos",
   verifyJWT,
   workerProfileVerifyController.updateWorkerPos
 );
 
 router.post(
-  "/update/ghc-images",
+  "/update/insurance",
   verifyJWT,
   workerProfileVerifyController.updateWorkerInsurance
+);
+
+router.post(
+  "/update/address",
+  verifyJWT,
+  workerProfileVerifyController.updateWorkerAddress
+);
+
+router.post(
+  "/update/gender",
+  verifyJWT,
+  workerProfileVerifyController.updateworkerGender
+);
+
+router.post(
+  "/phone/send-code",
+  verifyJWT,
+  workerProfileVerifyController.updateWorkerPhone
+);
+
+router.post(
+  "/phone/verify-code",
+  verifyJWT,
+  workerProfileVerifyController.updateWorkerPhoneVerifyCode
 );
 
 module.exports.workerProfileVerificationRoute = router;

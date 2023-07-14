@@ -38,6 +38,33 @@ class WorkerProfileVerifyController {
       await WorkerProfileVerificationService.updateWorkerInsurance(req, res);
     res.status(status).send(responseData);
   };
+
+  updateWorkerAddress = async (req, res, next) => {
+    const { status, ...responseData } =
+      await WorkerProfileVerificationService.updateWorkerAddress(req, res);
+    res.status(status).send(responseData);
+  };
+
+  updateworkerGender = async (req, res, next) => {
+    const { status, ...responseData } =
+      await WorkerProfileVerificationService.updateWorkerGender(req, res);
+    res.status(status).send(responseData);
+  };
+
+  updateWorkerPhone = async (req, res, next) => {
+    const { status, ...responseData } =
+      await WorkerProfileVerificationService.updateWorkerPhone(req, res);
+    res.status(status).send(responseData);
+  };
+
+  updateWorkerPhoneVerifyCode = async (req, res, next) => {
+    const { status, ...responseData } =
+      await WorkerProfileVerificationService.updateWorkerPhoneVerifyCode(
+        req,
+        res
+      );
+    res.status(status).send(responseData);
+  };
 }
 
 module.exports = new WorkerProfileVerifyController();
