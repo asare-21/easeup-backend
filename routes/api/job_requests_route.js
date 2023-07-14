@@ -51,7 +51,7 @@ router.post("/jreq_create", verifyJWT, async (req, res) => {
             service: body.service,
             workerId: body.worker,
             clientId: user.id,
-            photos: body.photos
+            photos: body.photos, date: body.date
         })
 
         // save

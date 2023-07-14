@@ -1,4 +1,3 @@
-const { boolean } = require('joi')
 const { Schema, model } = require('mongoose')
 
 
@@ -32,6 +31,8 @@ const jobrequestSchema = Schema({
     reactedTo: {
         type: Boolean,
         default: false
+    }, date: {
+        type: String, required: true
     }
 })
 
