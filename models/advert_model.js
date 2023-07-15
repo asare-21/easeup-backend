@@ -12,22 +12,23 @@ const advertSchema = Schema({
     },
     title: {
         type: String,
-        required: true,
+        default: '',
         trim: true,
     },
     subtitle: {
         type: String,
-        required: true,
+        default: '',
         trim: true
     },
     route: {
         type: String,
-        required: true,
+        default: '',
         trim: true
     },
     url: {
         type: String,
-        trim: true
+        trim: true,
+        required: true
     }
 })
 

@@ -64,6 +64,7 @@ const { servicesModel } = require("./models/services_model");
 const { servicesRoute } = require("./routes/api/services");
 const { jobRequestRoute } = require("./routes/api/job_requests_route");
 const { advertRoute } = require("./routes/api/advert_route");
+const { advertModel } = require("./models/advert_model");
 
 //Auth
 app.use(
@@ -136,7 +137,7 @@ http.listen(PORT, async () => {
     await FBadmin.initializeApp({
       credential: FBadmin.credential.cert(serviceAccount),
     });
-
+    // migrate()
     log.info("Connected to MongoDB and running");
   } catch (err) {
     console.error(err);
@@ -279,18 +280,29 @@ async function createNewRoom(_room) {
 }
 // migrate data ub firebase to mongodb
 async function migrate() {
-  let data = await FBadmin.firestore().collection("services").doc("3IxGFpl8wT1piNQdT31i").get()
-  data = data.data()
-  // save to mongodb
-  data.services.forEach(async (service) => {
-    const newService = new servicesModel({
-      img: service.img,
-      query: service.query,
-      service: service.service
-    })
-    await newService.save()
-  })
-  console.log(data)
+  // let data = await FBadmin.firestore().collection("adverts").doc("adverts").get()
+  // data = data.data()
+  // // save to mongodb
+  // console.log(data.data)
+  // data.data.forEach(async (service) => {
+  //   const adverts = new advertModel({
+  //     bgImg: "https://res.cloudinary.com/dl3f5pgro/image/upload/v1689455989/Discount_Banner_bw19op.png",
+  //     title: "",
+  //     subtitle: "",
+  //     route: "",
+  //     url: "https://www.easeupgh.tech/",
+  //   })
+  //   await adverts.save()
+  // const newService = new servicesModel({
+  //   img: service.img,
+  //   query: service.query,
+  //   service: service.service
+  // })
+  // await newService.save()
+  // }
+  // )
+
+
 
 }
 module.exports.admin = FBadmin;
