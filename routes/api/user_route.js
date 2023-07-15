@@ -135,6 +135,7 @@ router.get("/profile/:user_id", verifyJWT, getUserCache, async (req, res) => {
     // Find the user
     const userData = await userModel.findById(user_id);
     // cache data
+    console.log(userData)
 
     if (!userData)
       return res.json({
