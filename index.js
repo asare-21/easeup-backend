@@ -12,7 +12,7 @@ const { USER_ROUTE } = require("./routes/api/user_route");
 const { searchRoute } = require("./routes/api/searchRoute");
 const {
   workerProfileVerificationRoute,
-} = require("./routes/workerProleVerify.router");
+} = require("./routes/workerProfileVerify.router");
 const { workerRoute } = require("./routes/api/workerRoute");
 const { workerProfileRoute } = require("./routes/api/workerProfileRoute");
 const { bookmarkRoute } = require("./routes/api/bookmarkRoute");
@@ -85,6 +85,7 @@ app.use(compression());
 app.use(helmet());
 app.disable("x-powered-by");
 app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 app.use(morgan("combined"));
 app.use(limiter);
 app.use("/auth", authRoutes);

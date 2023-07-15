@@ -1,4 +1,4 @@
-const WorkerService = require("../services/worker.services");
+const WorkerService = require("../services/worker.service");
 
 class WorkerController {
   getWorker = async (req, res, next) => {
@@ -34,7 +34,7 @@ class WorkerController {
   };
 
   saveLocation = async (req, res, next) => {
-    const { status, ...responseData } = await WorkerService.createWorker(
+    const { status, ...responseData } = await WorkerService.saveWorkerLocation(
       req,
       res
     );
@@ -42,7 +42,7 @@ class WorkerController {
   };
 
   updateToken = async (req, res, next) => {
-    const { status, ...responseData } = await WorkerService.createWorker(
+    const { status, ...responseData } = await WorkerService.updateWorkerToken(
       req,
       res
     );
@@ -50,7 +50,7 @@ class WorkerController {
   };
 
   updateGhanaCard = async (req, res, next) => {
-    const { status, ...responseData } = await WorkerService.createWorker(
+    const { status, ...responseData } = await WorkerService.updateGhanaCard(
       req,
       res
     );
@@ -58,15 +58,13 @@ class WorkerController {
   };
 
   getNotifications = async (req, res, next) => {
-    const { status, ...responseData } = await WorkerService.createWorker(
-      req,
-      res
-    );
+    const { status, ...responseData } =
+      await WorkerService.getWorkerNotifications(req, res);
     res.status(status).send(responseData);
   };
 
   updateNotification = async (req, res, next) => {
-    const { status, ...responseData } = await WorkerService.createWorker(
+    const { status, ...responseData } = await WorkerService.updateNotifications(
       req,
       res
     );

@@ -99,9 +99,6 @@ async function createNotification(user_id, title, body, type, token) {
   }
 }
 
-router.use(bodyParser.urlencoded({ extended: false }));
-router.use(express.json());
-
 router.delete("/:user", verifyJWT, async (req, res) => {
   const { user } = req.params;
 

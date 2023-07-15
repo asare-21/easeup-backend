@@ -1,5 +1,24 @@
 const log = require("npmlog");
 const { workerModel } = require("../models/worker_models");
+const { notificationModel } = require("../models/nofications");
+const admin = require("firebase-admin");
+const { commonError, returnUnAuthUserError } = require("../utils");
+const { workerProfileModel } = require("../models/worker_profile_model");
+const {
+  workerProfileVerificationModel,
+} = require("../models/worker_profile_verification_model");
+const { locationModel } = require("../../models/workerLocationModel");
+const { cache } = require("../cache/user_cache");
+const { userModel } = require("../models/user_model");
+const {
+  createWorkerValidator,
+  updateWorkerLocationValidator,
+  updateWorkerTokenValidator,
+  updateWorkerGhcValidator,
+  updateUserNotificationsValidator,
+} = require("../validators/worker.validator");
+const workerCache = cache;
+
 class WorkerService {
   async createNotification(worker, title, body, type, token) {
     try {
@@ -151,11 +170,11 @@ class WorkerService {
       const existingUser = await userModel.findById(worker);
 
       if (existingUser)
-        return res.status(400).json({
+        return {
           msg: "An account with this email exists as a client. Sign in request denied.",
           status: 400,
           success: false,
-        });
+        };
       // At least one field is required
 
       // check if user already exists
@@ -163,12 +182,12 @@ class WorkerService {
 
       if (userExists) {
         // User Already Exists
-        return res.status(200).json({
+        return {
           user: userExists,
           msg: "An account with this email exists as a client. Sign in request denied.",
           status: 200,
           success: true,
-        });
+        };
       } // User Already Exists
       // Create the user
       const user = new workerModel({
@@ -192,9 +211,7 @@ class WorkerService {
         console.log(err);
         if (err) {
           console.log(err);
-          return res
-            .status(500)
-            .json({ msg: err.message, status: 500, success: false }); // Internal Server Error
+          return { msg: err.message, status: 500, success: false }; // Internal Server Error
         }
         workerCache.set(`worker/${worker}`, {
           email,
@@ -301,7 +318,7 @@ class WorkerService {
                 };
             });
           }
-          return { success: true };
+          return { status: 200, success: true };
         }
       );
       return {
@@ -319,11 +336,41 @@ class WorkerService {
   // delete worker
   async updateWorkerToken(req, res) {
     try {
-      return {
-        msg: "Worker Profile Deleted",
-        status: 200,
-        success: true,
-      };
+      // required field : user_id
+      const validationResults = await updateWorkerTokenValidator(req.body);
+
+      if (validationResults.status !== 200) {
+        return {
+          msg: "Bad Request. Missing fields",
+          status: 400,
+          success: false,
+          validationResults: validationResults.msg,
+        };
+      }
+
+      // Find the user
+      workerModel.findByIdAndUpdate(
+        user_id,
+        {
+          token,
+        },
+        (err, user) => {
+          if (err) {
+            log.warn(err.message);
+            return { msg: err.message, status: 500, success: false }; // Internal Server Error
+          }
+          if (!user)
+            return { msg: "Worker Not Found", status: 404, success: false }; // User Not Found
+          workerCache.del(`worker/${user_id}`);
+
+          return {
+            msg: "Profile token updated",
+            status: 200,
+            success: true,
+            user,
+          }; // User Found and returned
+        }
+      );
     } catch (e) {
       log.warn(e.message);
       console.log(e);
@@ -334,11 +381,46 @@ class WorkerService {
   // delete worker
   async updateGhanaCard(req, res) {
     try {
-      return {
-        msg: "Worker Profile Deleted",
-        status: 200,
-        success: true,
-      };
+      // required field : user_id
+      const validationResults = await updateWorkerGhcValidator(req.body);
+
+      if (validationResults.status !== 200) {
+        return {
+          msg: "Bad Request. Missing fields",
+          status: 400,
+          success: false,
+          validationResults: validationResults.msg,
+        };
+      }
+      const { user_id, ghc, ghc_n, ghc_exp } = req.body;
+      // Find the user
+      workerProfileVerificationModel.findOneAndUpdate(
+        { worker: user_id },
+        {
+          // ghc_image: ghc,
+          gh_card_to_face: ghc[0],
+          gh_card_image_back: ghc[1],
+          gh_card_image_front: ghc[2],
+          ghc_number: ghc_n,
+          ghc_exp: ghc_exp,
+        },
+        (err, user) => {
+          if (err) {
+            log.warn(err.message);
+            return { msg: err.message, status: 500, success: false }; // Internal Server Error
+          }
+          if (!user)
+            return { msg: "User Not Found", status: 404, success: false }; // User Not Found
+          cache.del(`worker/${user_id}`);
+
+          return {
+            msg: "Profile updated",
+            status: 200,
+            success: true,
+            user,
+          }; // User Found and returned
+        }
+      );
     } catch (e) {
       log.warn(e.message);
       console.log(e);
@@ -349,11 +431,21 @@ class WorkerService {
   // delete worker
   async getWorkerNotifications(req, res) {
     try {
-      return {
-        msg: "Worker Profile Deleted",
-        status: 200,
-        success: true,
-      };
+      // required field : user_id
+      const { user_id } = req.params;
+
+      if (!user_id) return { msg: "Bad Request", status: 400, success: false }; // User ID is required
+      //check firebase if uid exists
+      await // Find the user
+      notificationModel.find({ user: user_id }, (err, notifications) => {
+        if (err) return { msg: err.message, status: 500, success: false }; // Internal Server Error
+        return {
+          msg: "Notifications Found",
+          status: 200,
+          success: true,
+          notifications,
+        }; // Notifications Found and returned
+      });
     } catch (e) {
       log.warn(e.message);
       console.log(e);
@@ -364,11 +456,40 @@ class WorkerService {
   // delete worker
   async updateNotifications(req, res) {
     try {
-      return {
-        msg: "Worker Profile Deleted",
-        status: 200,
-        success: true,
-      };
+      // required field : user_id
+      const validationResults = await updateUserNotificationsValidator(
+        req.body
+      );
+
+      if (validationResults.status !== 200) {
+        return {
+          msg: "Bad Request. Missing fields",
+          status: 400,
+          success: false,
+          validationResults: validationResults.msg,
+        };
+      }
+      const { user_id } = req.params;
+      const { id } = req.body;
+
+      if (!user_id) return { msg: "Bad Request", status: 400, success: false }; // User ID is required
+      //check firebase if uid exists
+      await // Find the user
+      notificationModel.findOneAndUpdate(
+        { user: user_id, _id: id },
+        {
+          read: true,
+        },
+        (err, notification) => {
+          if (err) return { msg: err.message, status: 500, success: false }; // Internal Server Error
+          return {
+            msg: "Notification updated",
+            status: 200,
+            success: true,
+            notification,
+          }; // Notifications Found and returned
+        }
+      );
     } catch (e) {
       log.warn(e.message);
       console.log(e);
