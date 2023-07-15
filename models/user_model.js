@@ -12,10 +12,7 @@ const addressSchema = new Schema({
 });
 
 const userSchema = new Schema({
-  _id: {
-    type: String,
-    required: true,
-  },
+
   email: {
     type: String,
     unique: true,
