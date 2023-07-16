@@ -280,6 +280,7 @@ async function createNewRoom(_room) {
     console.log("Something went room ", e);
   }
 }
+
 // migrate data ub firebase to mongodb
 async function migrate() {
   // let data = await FBadmin.firestore().collection("adverts").doc("adverts").get()
