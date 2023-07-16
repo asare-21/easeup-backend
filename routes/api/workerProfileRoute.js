@@ -62,6 +62,7 @@ const {
 } = require("../validators/workerProfile.validator");
 const { workerVerifyJWT } = require("../../passport/common_worker");
 
+
 router.get("/:worker", workerVerifyJWT, getWorkerProfileCache, async (req, res) => {
   const { worker } = req.params;
   // check if user is authenticated
@@ -180,7 +181,7 @@ router.post("/comments/:worker", workerVerifyJWT, async (req, res) => {
         msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-        validationResults: validationResults.msg
+        validationResults: validationResults.msg,
       });
     }
 
@@ -235,7 +236,7 @@ router.post("/charge", workerVerifyJWT, async (req, res) => {
         msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-        validationResults: validationResults.msg
+        validationResults: validationResults.msg,
       });
     }
     // check if worker is valid
@@ -264,9 +265,7 @@ router.post("/charge", workerVerifyJWT, async (req, res) => {
 
 router.post("/skills", workerVerifyJWT, async (req, res) => {
   try {
-    const validationResults = await profileSkillsUpdateValidator(
-      req.body
-    );
+    const validationResults = await profileSkillsUpdateValidator(req.body);
 
     if (validationResults.status !== 200) {
       return res.status(400).json({
@@ -313,7 +312,7 @@ router.post("/bio", workerVerifyJWT, async (req, res) => {
         msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-        validationResults: validationResults.msg
+        validationResults: validationResults.msg,
       });
     }
     // check if worker is valid
@@ -352,7 +351,7 @@ router.post("/instagram", workerVerifyJWT, async (req, res) => {
         msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-        validationResults: validationResults.msg
+        validationResults: validationResults.msg,
       });
     }
     // check if worker is valid
@@ -385,16 +384,14 @@ router.post("/instagram", workerVerifyJWT, async (req, res) => {
 router.post("/twitter", workerVerifyJWT, async (req, res) => {
   const { worker, twitter } = req.body;
   try {
-    const validationResults = await profileTwitterUpdateValidator(
-      req.body
-    );
+    const validationResults = await profileTwitterUpdateValidator(req.body);
 
     if (validationResults.status !== 200) {
       return res.status(400).json({
         msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-        validationResults: validationResults.msg
+        validationResults: validationResults.msg,
       });
     }
     // check if worker is valid
@@ -427,16 +424,14 @@ router.post("/twitter", workerVerifyJWT, async (req, res) => {
 router.post("/portfolio", workerVerifyJWT, async (req, res) => {
   const { worker, media, description, thumbnail, image } = req.body;
   try {
-    const validationResults = await profilePortfolioUpdateValidator(
-      req.body
-    );
+    const validationResults = await profilePortfolioUpdateValidator(req.body);
 
     if (validationResults.status !== 200) {
       return res.status(400).json({
         msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-        validationResults: validationResults.msg
+        validationResults: validationResults.msg,
       });
     }
     // check if worker is valid
@@ -506,16 +501,14 @@ router.get(
 router.post("/work-radius", workerVerifyJWT, async (req, res) => {
   const { worker, radius } = req.body;
   try {
-    const validationResults = await profileWorkRadiusUpdateValidator(
-      req.body
-    );
+    const validationResults = await profileWorkRadiusUpdateValidator(req.body);
 
     if (validationResults.status !== 200) {
       return res.status(400).json({
         msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-        validationResults: validationResults.msg
+        validationResults: validationResults.msg,
       });
     }
     // check if worker is valid
@@ -773,16 +766,14 @@ router.get(
 // update booking status
 router.put("/booking-status", workerVerifyJWT, async (req, res) => {
   try {
-    const validationResults = await profileWorkRadiusUpdateValidator(
-      req.body
-    );
+    const validationResults = await profileWorkRadiusUpdateValidator(req.body);
 
     if (validationResults.status !== 200) {
       return res.status(400).json({
         msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-        validationResults: validationResults.msg
+        validationResults: validationResults.msg,
       });
     }
     const { worker, client, ref } = req.body;
@@ -841,16 +832,14 @@ router.put("/booking-status", workerVerifyJWT, async (req, res) => {
 //mark as pending
 router.put("/booking-status/pending", workerVerifyJWT, async (req, res) => {
   try {
-    const validationResults = await profileWorkRadiusUpdateValidator(
-      req.body
-    );
+    const validationResults = await profileWorkRadiusUpdateValidator(req.body);
 
     if (validationResults.status !== 200) {
       return res.status(400).json({
         msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-        validationResults: validationResults.msg
+        validationResults: validationResults.msg,
       });
     }
     const { worker, client, ref } = req.body;
@@ -922,7 +911,7 @@ router.post("/worker-review", workerVerifyJWT, async (req, res) => {
         msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-        validationResults: validationResults.msg
+        validationResults: validationResults.msg,
       });
     }
     const { worker, user, rating, review, userImage, name } = req.body;
@@ -1024,7 +1013,7 @@ router.post("/available-slots/:worker", workerVerifyJWT, async (req, res) => {
         msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-        validationResults: validationResults.msg
+        validationResults: validationResults.msg,
       });
     }
     const { workers, day } = req.body;
@@ -1116,7 +1105,7 @@ router.post("/book-slot", workerVerifyJWT, async (req, res) => {
         msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-        validationResults: validationResults.msg
+        validationResults: validationResults.msg,
       });
     }
     const {
@@ -1298,7 +1287,7 @@ router.post("/refund/:ref", workerVerifyJWT, async (req, res) => {
         msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-        validationResults: validationResults.msg
+        validationResults: validationResults.msg,
       });
     }
     const { worker, reason } = req.body;
@@ -1447,7 +1436,7 @@ router.patch("/update-location", workerVerifyJWT, async (req, res) => {
         msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-        validationResults: validationResults.msg
+        validationResults: validationResults.msg,
       });
     }
     const { worker, client, location, ref } = req.body;
@@ -1511,7 +1500,7 @@ router.patch("/update-date", workerVerifyJWT, async (req, res) => {
         msg: "Bad Request. Missing fields",
         status: 400,
         success: false,
-        validationResults: validationResults.msg
+        validationResults: validationResults.msg,
       });
     }
     const { worker, client, date, day, ref } = req.body;
@@ -1687,4 +1676,4 @@ router.get(
   }
 );
 
-module.exports.workerProfileRoute = router;
+// module.exports.workerProfileRoute = router;

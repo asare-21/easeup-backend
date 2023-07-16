@@ -38,7 +38,7 @@ const {
   verifyCodeValidator,
   createUserValidator,
   updateUserNotificationValidator,
-} = require("../validators/user.validator");
+} = require("../../validators/user.validator");
 const userCache = cache;
 
 function returnUnAuthUserError(res, msg) {
@@ -94,9 +94,6 @@ async function createNotification(user_id, title, body, type, token) {
     return commonError(res, e.message);
   }
 }
-
-router.use(bodyParser.urlencoded({ extended: false }));
-router.use(express.json());
 
 router.delete("/:user", verifyJWT, async (req, res) => {
   const { user } = req.params;
@@ -942,7 +939,7 @@ router.delete("/bookmarks/delete", verifyJWT, async (req, res) => {
   }
 });
 // exports all the routes
-module.exports.USER_ROUTE = router;
+// module.exports.USER_ROUTE = router;
 module.exports.commonError = commonError;
 module.exports.returnUnAuthUserError = returnUnAuthUserError;
 module.exports.createNotification = createNotification;

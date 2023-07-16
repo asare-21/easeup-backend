@@ -24,6 +24,7 @@ const {
   updateUserNotificationsValidator,
 } = require("../validators/worker.validator");
 const { workerVerifyJWT } = require("../../passport/common_worker");
+
 const workerCache = cache;
 
 async function createNotification(worker, title, body, type, token) {
@@ -73,6 +74,8 @@ router.get("/:worker", workerVerifyJWT, getWorkerCache, async (req, res) => {
   const { worker } = req.params;
   // check if user is authenticated
   try {
+    const { worker } = req.params;
+    // check if user is authenticated
     // check if worker is valid
     const result = await workerModel.findById(worker);
 
@@ -98,6 +101,7 @@ router.delete("/:worker", workerVerifyJWT, async (req, res) => {
   const { worker } = req.params;
 
   try {
+    const { worker } = req.params;
     // check if worker is valid
 
     await Promise.all([
@@ -526,4 +530,4 @@ router.post("/nofications/update/:user_id", workerVerifyJWT, async (req, res) =>
   }
 });
 
-module.exports.workerRoute = router;
+// module.exports.workerRoute = router;
