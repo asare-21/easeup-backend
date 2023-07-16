@@ -55,7 +55,7 @@ const {
   profilePortfolioUpdateValidator,
   profileWorkRadiusUpdateValidator,
   profileReceieveWorkerReviewValidator,
-  availableSlotsValidator,
+  availableSlotsValidator,  
   bookSlotValidator,
   refundPaymentValidator,
   updateLocationValidator,
@@ -1274,7 +1274,7 @@ router.post("/verify-payment", verifyJWT, async (req, res) => {
   } catch (e) {
     return commonError(res, e.message);
   }
-});
+}); 
 
 router.post("/refund/:ref", verifyJWT, async (req, res) => {
   try {

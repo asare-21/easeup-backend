@@ -1,13 +1,13 @@
-const UserService = require("../services/worker.service");
+const UserService = require("../services/user.services");
 
-class WorkerController {
+class UserController {
   deleteUser = async (req, res, next) => {
-    const { status, ...responseData } = await UserService.findWorker(req, res);
+    const { status, ...responseData } = await UserService.deleteUser(req, res);
     res.status(status).send(responseData);
   };
 
   getUserProfile = async (req, res, next) => {
-    const { status, ...responseData } = await UserService.removeWorker(
+    const { status, ...responseData } = await UserService.getUserProfile(
       req,
       res
     );
@@ -15,15 +15,12 @@ class WorkerController {
   };
 
   updateImage = async (req, res, next) => {
-    const { status, ...responseData } = await UserService.getWorkerToken(
-      req,
-      res
-    );
+    const { status, ...responseData } = await UserService.updateImage(req, res);
     res.status(status).send(responseData);
   };
 
   updateAddress = async (req, res, next) => {
-    const { status, ...responseData } = await UserService.createWorker(
+    const { status, ...responseData } = await UserService.updateAddress(
       req,
       res
     );
@@ -31,7 +28,7 @@ class WorkerController {
   };
 
   updateGender = async (req, res, next) => {
-    const { status, ...responseData } = await UserService.saveWorkerLocation(
+    const { status, ...responseData } = await UserService.updateGender(
       req,
       res
     );
@@ -39,14 +36,16 @@ class WorkerController {
   };
 
   updateToken = async (req, res, next) => {
-    const { status, ...responseData } = await UserService.updateWorkerToken(
-      req,
-      res
-    );
+    const { status, ...responseData } = await UserService.updateToken(req, res);
     res.status(status).send(responseData);
   };
 
   updatePhone = async (req, res, next) => {
+    const { status, ...responseData } = await UserService.updatePhone(req, res);
+    res.status(status).send(responseData);
+  };
+
+  updateGhanaCard = async (req, res, next) => {
     const { status, ...responseData } = await UserService.updateGhanaCard(
       req,
       res
@@ -54,14 +53,13 @@ class WorkerController {
     res.status(status).send(responseData);
   };
 
-  updateGhanaCard = async (req, res, next) => {
-    const { status, ...responseData } =
-      await UserService.getWorkerNotifications(req, res);
+  updateInfo = async (req, res, next) => {
+    const { status, ...responseData } = await UserService.updateUser(req, res);
     res.status(status).send(responseData);
   };
 
   updatePhoneSendCode = async (req, res, next) => {
-    const { status, ...responseData } = await UserService.updateNotifications(
+    const { status, ...responseData } = await UserService.updatePhoneSendCode(
       req,
       res
     );
@@ -69,7 +67,7 @@ class WorkerController {
   };
 
   updatePhoneVerifyCode = async (req, res, next) => {
-    const { status, ...responseData } = await UserService.updateNotifications(
+    const { status, ...responseData } = await UserService.updatePhoneVerifyCode(
       req,
       res
     );
@@ -77,13 +75,12 @@ class WorkerController {
   };
 
   createUser = async (req, res, next) => {
-    const { status, ...responseData } =
-      await UserService.getWorkerNotifications(req, res);
+    const { status, ...responseData } = await UserService.createUser(req, res);
     res.status(status).send(responseData);
   };
 
   getUserNotifications = async (req, res, next) => {
-    const { status, ...responseData } = await UserService.updateNotifications(
+    const { status, ...responseData } = await UserService.getNotifications(
       req,
       res
     );
@@ -99,15 +96,15 @@ class WorkerController {
   };
 
   getBookmarks = async (req, res, next) => {
-    const { status, ...responseData } = await UserService.updateNotifications(
+    const { status, ...responseData } = await UserService.getBookmarks(
       req,
       res
     );
     res.status(status).send(responseData);
   };
 
-  deleteBookmarks= async (req, res, next) => {
-    const { status, ...responseData } = await UserService.updateNotifications(
+  deleteBookmarks = async (req, res, next) => {
+    const { status, ...responseData } = await UserService.deleteBookmark(
       req,
       res
     );
@@ -115,4 +112,4 @@ class WorkerController {
   };
 }
 
-module.exports = new WorkerController();
+module.exports = new UserController();

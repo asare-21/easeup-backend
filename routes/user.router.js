@@ -1,101 +1,101 @@
 const router = require("express").Router();
-const workerProfileVerifyController = require("../controllers/workerProfileVerify.controller");
+const userController = require("../controllers/user.controller");
 const { verifyJWT } = require("../passport/common");
 
 router.delete(
   "/:user",
   verifyJWT,
-  workerProfileVerifyController.getWorkerProfileVerification
+  userController.deleteUser
 );
 
 router.get(
   "/profile/:user_id",
   verifyJWT,
-  workerProfileVerifyController.getWorkerProfileVerification
+  userController.getUserProfile
 );
 
 router.post(
   "/update/image",
   verifyJWT,
-  workerProfileVerifyController.getWorkerProfileVerification
+  userController.updateImage
 );
 
 router.post(
   "/update/address",
   verifyJWT,
-  workerProfileVerifyController.getWorkerProfileVerification
+  userController.updateAddress
 );
 
 router.post(
   "/update/gender",
   verifyJWT,
-  workerProfileVerifyController.getWorkerProfileVerification
+  userController.updateGender
 );
 
 router.post(
   "/update/token",
   verifyJWT,
-  workerProfileVerifyController.getWorkerProfileVerification
+  userController.updateToken
 );
 
 router.post(
   "/update/phone",
   verifyJWT,
-  workerProfileVerifyController.getWorkerProfileVerification
+  userController.updatePhone
 );
 
 router.post(
   "/update/ghc",
   verifyJWT,
-  workerProfileVerifyController.getWorkerProfileVerification
+  userController.updateGhanaCard
 );
 
 router.post(
   "/update",
   verifyJWT,
-  workerProfileVerifyController.getWorkerProfileVerification
+  userController.update
 );
 
 router.post(
   "/phone/send-code",
   verifyJWT,
-  workerProfileVerifyController.getWorkerProfileVerification
+  userController.updatePhoneSendCode
 );
 
 router.post(
   "/phone/verify-code",
   verifyJWT,
-  workerProfileVerifyController.getWorkerProfileVerification
+  userController.updatePhoneSendCode
 );
 
 router.post(
   "/create",
   verifyJWT,
-  workerProfileVerifyController.getWorkerProfileVerification
+  userController.createUser
 );
 
 router.get(
   "/nofications/:user_id",
   verifyJWT,
-  workerProfileVerifyController.getWorkerProfileVerification
+  userController.getUserNotifications
 );
 
 router.post(
   "/nofications/update/:user_id",
   verifyJWT,
-  workerProfileVerifyController.getWorkerProfileVerification
+  userController.updateUserNotifications
 );
 
 router.get(
   "/bookmarks",
   verifyJWT,
-  workerProfileVerifyController.getWorkerProfileVerification
+  userController.getBookmarks
 );
 
 router.delete(
   "/bookmarks/delete",
   verifyJWT,
-  workerProfileVerifyController.getWorkerProfileVerification
+  userController.deleteBookmarks
 );
 
 module.exports.userRoute = router;
