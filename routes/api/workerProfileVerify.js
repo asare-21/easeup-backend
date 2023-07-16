@@ -7,7 +7,7 @@ const admin = require("firebase-admin");
 const log = require("npmlog");
 const otpGenerator = require("otp-generator");
 const axios = require("axios");
-const { verifyJWT } = require("../../passport/common");
+const { workerVerifyJWT } = require("../../passport/common_worker");
 const { commonError, returnUnAuthUserError } = require("../api/user_route");
 const { workerProfileModel } = require("../../models/worker_profile_model");
 const { cache } = require("../../cache/user_cache");
@@ -23,7 +23,7 @@ const {
   updateWorkerPhoneVerifyCodeValidator,
 } = require("../validators/workerProfileVerify.validator");
 // worker profile verification data
-router.get("/:worker", verifyJWT, async (req, res) => {
+router.get("/:worker", workerVerifyJWT, async (req, res) => {
   const { worker } = req.params;
   // check if user is authenticated
   try {
@@ -49,7 +49,7 @@ router.get("/:worker", verifyJWT, async (req, res) => {
   }
 });
 // update selfie
-router.post("/update/image", verifyJWT, async (req, res) => {
+router.post("/update/image", workerVerifyJWT, async (req, res) => {
   try {
     // required field : user_id
     const validationResults = await updateWorkerProfileImageValidator(req.body);
@@ -62,9 +62,7 @@ router.post("/update/image", verifyJWT, async (req, res) => {
         validationResults: validationResults.msg
       });
     }
-
     const { worker, selfie } = req.body;
-
     // Find the user
     workerProfileVerificationModel.findOneAndUpdate(
       { worker },
@@ -75,7 +73,6 @@ router.post("/update/image", verifyJWT, async (req, res) => {
         if (err) {
           log.warn(err.message);
           return res
-
             .json({ msg: err.message, status: 500, success: false }); // Internal Server Error
         }
         if (!user)
@@ -93,7 +90,6 @@ router.post("/update/image", verifyJWT, async (req, res) => {
             if (err) {
               log.warn(err.message);
               return res
-
                 .json({ msg: err.message, status: 500, success: false }); // Internal Server Error
             }
             cache.del(`worker-profile/${worker}`);
@@ -120,7 +116,7 @@ router.post("/update/image", verifyJWT, async (req, res) => {
 //accepts url of front and back of ghana card
 // update ghc front
 // update ghc back
-router.post("/update/ghc-images", verifyJWT, async (req, res) => {
+router.post("/update/ghc-images", workerVerifyJWT, async (req, res) => {
   try {
     // required field : user_id
     const validationResults = await updateWorkerGhImagesValidator(req.body);
@@ -148,7 +144,6 @@ router.post("/update/ghc-images", verifyJWT, async (req, res) => {
         if (err) {
           log.warn(err.message);
           return res
-
             .json({ msg: err.message, status: 500, success: false }); // Internal Server Error
         }
         if (!user)
@@ -172,8 +167,9 @@ router.post("/update/ghc-images", verifyJWT, async (req, res) => {
     return commonError(res, e.message);
   }
 });
+
 // update age doc
-router.post("/update/age-verify", verifyJWT, async (req, res) => {
+router.post("/update/age-verify", workerVerifyJWT, async (req, res) => {
   try {
     // required field : user_id
     const validationResults = await updateWorkerAgeValidator(req.body);
@@ -222,7 +218,7 @@ router.post("/update/age-verify", verifyJWT, async (req, res) => {
   }
 });
 // update proof of skill
-router.post("/update/pos", verifyJWT, async (req, res) => {
+router.post("/update/pos", workerVerifyJWT, async (req, res) => {
   try {
     // required field : user_id
     const validationResults = await updateWorkerProofOfSkillValidator(req.body);
@@ -272,7 +268,7 @@ router.post("/update/pos", verifyJWT, async (req, res) => {
   }
 });
 // insurance
-router.post("/update/insurance", verifyJWT, async (req, res) => {
+router.post("/update/insurance", workerVerifyJWT, async (req, res) => {
   try {
     // required field : user_id
     const validationResults = await updateWorkerInsuranceValidator(req.body);
@@ -323,7 +319,7 @@ router.post("/update/insurance", verifyJWT, async (req, res) => {
   }
 });
 // update address
-router.post("/update/address", verifyJWT, async (req, res) => {
+router.post("/update/address", workerVerifyJWT, async (req, res) => {
   try {
     // required field : user_id
     const validationResults = await updateWorkerAddressValidator(req.body);
@@ -377,7 +373,7 @@ router.post("/update/address", verifyJWT, async (req, res) => {
   }
 });
 // update gender
-router.post("/update/gender", verifyJWT, async (req, res) => {
+router.post("/update/gender", workerVerifyJWT, async (req, res) => {
   try {
     // required field : worker
     const validationResults = await updateWorkerGenderValidator(req.body);
@@ -429,7 +425,7 @@ router.post("/update/gender", verifyJWT, async (req, res) => {
 });
 
 // send verifcatioin code
-router.post("/phone/send-code", verifyJWT, async (req, res) => {
+router.post("/phone/send-code", workerVerifyJWT, async (req, res) => {
   //
   try {
     // required field : user_id
@@ -509,7 +505,7 @@ router.post("/phone/send-code", verifyJWT, async (req, res) => {
   }
 });
 // update phone
-router.post("/phone/verify-code", verifyJWT, async (req, res) => {
+router.post("/phone/verify-code", workerVerifyJWT, async (req, res) => {
   //
   try {
     // required field : user_id

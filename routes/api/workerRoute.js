@@ -3,7 +3,6 @@ const { workerModel } = require("../../models/worker_models");
 const { notificationModel } = require("../../models/nofications");
 const admin = require("firebase-admin");
 const log = require("npmlog");
-const { verifyJWT } = require("../../passport/common");
 const { commonError, returnUnAuthUserError } = require("../api/user_route");
 const { workerProfileModel } = require("../../models/worker_profile_model");
 const {
@@ -24,6 +23,7 @@ const {
   updateWorkerGhcValidator,
   updateUserNotificationsValidator,
 } = require("../validators/worker.validator");
+const { workerVerifyJWT } = require("../../passport/common_worker");
 const workerCache = cache;
 
 async function createNotification(worker, title, body, type, token) {
@@ -69,7 +69,7 @@ async function createNotification(worker, title, body, type, token) {
   }
 }
 
-router.get("/:worker", verifyJWT, getWorkerCache, async (req, res) => {
+router.get("/:worker", workerVerifyJWT, getWorkerCache, async (req, res) => {
   const { worker } = req.params;
   // check if user is authenticated
   try {
@@ -94,7 +94,7 @@ router.get("/:worker", verifyJWT, getWorkerCache, async (req, res) => {
   }
 });
 
-router.delete("/:worker", verifyJWT, async (req, res) => {
+router.delete("/:worker", workerVerifyJWT, async (req, res) => {
   const { worker } = req.params;
 
   try {
@@ -123,7 +123,7 @@ router.delete("/:worker", verifyJWT, async (req, res) => {
 
 router.get(
   "/token/:worker",
-  verifyJWT,
+  workerVerifyJWT,
   getWorkerTokenCache,
   async (req, res) => {
     const { worker } = req.params;
@@ -158,7 +158,7 @@ router.get(
   }
 );
 
-router.post("/create", verifyJWT, async (req, res) => {
+router.post("/create", workerVerifyJWT, async (req, res) => {
   try {
     // validating request body submitted
     const validationResults = await createWorkerValidator(req.body);
@@ -277,7 +277,7 @@ router.post("/create", verifyJWT, async (req, res) => {
   }
 });
 
-router.post("/location", verifyJWT, async (req, res) => {
+router.post("/location", workerVerifyJWT, async (req, res) => {
   try {
     /*
         *     "heading": Number,
@@ -333,7 +333,7 @@ router.post("/location", verifyJWT, async (req, res) => {
   }
 });
 
-router.post("/update/token", verifyJWT, async (req, res) => {
+router.post("/update/token", workerVerifyJWT, async (req, res) => {
   try {
     // required field : user_id
     const validationResults = await updateWorkerTokenValidator(req.body);
@@ -384,7 +384,7 @@ router.post("/update/token", verifyJWT, async (req, res) => {
   }
 });
 
-router.post("/update/ghc", verifyJWT, async (req, res) => {
+router.post("/update/ghc", workerVerifyJWT, async (req, res) => {
   try {
     // required field : user_id
     const validationResults = await updateWorkerGhcValidator(req.body);
@@ -441,7 +441,7 @@ router.post("/update/ghc", verifyJWT, async (req, res) => {
   }
 });
 
-router.get("/nofications/:user_id", verifyJWT, async (req, res) => {
+router.get("/nofications/:user_id", workerVerifyJWT, async (req, res) => {
   try {
     // required field : user_id
     const { user_id } = req.params;
@@ -475,7 +475,7 @@ router.get("/nofications/:user_id", verifyJWT, async (req, res) => {
   }
 });
 
-router.post("/nofications/update/:user_id", verifyJWT, async (req, res) => {
+router.post("/nofications/update/:user_id", workerVerifyJWT, async (req, res) => {
   try {
     // required field : user_id
     const validationResults = await updateUserNotificationsValidator(req.body);

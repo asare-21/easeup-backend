@@ -4,11 +4,6 @@ const {
 } = require('mongoose');
 
 const workerSchema = new Schema({
-    _id: {
-        type: String,
-        required: true
-    },
-
     email: {
         type: String,
         required: true,
@@ -22,7 +17,6 @@ const workerSchema = new Schema({
         type: String,
         required: true
     },
-
     phone: {
         type: String,
         default: ''
@@ -59,8 +53,19 @@ const workerSchema = new Schema({
         type: [String],
         default: []
     },
-
-
+    /////////////////////////////
+    googleId: {
+        type: String,
+        default: ''
+    },
+    facebookId: {
+        type: String,
+        default: ''
+    },
+    profile_name: {
+        type: String,
+        default: ''
+    },
 })
 
 module.exports.workerModel = model('Worker', workerSchema);

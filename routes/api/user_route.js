@@ -131,7 +131,6 @@ router.get("/profile/:user_id", verifyJWT, getUserCache, async (req, res) => {
         .status(400)
         .json({ msg: "Bad Request", status: 400, success: false }); // User ID is required
     //check firebase if uid exists
-
     // Find the user
     const userData = await userModel.findById(user_id);
     // cache data
@@ -143,9 +142,7 @@ router.get("/profile/:user_id", verifyJWT, getUserCache, async (req, res) => {
         status: 500,
         success: false,
       }); // Internal Server Error
-
     userCache.set(`user/${user_id}`, userData);
-
     // return user data
     return res.status(200).json({
       msg: "User Found",
@@ -153,24 +150,14 @@ router.get("/profile/:user_id", verifyJWT, getUserCache, async (req, res) => {
       success: true,
       user: userData,
     });
-    // userModel.findById(user_id, (err, user) => {
-    //     if (err) {
-    //         log.warn(err.message)
-    //         return res.json({ msg: err.message, status: 500, success: false }) // Internal Server Error
-    //     }
-    //     if (!user) return res.status(404).json({ msg: 'User Not Found', status: 404, success: false }) // User Not Found
-    //     userCache.set(`user/${user_id}`, user);
-    //     return res.status(200).json({
-    //         msg: 'User Found', status: 200, success: true, user
-    //     }) // User Found and returned
-    // })
+
   } catch (e) {
     if (e.errorInfo) {
-      // User Not Found firebase error
       // User Not Found
       log.warn(e.message);
       return returnUnAuthUserError(res, e.message);
     }
+
     return commonError(res, e.message);
   }
 });
