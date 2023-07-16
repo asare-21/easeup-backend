@@ -91,7 +91,7 @@ app.use(morgan("combined"));
 app.use(limiter);
 app.use("/auth", authRoutes);
 app.use("/auth-worker", authWorker);
-app.use("/user", USER_ROUTE);
+app.use("/user", userRoute);
 app.use("/search", searchRoute);
 app.use("/bookmark", bookmarkRoute);
 app.use("/verify-worker-profile", workerProfileVerificationRoute);

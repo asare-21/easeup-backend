@@ -123,10 +123,11 @@ router.get("/profile/:user_id", verifyJWT, getUserCache, async (req, res) => {
         .status(400)
         .json({ msg: "Bad Request", status: 400, success: false }); // User ID is required
     //check firebase if uid exists
+    console.log(req)
     // Find the user
-    const userData = await userModel.findById(user_id);
+    const userData = await userModel.findById(req.user.id);
     // cache data
-    console.log(userData)
+    console.log("User data ", userData)
     if (!userData)
       return res.json({
         msg: "Something went wrong. User not found",
