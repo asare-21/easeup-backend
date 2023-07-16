@@ -562,4 +562,4 @@ router.post("/phone/verify-code", verifyJWT, async (req, res) => {
   }
 });
 
-module.exports.workerProfileVerificationRoute = router;
+// module.exports.workerProfileVerificationRoute = router;

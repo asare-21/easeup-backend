@@ -958,7 +958,7 @@ router.delete("/bookmarks/delete", verifyJWT, async (req, res) => {
   }
 });
 // exports all the routes
-module.exports.USER_ROUTE = router;
+// module.exports.USER_ROUTE = router;
 module.exports.commonError = commonError;
 module.exports.returnUnAuthUserError = returnUnAuthUserError;
 module.exports.createNotification = createNotification;

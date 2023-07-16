@@ -22,7 +22,6 @@ const {
   cache,
   getUserNotificationsCache,
 } = require("../cache/user_cache");
-const { workerModel } = require("../models/worker_models");
 const {
   updateImageValidator,
   updateAddressValidator,

@@ -53,7 +53,7 @@ router.post(
 router.post(
   "/update",
   verifyJWT,
-  userController.update
+  userController.updateInfo
 );
 
 router.post(

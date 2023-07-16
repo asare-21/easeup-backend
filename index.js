@@ -8,13 +8,13 @@ const PORT = process.env.PORT || 3000;
 const morgan = require("morgan");
 const { connect } = require("mongoose");
 const rateLimit = require("express-rate-limit");
-const { USER_ROUTE } = require("./routes/api/user_route");
+const { userRoute } = require("./routes/user.router");
 const { searchRoute } = require("./routes/api/searchRoute");
 const {
   workerProfileVerificationRoute,
 } = require("./routes/workerProfileVerify.router");
-const { workerRoute } = require("./routes/api/workerRoute");
-const { workerProfileRoute } = require("./routes/api/workerProfileRoute");
+const { workerRoute } = require("./routes/worker.router");
+const { workerProfileRoute } = require("./routes/workerProfile");
 const { bookmarkRoute } = require("./routes/api/bookmarkRoute");
 const log = require("npmlog");
 const serviceAccount = require("./easeup.json");
@@ -90,7 +90,7 @@ app.use(morgan("combined"));
 app.use(limiter);
 app.use("/auth", authRoutes);
 
-app.use("/user", USER_ROUTE);
+app.use("/user", userRoute);
 app.use("/search", searchRoute);
 app.use("/bookmark", bookmarkRoute);
 app.use("/verify-worker-profile", workerProfileVerificationRoute);

@@ -525,4 +525,4 @@ router.post("/nofications/update/:user_id", verifyJWT, async (req, res) => {
   }
 });
 
-module.exports.workerRoute = router;
+// module.exports.workerRoute = router;

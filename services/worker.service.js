@@ -7,7 +7,7 @@ const { workerProfileModel } = require("../models/worker_profile_model");
 const {
   workerProfileVerificationModel,
 } = require("../models/worker_profile_verification_model");
-const { locationModel } = require("../../models/workerLocationModel");
+const { locationModel } = require("../models/workerLocationModel");
 const { cache } = require("../cache/user_cache");
 const { userModel } = require("../models/user_model");
 const {
