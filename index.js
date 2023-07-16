@@ -65,6 +65,7 @@ const { servicesRoute } = require("./routes/api/services");
 const { jobRequestRoute } = require("./routes/api/job_requests_route");
 const { advertRoute } = require("./routes/api/advert_route");
 const { advertModel } = require("./models/advert_model");
+const { authWorker } = require("./routes/api/auth_work");
 
 //Auth
 app.use(
@@ -88,7 +89,7 @@ app.use(express.json());
 app.use(morgan("combined"));
 app.use(limiter);
 app.use("/auth", authRoutes);
-
+app.use("/auth-worker", authWorker);
 app.use("/user", USER_ROUTE);
 app.use("/search", searchRoute);
 app.use("/bookmark", bookmarkRoute);
@@ -104,6 +105,7 @@ app.use("/dashboard", dashboard);
 app.use("/services", servicesRoute)
 app.use("/j-requests", jobRequestRoute)
 app.use("/adverts", advertRoute)
+
 // handle 404
 app.use((req, res, next) => {
   return res.status(404).json({

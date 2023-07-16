@@ -54,14 +54,10 @@ function commonError(res, msg) {
 
 async function createNotification(user_id, title, body, type, token) {
   try {
-    // required field : user_id
-
     if (!user_id)
       return res
         .status(400)
         .json({ msg: "Bad Request", status: 400, success: false }); // User ID is required
-    //check firebase if uid exists
-
     // Find the user
     userModel.findById(user_id, (err, user) => {
       if (err) return log.error("Internal Server Error"); // Internal Server Error
@@ -104,7 +100,6 @@ router.use(express.json());
 
 router.delete("/:user", verifyJWT, async (req, res) => {
   const { user } = req.params;
-
   try {
     await Promise.all([userModel.findByIdAndDelete(user)]);
     return res.status(200).json({
@@ -135,7 +130,6 @@ router.get("/profile/:user_id", verifyJWT, getUserCache, async (req, res) => {
     const userData = await userModel.findById(user_id);
     // cache data
     console.log(userData)
-
     if (!userData)
       return res.json({
         msg: "Something went wrong. User not found",
