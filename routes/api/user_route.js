@@ -768,9 +768,7 @@ router.get(
       // Find the user
       notificationModel.find({ user: user_id }, (err, notifications) => {
         if (err)
-          return res
-
-            .json({ msg: err.message, status: 500, success: false }); // Internal Server Error
+          return res.json({ msg: err.message, status: 500, success: false }); // Internal Server Error
         // cache data
         userCache.set(
           `notifications/${user_id}`,

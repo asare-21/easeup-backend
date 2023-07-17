@@ -336,7 +336,8 @@ class WorkerService {
   // delete worker
   async updateWorkerToken(req, res) {
     try {
-      // required field : user_id
+      const userId = req.user.id;
+
       const validationResults = await updateWorkerTokenValidator(req.body);
 
       if (validationResults.status !== 200) {
@@ -350,7 +351,7 @@ class WorkerService {
 
       // Find the user
       workerModel.findByIdAndUpdate(
-        user_id,
+        userId,
         {
           token,
         },
@@ -361,7 +362,7 @@ class WorkerService {
           }
           if (!user)
             return { msg: "Worker Not Found", status: 404, success: false }; // User Not Found
-          workerCache.del(`worker/${user_id}`);
+          workerCache.del(`worker/${userId}`);
 
           return {
             msg: "Profile token updated",
@@ -381,7 +382,6 @@ class WorkerService {
   // delete worker
   async updateGhanaCard(req, res) {
     try {
-      // required field : user_id
       const validationResults = await updateWorkerGhcValidator(req.body);
 
       if (validationResults.status !== 200) {
@@ -392,10 +392,12 @@ class WorkerService {
           validationResults: validationResults.msg,
         };
       }
-      const { user_id, ghc, ghc_n, ghc_exp } = req.body;
+      const { ghc, ghc_n, ghc_exp } = req.body;
+      const userId = req.user.id;
+
       // Find the user
       workerProfileVerificationModel.findOneAndUpdate(
-        { worker: user_id },
+        { worker: userId },
         {
           // ghc_image: ghc,
           gh_card_to_face: ghc[0],
@@ -411,7 +413,7 @@ class WorkerService {
           }
           if (!user)
             return { msg: "User Not Found", status: 404, success: false }; // User Not Found
-          cache.del(`worker/${user_id}`);
+          cache.del(`worker/${userId}`);
 
           return {
             msg: "Profile updated",
@@ -431,13 +433,12 @@ class WorkerService {
   // delete worker
   async getWorkerNotifications(req, res) {
     try {
-      // required field : user_id
-      const { user_id } = req.params;
+      const userId = req.user.id;
 
-      if (!user_id) return { msg: "Bad Request", status: 400, success: false }; // User ID is required
+      if (!userId) return { msg: "Bad Request", status: 400, success: false }; // User ID is required
       //check firebase if uid exists
       await // Find the user
-      notificationModel.find({ user: user_id }, (err, notifications) => {
+      notificationModel.find({ user: userId }, (err, notifications) => {
         if (err) return { msg: err.message, status: 500, success: false }; // Internal Server Error
         return {
           msg: "Notifications Found",
@@ -469,14 +470,14 @@ class WorkerService {
           validationResults: validationResults.msg,
         };
       }
-      const { user_id } = req.params;
+      const userId = req.user.id;
       const { id } = req.body;
 
-      if (!user_id) return { msg: "Bad Request", status: 400, success: false }; // User ID is required
+      if (!userId) return { msg: "Bad Request", status: 400, success: false }; // User ID is required
       //check firebase if uid exists
       await // Find the user
       notificationModel.findOneAndUpdate(
-        { user: user_id, _id: id },
+        { user: userId, _id: id },
         {
           read: true,
         },

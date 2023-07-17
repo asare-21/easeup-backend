@@ -9,38 +9,28 @@ class WorkerController {
     res.status(status).send(responseData);
   };
   getWorkerReviews = async (req, res, next) => {
-    const { status, ...responseData } = await WorkerProfileService.findWorkerReviews(
-      req,
-      res
-    );
+    const { status, ...responseData } =
+      await WorkerProfileService.findWorkerReviews(req, res);
     res.status(status).send(responseData);
   };
   getWorkerComments = async (req, res, next) => {
-    const { status, ...responseData } = await WorkerProfileService.findWorkerComments(
-      req,
-      res
-    );
+    const { status, ...responseData } =
+      await WorkerProfileService.findWorkerComments(req, res);
     res.status(status).send(responseData);
   };
   AddWorkerComments = async (req, res, next) => {
-    const { status, ...responseData } = await WorkerProfileService.addWorkerComments(
-      req,
-      res
-    );
+    const { status, ...responseData } =
+      await WorkerProfileService.addWorkerComments(req, res);
     res.status(status).send(responseData);
   };
   AddWorkerCharge = async (req, res, next) => {
-    const { status, ...responseData } = await WorkerProfileService.addWorkerCharge(
-      req,
-      res
-    );
+    const { status, ...responseData } =
+      await WorkerProfileService.addWorkerCharge(req, res);
     res.status(status).send(responseData);
   };
   AddWorkerSkills = async (req, res, next) => {
-    const { status, ...responseData } = await WorkerProfileService.addWorkerSkills(
-      req,
-      res
-    );
+    const { status, ...responseData } =
+      await WorkerProfileService.addWorkerSkills(req, res);
     res.status(status).send(responseData);
   };
 
@@ -52,32 +42,30 @@ class WorkerController {
     res.status(status).send(responseData);
   };
   AddWorkerInstagram = async (req, res, next) => {
-    const { status, ...responseData } = await WorkerProfileService.addWorkerInstagram(
-      req,
-      res
-    );
+    const { status, ...responseData } =
+      await WorkerProfileService.addWorkerInstagram(req, res);
     res.status(status).send(responseData);
   };
 
   AddWorkerTwitter = async (req, res, next) => {
-    const { status, ...responseData } = await WorkerProfileService.addWorkeTwitter(
-      req,
-      res
-    );
+    const { status, ...responseData } =
+      await WorkerProfileService.addWorkeTwitter(req, res);
     res.status(status).send(responseData);
   };
   addWorkerPortfolio = async (req, res, next) => {
-    const { status, ...responseData } = await WorkerProfileService.addWorkerPortfolio(
-      req,
-      res
-    );
+    const { status, ...responseData } =
+      await WorkerProfileService.addWorkerPortfolio(req, res);
     res.status(status).send(responseData);
   };
+  getWorkerPortfolio = async (req, res, next) => {
+    const { status, ...responseData } =
+      await WorkerProfileService.getWorkerPortfolioPage(req, res);
+    res.status(status).send(responseData);
+  };
+
   AddWorkerRadius = async (req, res, next) => {
-    const { status, ...responseData } = await WorkerProfileService.addWorkerRadius(
-      req,
-      res
-    );
+    const { status, ...responseData } =
+      await WorkerProfileService.addWorkerRadius(req, res);
     res.status(status).send(responseData);
   };
   getBooking = async (req, res, next) => {
@@ -88,24 +76,18 @@ class WorkerController {
     res.status(status).send(responseData);
   };
   getPaidBooking = async (req, res, next) => {
-    const { status, ...responseData } = await WorkerProfileService.findPaidBooking(
-      req,
-      res
-    );
+    const { status, ...responseData } =
+      await WorkerProfileService.findPaidBooking(req, res);
     res.status(status).send(responseData);
   };
   getUpcomingBooking = async (req, res, next) => {
-    const { status, ...responseData } = await WorkerProfileService.findUpcomingBooking(
-      req,
-      res
-    );
+    const { status, ...responseData } =
+      await WorkerProfileService.findUpcomingBooking(req, res);
     res.status(status).send(responseData);
   };
   getPendingBooking = async (req, res, next) => {
-    const { status, ...responseData } = await WorkerProfileService.findPendingBooking(
-      req,
-      res
-    );
+    const { status, ...responseData } =
+      await WorkerProfileService.findPendingBooking(req, res);
     res.status(status).send(responseData);
   };
 
@@ -126,10 +108,8 @@ class WorkerController {
     res.status(status).send(responseData);
   };
   updateBookingStatus = async (req, res, next) => {
-    const { status, ...responseData } = await WorkerProfileService.updateBookingStatus(
-      req,
-      res
-    );
+    const { status, ...responseData } =
+      await WorkerProfileService.updateBookingStatus(req, res);
     res.status(status).send(responseData);
   };
   markBookingAsPending = async (req, res, next) => {
@@ -138,31 +118,23 @@ class WorkerController {
     res.status(status).send(responseData);
   };
   AddWorkerReviews = async (req, res, next) => {
-    const { status, ...responseData } = await WorkerProfileService.addWorkerReviews(
-      req,
-      res
-    );
+    const { status, ...responseData } =
+      await WorkerProfileService.addWorkerReviews(req, res);
     res.status(status).send(responseData);
   };
   getWorkerReviews = async (req, res, next) => {
-    const { status, ...responseData } = await WorkerProfileService.findWorkerReviews(
-      req,
-      res
-    );
+    const { status, ...responseData } =
+      await WorkerProfileService.findWorkerReviews(req, res);
     res.status(status).send(responseData);
   };
   addAvailableSlots = async (req, res, next) => {
-    const { status, ...responseData } = await WorkerProfileService.addAvailableSlots(
-      req,
-      res
-    );
+    const { status, ...responseData } =
+      await WorkerProfileService.addAvailableSlots(req, res);
     res.status(status).send(responseData);
   };
   bookWorkerSlot = async (req, res, next) => {
-    const { status, ...responseData } = await WorkerProfileService.bookWorkerSlot(
-      req,
-      res
-    );
+    const { status, ...responseData } =
+      await WorkerProfileService.bookWorkerSlot(req, res);
     res.status(status).send(responseData);
   };
 
@@ -188,10 +160,8 @@ class WorkerController {
     res.status(status).send(responseData);
   };
   updateLocation = async (req, res, next) => {
-    const { status, ...responseData } = await WorkerProfileService.updateLocation(
-      req,
-      res
-    );
+    const { status, ...responseData } =
+      await WorkerProfileService.updateLocation(req, res);
     res.status(status).send(responseData);
   };
   updateDate = async (req, res, next) => {

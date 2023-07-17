@@ -4,6 +4,7 @@ const GoogleStrategy = require("passport-google-oauth2").Strategy;
 const FacebookStrategy = require("passport-facebook").Strategy;
 const TwitterStrategy = require("passport-twitter").Strategy;
 const { userModel } = require("../models/user_model");
+const {createNotification} = require("../utils")
 
 passport.use(
   new GoogleStrategy(
@@ -30,8 +31,23 @@ passport.use(
             googleId: profile.id,
             profile_name: profile.displayName,
           });
-          console.log("user not found", user)
-
+          console.log("user not found", user);
+          // create notification
+          await createNotification(
+            user._id,
+            "Welcome to Easeup",
+            "We're glad to have you on board. Enjoy your stay",
+            "welcome",
+            user.token
+          );
+          // send notification to update user profile
+          await createNotification(
+            user._id,
+            "Update your profile",
+            "We noticed you haven't updated your profile. Please update your profile to enjoy the full experience",
+            "update_profile",
+            user.token
+          );
         } else if (user && !user.facebookId) {
 
           user = await userModel.findByIdAndUpdate(user._id, {
