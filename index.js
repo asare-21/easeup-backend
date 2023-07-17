@@ -285,36 +285,5 @@ async function createNewRoom(_room) {
   }
 }
 
-// migrate data ub firebase to mongodb
-async function migrate() {
-
-  const ads = [
-    {
-      title: "Welcome to Easeup!",
-      subtitle: "Empowering Handymen to Connect and Thrive in the Gig Economy",
-      url: "https://res.cloudinary.com/dl3f5pgro/image/upload/v1689620789/smiling-holding-out-hand-camera-young-african-american-builder-uniform-isolated-blue-background_dlbo1z.jpg"
-    },
-    {
-      title: "Earn More with Easeup",
-      subtitle: "Get Connected to High-Paying Clients and Maximize Your Earnings as a Handyman",
-      url: "https://res.cloudinary.com/dl3f5pgro/image/upload/v1689621050/people-renovating-their-new-house_q4zdem.jpg"
-    },
-    {
-      title: "Stand Out as a Handyman",
-      subtitle: "Create a Professional Profile, Showcase Your Skills, and Attract More Clients with Easeup",
-      url: "https://res.cloudinary.com/dl3f5pgro/image/upload/v1689621355/abstract-app-social-web-service-object_clee2o.jpg"
-    },
-    {
-      title: "Join the Handyman Community",
-      subtitle: "Connect with Like-minded Handymen, Share Knowledge, and Collaborate for Success",
-      url: "https://res.cloudinary.com/dl3f5pgro/image/upload/v1689621470/family-enjoying-their-quality-winter-time_b6ja3f.jpg"
-    },
-  ]
-
-  ads.forEach(async (ad) => {
-    await introModel.create(ad)
-  })
-
-}
 
 module.exports.admin = FBadmin;
