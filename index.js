@@ -66,6 +66,8 @@ const { advertRoute } = require("./routes/api/advert_route");
 const { advertModel } = require("./models/advert_model");
 const { authWorker } = require("./routes/api/auth_work");
 const { workerProfileRoute } = require("./routes/api/workerProfileRoute");
+const { introModel } = require("./models/intro_model");
+const { introRoute } = require("./routes/api/intro_route");
 
 //Auth
 app.use(
@@ -106,6 +108,7 @@ app.use("/dashboard", dashboard);
 app.use("/services", servicesRoute)
 app.use("/j-requests", jobRequestRoute)
 app.use("/adverts", advertRoute)
+app.use("/intro", introRoute)
 
 // handle 404
 app.use((req, res, next) => {
@@ -140,8 +143,8 @@ http.listen(PORT, async () => {
     await FBadmin.initializeApp({
       credential: FBadmin.credential.cert(serviceAccount),
     });
-
     log.info("Connected to MongoDB and running");
+
   } catch (err) {
     console.error(err);
   }
@@ -284,39 +287,33 @@ async function createNewRoom(_room) {
 
 // migrate data ub firebase to mongodb
 async function migrate() {
-  // let data = await FBadmin.firestore().collection("adverts").doc("adverts").get()
-  // data = data.data()
-  // // save to mongodb
-  // console.log(data.data)
-  // data.data.forEach(async (service) => {
-  //   const adverts = new advertModel({
-  //     bgImg: "https://res.cloudinary.com/dl3f5pgro/image/upload/v1689455989/Discount_Banner_bw19op.png",
-  //     title: "",
-  //     subtitle: "",
-  //     route: "",
-  //     url: "https://www.easeupgh.tech/",
-  //   })
-  //   await adverts.save()
-  // const newService = new servicesModel({
-  //   img: service.img,
-  //   query: service.query,
-  //   service: service.service
-  // })
-  // await newService.save()
-  // }
-  // )
-  let data = await FBadmin.firestore().collection("services").doc("3IxGFpl8wT1piNQdT31i").get()
-  data = data.data()
-  // save to mongodb
-  data.services.forEach(async (service) => {
-    const newService = new servicesModel({
-      img: service.img,
-      query: service.query,
-      service: service.service
-    })
-    await newService.save()
+
+  const ads = [
+    {
+      title: "Welcome to Easeup!",
+      subtitle: "Empowering Handymen to Connect and Thrive in the Gig Economy",
+      url: "https://res.cloudinary.com/dl3f5pgro/image/upload/v1689620789/smiling-holding-out-hand-camera-young-african-american-builder-uniform-isolated-blue-background_dlbo1z.jpg"
+    },
+    {
+      title: "Earn More with Easeup",
+      subtitle: "Get Connected to High-Paying Clients and Maximize Your Earnings as a Handyman",
+      url: "https://res.cloudinary.com/dl3f5pgro/image/upload/v1689621050/people-renovating-their-new-house_q4zdem.jpg"
+    },
+    {
+      title: "Stand Out as a Handyman",
+      subtitle: "Create a Professional Profile, Showcase Your Skills, and Attract More Clients with Easeup",
+      url: "https://res.cloudinary.com/dl3f5pgro/image/upload/v1689621355/abstract-app-social-web-service-object_clee2o.jpg"
+    },
+    {
+      title: "Join the Handyman Community",
+      subtitle: "Connect with Like-minded Handymen, Share Knowledge, and Collaborate for Success",
+      url: "https://res.cloudinary.com/dl3f5pgro/image/upload/v1689621470/family-enjoying-their-quality-winter-time_b6ja3f.jpg"
+    },
+  ]
+
+  ads.forEach(async (ad) => {
+    await introModel.create(ad)
   })
-  console.log(data)
 
 }
 
