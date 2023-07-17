@@ -5,6 +5,30 @@ class WorkerProfileService {
   async findWorker(req, res) {
     try {
       //TODO ADD SERVICE
+      const rating = await reviewModel
+        .aggregate([
+          {
+            $match: { worker },
+          },
+          {
+            $group: {
+              _id: null,
+              avgRating: { $avg: "$rating" },
+            },
+          },
+        ])
+        .exec();
+
+
+      let avgRating = 0;
+
+      if (promiseRating.length > 0) avgRating = promiseRating[0].avgRating ?? 0;
+
+      const totalReviews = await reviewModel.countDocuments({ worker });
+
+      result.rating = avgRating;
+      result.totalReviews = totalReviews;
+      result.jobs = totalReviews;
       return {
         msg: "Worker Profile",
         status: 200,

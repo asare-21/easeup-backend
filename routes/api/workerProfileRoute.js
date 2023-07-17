@@ -1676,4 +1676,4 @@ router.get(
   }
 );
 
-// module.exports.workerProfileRoute = router;
+module.exports.workerProfileRoute = router;

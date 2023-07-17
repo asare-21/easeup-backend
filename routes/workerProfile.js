@@ -107,4 +107,4 @@ router.get(
 );
 router.get("/popular/:id", verifyJWT, workerProfileController.getWorkerProfile);
 
-module.exports.workerProfileRoute = router;
+module.exports.workerProfileRouteNew = router;
