@@ -29,127 +29,137 @@ router.get(
   "/reviews/:worker",
   verifyJWT,
   getReviewsCache,
-  workerProfileController.getWorkerProfile
+  workerProfileController.getWorkerReviews
 );
 router.get(
   "/comments/:worker/:post",
   verifyJWT,
   getCommentsCache,
-  workerProfileController.getWorkerProfile
+  workerProfileController.getWorkerComments
 );
 router.post(
   "/comments/:worker",
   verifyJWT,
-  workerProfileController.getWorkerProfile
+  workerProfileController.addWorkerComments
 );
-router.post("/charge", verifyJWT, workerProfileController.getWorkerProfile);
-router.post("/skills", verifyJWT, workerProfileController.getWorkerProfile);
-router.post("/bio", verifyJWT, workerProfileController.getWorkerProfile);
-router.post("/instagram", verifyJWT, workerProfileController.getWorkerProfile);
-router.post("/portfolio", verifyJWT, workerProfileController.getWorkerProfile);
+router.post("/charge", verifyJWT, workerProfileController.addWorkerCharge);
+router.post("/skills", verifyJWT, workerProfileController.addWorkerSkills);
+router.post("/bio", verifyJWT, workerProfileController.addWorkerBio);
+router.post("/instagram", verifyJWT, workerProfileController.addWorkerInstagram);
+router.post("/portfolio", verifyJWT, workerProfileController.addWorkerPortfolio);
 router.get(
   "/portfolio/:worker/:page",
   verifyJWT,
   mediaCache,
-  workerProfileController.getWorkerProfile
+  workerProfileController.getWorkerPortfolio
 );
 router.post(
   "/work-radius",
   verifyJWT,
-  workerProfileController.getWorkerProfile
+  workerProfileController.addWorkerRadius
 );
 router.get(
   "/booking/:worker",
   verifyJWT,
   getBookingCache,
-  workerProfileController.getWorkerProfile
+  workerProfileController.getBooking
 );
-router.get("/paid/:user", verifyJWT,getPaidBookingsCache, workerProfileController.getWorkerProfile);
+router.get(
+  "/paid/:user",
+  verifyJWT,
+  getPaidBookingsCache,
+  workerProfileController.getPaidBooking
+);
 router.get(
   "/booking-upcoming/:worker",
   verifyJWT,
   getUpcomingBookingCache,
-  workerProfileController.getWorkerProfile
+  workerProfileController.getUpcomingBooking
 );
 router.get(
   "/booking-pending/:worker",
   verifyJWT,
-  workerProfileController.getWorkerProfile
+  workerProfileController.getPendingBooking
 );
 router.get(
   "/booking-progress/:worker",
   verifyJWT,
-  workerProfileController.getWorkerProfile
+  workerProfileController.getBookingInProgress
 );
 router.get(
   "/booking-completed/:worker",
   verifyJWT,
   getCompletedBookingCache,
-  workerProfileController.getWorkerProfile
+  workerProfileController.getCompletedBooking
 );
 router.get(
   "/booking-cancelled/:worker",
   verifyJWT,
   getCancelledBookingCache,
-  workerProfileController.getWorkerProfile
+  workerProfileController.getCancelledBooking
 );
 router.put(
   "/booking-status",
   verifyJWT,
-  workerProfileController.getWorkerProfile
+  workerProfileController.updateBookingStatus
 );
 router.put(
   "/booking-status/pending",
   verifyJWT,
-  workerProfileController.getWorkerProfile
+  workerProfileController.markBookingAsPending
 );
 router.post(
   "/worker-review",
   verifyJWT,
-  workerProfileController.getWorkerProfile
+  workerProfileController.addWorkerReviews
 );
 router.get(
   "/worker-review/:worker",
   verifyJWT,
   getWorkerReviewCache,
-  workerProfileController.getWorkerProfile
+  workerProfileController.getWorkerReviews
 );
 router.post(
   "/available-slots/:worker",
   verifyJWT,
-  workerProfileController.getWorkerProfile
+  workerProfileController.addAvailableSlots
 );
-router.post("/book-slot", verifyJWT, workerProfileController.getWorkerProfile);
+router.post("/book-slot", verifyJWT, workerProfileController.bookWorkerSlot);
 router.post(
   "/verify-payment",
   verifyJWT,
-  workerProfileController.getWorkerProfile
+  workerProfileController.verifyPaymentWebhook
 );
 router.post(
   "/refund/:ref",
   verifyJWT,
-  workerProfileController.getWorkerProfile
+  workerProfileController.refundWorker
 );
 router.post(
   "/cancel/:ref",
   verifyJWT,
-  workerProfileController.getWorkerProfile
+  workerProfileController.cancelWorker
 );
 router.patch(
   "/update-location",
   verifyJWT,
-  workerProfileController.getWorkerProfile
+  workerProfileController.updateLocation
 );
 router.patch(
   "/update-date",
   verifyJWT,
-  workerProfileController.getWorkerProfile
+  workerProfileController.updateDate
 );
 router.get(
   "/notify/:worker",
   verifyJWT,
-  workerProfileController.getWorkerProfile
+  workerProfileController.notifyWorker
 );
-router.get("/popular/:id", verifyJWT, getPopularWorkersCache,workerProfileController.getWorkerProfile);
+router.get(
+  "/popular/:id",
+  verifyJWT,
+  getPopularWorkersCache,
+  workerProfileController.getPopular
+);
 
 module.exports.workerProfileRouteNew = router;

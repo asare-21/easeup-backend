@@ -18,36 +18,36 @@ class WorkerController {
       await WorkerProfileService.findWorkerComments(req, res);
     res.status(status).send(responseData);
   };
-  AddWorkerComments = async (req, res, next) => {
+  addWorkerComments = async (req, res, next) => {
     const { status, ...responseData } =
       await WorkerProfileService.addWorkerComments(req, res);
     res.status(status).send(responseData);
   };
-  AddWorkerCharge = async (req, res, next) => {
+  addWorkerCharge = async (req, res, next) => {
     const { status, ...responseData } =
       await WorkerProfileService.addWorkerCharge(req, res);
     res.status(status).send(responseData);
   };
-  AddWorkerSkills = async (req, res, next) => {
+  addWorkerSkills = async (req, res, next) => {
     const { status, ...responseData } =
       await WorkerProfileService.addWorkerSkills(req, res);
     res.status(status).send(responseData);
   };
 
-  AddWorkerBio = async (req, res, next) => {
+  addWorkerBio = async (req, res, next) => {
     const { status, ...responseData } = await WorkerProfileService.addWorkerBio(
       req,
       res
     );
     res.status(status).send(responseData);
   };
-  AddWorkerInstagram = async (req, res, next) => {
+  addWorkerInstagram = async (req, res, next) => {
     const { status, ...responseData } =
       await WorkerProfileService.addWorkerInstagram(req, res);
     res.status(status).send(responseData);
   };
 
-  AddWorkerTwitter = async (req, res, next) => {
+  addWorkerTwitter = async (req, res, next) => {
     const { status, ...responseData } =
       await WorkerProfileService.addWorkeTwitter(req, res);
     res.status(status).send(responseData);
@@ -63,7 +63,7 @@ class WorkerController {
     res.status(status).send(responseData);
   };
 
-  AddWorkerRadius = async (req, res, next) => {
+  addWorkerRadius = async (req, res, next) => {
     const { status, ...responseData } =
       await WorkerProfileService.addWorkerRadius(req, res);
     res.status(status).send(responseData);
@@ -117,7 +117,7 @@ class WorkerController {
       await WorkerProfileService.markBookingAsPending(req, res);
     res.status(status).send(responseData);
   };
-  AddWorkerReviews = async (req, res, next) => {
+  addWorkerReviews = async (req, res, next) => {
     const { status, ...responseData } =
       await WorkerProfileService.addWorkerReviews(req, res);
     res.status(status).send(responseData);
