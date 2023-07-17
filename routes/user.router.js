@@ -65,7 +65,7 @@ router.post(
 router.post(
   "/phone/verify-code",
   verifyJWT,
-  userController.updatePhoneSendCode
+  userController.updatePhoneVerifyCode
 );
 
 router.post(

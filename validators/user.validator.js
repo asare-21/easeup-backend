@@ -3,7 +3,6 @@ const { JoiValidator } = require("../joi.validator");
 
 const updateImageValidator = (params) => {
   const schema = Joi.object({
-    user_id: Joi.string().optional().label("UserId"),
     profile_picture: Joi.string().optional().label("Profile Picture"),
   }).strict();
 
@@ -18,7 +17,6 @@ const updateImageValidator = (params) => {
 
 const updateAddressValidator = (params) => {
   const schema = Joi.object({
-    user_id: Joi.string().optional().label("UserId"),
     address: Joi.string().optional().label("Address"),
     latlng: Joi.array().optional().label("Latlng"),
   }).strict();
@@ -34,7 +32,6 @@ const updateAddressValidator = (params) => {
 
 const updateGenderValidator = (params) => {
   const schema = Joi.object({
-    user_id: Joi.string().optional().label("UserId"),
     gender: Joi.string().optional().label("Gender"),
   }).strict();
 
@@ -49,7 +46,6 @@ const updateGenderValidator = (params) => {
 
 const updateTokenValidator = (params) => {
   const schema = Joi.object({
-    user_id: Joi.string().optional().label("UserId"),
     token: Joi.string().optional().label("Token"),
   }).strict();
 
@@ -64,7 +60,6 @@ const updateTokenValidator = (params) => {
 
 const updatePhoneValidator = (params) => {
   const schema = Joi.object({
-    user_id: Joi.string().optional().label("UserId"),
     phone: Joi.string().optional().label("Phone"),
   }).strict();
 
@@ -79,7 +74,6 @@ const updatePhoneValidator = (params) => {
 
 const updateGhcValidator = (params) => {
   const schema = Joi.object({
-    user_id: Joi.string().optional().label("UserId"),
     ghc: Joi.array().optional().label("Phone"),
     ghc_n: Joi.string().optional().label("Ghc number"),
     ghc_exp: Joi.string().optional().label("Ghc exp"),
@@ -96,7 +90,6 @@ const updateGhcValidator = (params) => {
 
 const updateUserValidator = (params) => {
   const schema = Joi.object({
-    user_id: Joi.string().optional().label("UserId"),
     gender: Joi.string().optional().label("gender"),
     dob: Joi.string().optional().label("dob"),
     phone: Joi.string().optional().label("Phone"),
@@ -114,7 +107,6 @@ const updateUserValidator = (params) => {
 
 const sendCodeValidator = (params) => {
   const schema = Joi.object({
-    user_id: Joi.string().optional().label("UserId"),
     phone: Joi.string().optional().label("Phone"),
   }).strict();
 
@@ -129,7 +121,6 @@ const sendCodeValidator = (params) => {
 
 const verifyCodeValidator = (params) => {
   const schema = Joi.object({
-    user_id: Joi.string().optional().label("UserId"),
     phone: Joi.string().optional().label("Phone"),
     code: Joi.string().optional().label("Code"),
   }).strict();
@@ -145,7 +136,6 @@ const verifyCodeValidator = (params) => {
 
 const createUserValidator = (params) => {
   const schema = Joi.object({
-    user_id: Joi.string().optional().label("UserId"),
     email: Joi.string().optional().label("Email"),
     profile_name: Joi.string().optional().label("Profile Name"),
     last_login: Joi.string().optional().label("Last Login"),

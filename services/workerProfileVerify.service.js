@@ -97,7 +97,6 @@ class WorkerProfileVerificationService {
   // update ghc back
   async updateWorkerGhanaCard(req, res) {
     try {
-      // required field : user_id
       const validationResults = await updateWorkerGhImagesValidator(req.body);
 
       if (validationResults.status !== 200) {
@@ -150,7 +149,6 @@ class WorkerProfileVerificationService {
   }
   async updateWorkerAge(req, res) {
     try {
-      // required field : user_id
       const validationResults = await updateWorkerAgeValidator(req.body);
 
       if (validationResults.status !== 200) {
@@ -196,7 +194,6 @@ class WorkerProfileVerificationService {
 
   async updateWorkerProofOfSkill(req, res) {
     try {
-      // required field : user_id
       const validationResults = await updateWorkerProofOfSkillValidator(
         req.body
       );
@@ -244,7 +241,6 @@ class WorkerProfileVerificationService {
 
   async updateWorkerInsurance(req, res) {
     try {
-      // required field : user_id
       const validationResults = await updateWorkerInsuranceValidator(req.body);
 
       if (validationResults.status !== 200) {
@@ -290,7 +286,6 @@ class WorkerProfileVerificationService {
 
   async updateWorkerAddress(req, res) {
     try {
-      // required field : user_id
       const validationResults = await updateWorkerAddressValidator(req.body);
 
       if (validationResults.status !== 200) {
@@ -384,7 +379,6 @@ class WorkerProfileVerificationService {
 
   async updateWorkerPhone(req, res) {
     try {
-      // required field : user_id
       const validationResults = await updateWorkerPhoneValidator(req.body);
 
       if (validationResults.status !== 200) {
@@ -426,11 +420,11 @@ class WorkerProfileVerificationService {
       ); // wait for the sms to be sent
       console.log(response);
       if (response.data.handshake.label !== "HSHK_OK")
-        return res.json({
+        return {
           msg: "Handshake error. Access Denied",
           status: 500,
           success: false,
-        }); // Internal Server Error
+        }; // Internal Server Error
 
       //update user with code
       await workerProfileVerificationModel.findOneAndUpdate(
@@ -453,7 +447,6 @@ class WorkerProfileVerificationService {
 
   async updateWorkerPhoneVerifyCode(req, res) {
     try {
-      // required field : user_id
       const validationResults = await updateWorkerPhoneVerifyCodeValidator(
         req.body
       );
@@ -478,11 +471,11 @@ class WorkerProfileVerificationService {
 
       // Check if code matches
       if (user.code.toString() !== code.toString())
-        return res.status(400).json({
+        return {
           msg: "Verification code is incorrect",
           status: 400,
           success: false,
-        }); // Verification code is incorrect
+        }; // Verification code is incorrect
       // Update the user if code matched
       await workerProfileVerificationModel.findOneAndUpdate(
         { worker },
