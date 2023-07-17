@@ -58,14 +58,14 @@ class UserService {
   async getUserProfile(req, res) {
     try {
       // required field : user_id
-      const user_id = req.params.user_id;
+      const user_id = req.user.id;
       if (!user_id) return { msg: "Bad Request", status: 400, success: false }; // User ID is required
       //check firebase if uid exists
-
+      console.log(req.user)
       // Find the user
       const userData = await userModel.findById(user_id);
       // cache data
-
+      console.log("User data ", userData)
       if (!userData)
         return {
           msg: "Something went wrong. User not found",
@@ -115,7 +115,7 @@ class UserService {
       const { user_id, profile_picture } = req.body;
       // Find the user
       userModel.findByIdAndUpdate(
-        user_id,
+        req.user.id,
         {
           profile_picture: profile_picture,
         },

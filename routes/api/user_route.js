@@ -117,13 +117,10 @@ router.delete("/:user", verifyJWT, async (req, res) => {
 router.get("/profile/:user_id", verifyJWT, getUserCache, async (req, res) => {
   try {
     // required field : user_id
-    const user_id = req.params.user_id;
-    if (!user_id)
-      return res
-        .status(400)
-        .json({ msg: "Bad Request", status: 400, success: false }); // User ID is required
-    //check firebase if uid exists
     console.log(req)
+
+    const user_id = req.params.user_id;
+    //check firebase if uid exists
     // Find the user
     const userData = await userModel.findById(req.user.id);
     // cache data
