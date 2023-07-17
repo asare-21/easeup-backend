@@ -91,7 +91,7 @@ router.get("/:worker", workerVerifyJWT, getWorkerProfileCache, async (req, res) 
     if (promiseRating.length > 0) avgRating = promiseRating[0].avgRating ?? 0;
 
     const totalReviews = await reviewModel.countDocuments({ worker });
-
+    if (promiseWorker === null || promiseWorker === undefined) return commonError(res, "Worker not found")
     promiseWorker.rating = avgRating;
     promiseWorker.totalReviews = totalReviews;
     promiseWorker.jobs = totalReviews;
