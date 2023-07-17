@@ -59,7 +59,7 @@ const {
   refundPaymentValidator,
   updateLocationValidator,
   updateDateValidator,
-} = require("../validators/workerProfile.validator");
+} = require("../../validators/worker.validator");
 const { workerVerifyJWT } = require("../../passport/common_worker");
 
 

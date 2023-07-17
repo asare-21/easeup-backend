@@ -14,7 +14,6 @@ const {
   workerProfileVerificationRoute,
 } = require("./routes/workerProfileVerify.router");
 const { workerRoute } = require("./routes/worker.router");
-const { workerProfileRoute } = require("./routes/workerProfile");
 const { bookmarkRoute } = require("./routes/api/bookmarkRoute");
 const log = require("npmlog");
 const serviceAccount = require("./easeup.json");
@@ -66,6 +65,7 @@ const { jobRequestRoute } = require("./routes/api/job_requests_route");
 const { advertRoute } = require("./routes/api/advert_route");
 const { advertModel } = require("./models/advert_model");
 const { authWorker } = require("./routes/api/auth_work");
+const { workerProfileRoute } = require("./routes/api/workerProfileRoute");
 
 //Auth
 app.use(
