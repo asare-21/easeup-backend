@@ -29,6 +29,7 @@ const { dashboard } = require("./routes/dashboard/dashboard");
 const { jobPlanRoute } = require("./routes/api/job_plan_route");
 const authRoutes = require("./routes/api/auth");
 const { jobs } = require("./routes/api/jobs");
+const { introRoute } = require("./routes/api/intro_route");
 const limiter = rateLimit({
   windowMs: 600000, //
   max: 10000,

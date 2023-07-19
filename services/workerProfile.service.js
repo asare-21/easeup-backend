@@ -62,19 +62,20 @@ class WorkerProfileService {
         .exec();
 
       let avgRating = 0;
+      let response = await Promise.all([workerPromise, rating, reviewModel.countDocuments({ worker })])
 
-      if (promiseRating.length > 0) avgRating = promiseRating[0].avgRating ?? 0;
+      if (response[1].length > 0) avgRating = response[1].avgRating ?? 0;
 
-      const totalReviews = await reviewModel.countDocuments({ worker });
+      const totalReviews = response[2]
 
-      result.rating = avgRating;
-      result.totalReviews = totalReviews;
-      result.jobs = totalReviews;
+      response[0].rating = avgRating;
+      response[0].totalReviews = totalReviews;
+      response[0].jobs = totalReviews;
       return {
         msg: "Worker Profile",
         status: 200,
         success: true,
-        worker: promiseWorker,
+        worker: response[0] ?? {},
         avgRating: avgRating ?? 0,
         totalReviews,
       };
