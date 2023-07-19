@@ -1,4 +1,4 @@
-## Authentication
+## User Authentication
 ### Google
 
 
@@ -38,3 +38,11 @@
 
 4 Whenever frontend calls api, the token should be passed as bearer token
 
+
+## Worker Authentication
+
+### Signup 
+URL : {BASE_URL}/worker/create
+
+### Login
+URL : {BASE_URL}/worker/login

@@ -64,7 +64,6 @@ const { servicesRoute } = require("./routes/api/services");
 const { jobRequestRoute } = require("./routes/api/job_requests_route");
 const { advertRoute } = require("./routes/api/advert_route");
 const { advertModel } = require("./models/advert_model");
-const { authWorker } = require("./routes/api/auth_work");
 const { workerProfileRoute } = require("./routes/api/workerProfileRoute");
 
 //Auth
@@ -90,7 +89,6 @@ app.use(express.urlencoded({ extended: false }));
 app.use(morgan("combined"));
 app.use(limiter);
 app.use("/auth", authRoutes);
-app.use("/auth-worker", authWorker);
 app.use("/user", userRoute);
 app.use("/search", searchRoute);
 app.use("/bookmark", bookmarkRoute);

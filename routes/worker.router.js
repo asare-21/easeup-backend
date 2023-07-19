@@ -1,39 +1,46 @@
 const router = require("express").Router();
 const workerController = require("../controllers/worker.controller");
-const { verifyJWT } = require("../passport/common");
+const { workerVerifyJWT } = require("../passport/common");
 const {
   getWorkerCache,
   getWorkerTokenCache,
 } = require("../cache/worker_cache");
 
-router.get("/:worker", verifyJWT, getWorkerCache, workerController.getWorker);
+router.get(
+  "/:worker",
+  workerVerifyJWT,
+  getWorkerCache,
+  workerController.getWorker
+);
 
-router.delete("/:worker", verifyJWT, workerController.deleteWorker);
+router.delete("/:worker", workerVerifyJWT, workerController.deleteWorker);
 
 router.get(
   "/token/:worker",
-  verifyJWT,
+  workerVerifyJWT,
   getWorkerTokenCache,
   workerController.getWorkerToken
 );
 
-router.post("/create", verifyJWT, workerController.createWorker);
+router.post("/create", workerController.createWorker);
 
-router.post("/location", verifyJWT, workerController.saveLocation);
+router.post("/login", workerController.loginWorker);
 
-router.post("/update/token", verifyJWT, workerController.updateToken);
+router.post("/location", workerVerifyJWT, workerController.saveLocation);
 
-router.get("/update/ghc", verifyJWT, workerController.updateGhanaCard);
+router.post("/update/token", workerVerifyJWT, workerController.updateToken);
+
+router.get("/update/ghc", workerVerifyJWT, workerController.updateGhanaCard);
 
 router.get(
   "/nofications/:user_id",
-  verifyJWT,
+  workerVerifyJWT,
   workerController.getNotifications
 );
 
 router.post(
   "/nofications/update/:user_id",
-  verifyJWT,
+  workerVerifyJWT,
   workerController.updateNotification
 );
 

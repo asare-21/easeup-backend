@@ -3,9 +3,11 @@ const { userModel } = require("./models/user_model");
 const { notificationModel } = require("./models/nofications");
 const { workerModel } = require("./models/worker_models");
 const { workerProfileModel } = require("./models/worker_profile_model");
+const {workerProfileVerificationModel} = require("./models/worker_profile_verification_model")
 const { mediaModel } = require("./models/mediaModel");
 const log = require("npmlog");
 const admin = require("firebase-admin");
+const crypto = require("crypto");
 
 async function getAndCacheUsers() {
   console.log("getting users");
@@ -120,7 +122,45 @@ async function createNotification(user_id, title, body, type, token) {
   }
 }
 
+//Function that generates Salt and Hash
+function generatePassword(password) {
+  const salt = crypto.randomBytes(32).toString("hex");
+  const genHash = crypto
+    .pbkdf2Sync(password, salt, 10000, 64, "sha512")
+    .toString("hex");
+
+  return {
+    salt: salt,
+    hash: genHash,
+  };
+}
+
+//Function that verifies userpassword with databse salt and hash
+function isValidPassword(password, salt, hash) {
+  const hashVerify = crypto
+    .pbkdf2Sync(password, salt, 10000, 64, "sha512")
+    .toString("hex");
+
+  return hash === hashVerify;
+}
+
+async function createWorkerProfileAndVerification(worker, profile_name) {
+  const workerProfile = new workerProfileModel({
+    worker,
+    name: profile_name,
+  });
+  const workerVerification = new workerProfileVerificationModel({
+    worker,
+  });
+
+  return await Promise.all([workerProfile.save(), workerVerification.save()]);
+}
+
 //export
+module.exports.generatePassword = generatePassword;
+module.exports.isValidPassword = isValidPassword;
+module.exports.createWorkerProfileAndVerification =
+  createWorkerProfileAndVerification;
 module.exports.getAndCacheUsers = getAndCacheUsers;
 module.exports.getAndCacheWorkers = getAndCacheWorkers;
 module.exports.getAndCacheWorkerProfiles = getAndCacheWorkerProfiles;

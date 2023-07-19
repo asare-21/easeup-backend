@@ -23,7 +23,7 @@ const {
   updateWorkerGhcValidator,
   updateUserNotificationsValidator,
 } = require("../validators/worker.validator");
-const { workerVerifyJWT } = require("../../passport/common_worker");
+const { workerVerifyJWT } = require("../../passport/common");
 
 const workerCache = cache;
 
