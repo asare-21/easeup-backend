@@ -1,6 +1,6 @@
 const router = require("express").Router();
-const workerProfileController = require("../controllers/workerProfile.controller");
-const { verifyJWT } = require("../passport/common");
+const workerProfileController = require("../../controllers/workerProfile.controller");
+const { verifyJWT } = require("../../passport/common");
 const {
   getReviewsCache,
   getCommentsCache,
@@ -14,9 +14,9 @@ const {
   getNotificationsCache,
   getPaidBookingsCache,
   getPendingBookingCache,
-} = require("../cache/worker_cache");
-const { mediaCache } = require("../cache/media_cache");
-const { getWorkerProfileCache } = require("../cache/worker_profile");
+} = require("../../cache/worker_cache");
+const { mediaCache } = require("../../cache/media_cache");
+const { getWorkerProfileCache } = require("../../cache/worker_profile");
 
 router.get(
   "/:worker",
@@ -162,4 +162,4 @@ router.get(
   workerProfileController.getPopular
 );
 
-module.exports.workerProfileRouteNew = router;
+module.exports.workerProfileRoute = router;

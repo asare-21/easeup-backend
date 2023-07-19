@@ -1,10 +1,10 @@
 const router = require("express").Router();
-const workerController = require("../controllers/worker.controller");
-const { workerVerifyJWT } = require("../passport/common");
+const workerController = require("../../controllers/worker.controller");
+const { workerVerifyJWT } = require("../../passport/common");
 const {
   getWorkerCache,
   getWorkerTokenCache,
-} = require("../cache/worker_cache");
+} = require("../../cache/worker_cache");
 
 router.get(
   "/:worker",
