@@ -33,6 +33,14 @@ class WorkerController {
     res.status(status).send(responseData);
   };
 
+  loginWorker = async (req, res, next) => {
+    const { status, ...responseData } = await WorkerService.workerLogin(
+      req,
+      res
+    );
+    res.status(status).send(responseData);
+  };
+
   saveLocation = async (req, res, next) => {
     const { status, ...responseData } = await WorkerService.saveWorkerLocation(
       req,

@@ -8,12 +8,12 @@ const PORT = process.env.PORT || 3000;
 const morgan = require("morgan");
 const { connect } = require("mongoose");
 const rateLimit = require("express-rate-limit");
-const { userRoute } = require("./routes/user.router");
+const { userRoute } = require("./routes/api/user.router");
 const { searchRoute } = require("./routes/api/searchRoute");
 const {
   workerProfileVerificationRoute,
-} = require("./routes/workerProfileVerify.router");
-const { workerRoute } = require("./routes/worker.router");
+} = require("./routes/api/workerProfileVerify.router");
+const { workerRoute } = require("./routes/api/worker.router");
 const { bookmarkRoute } = require("./routes/api/bookmarkRoute");
 const log = require("npmlog");
 const serviceAccount = require("./easeup.json");
@@ -64,10 +64,7 @@ const { servicesRoute } = require("./routes/api/services");
 const { jobRequestRoute } = require("./routes/api/job_requests_route");
 const { advertRoute } = require("./routes/api/advert_route");
 const { advertModel } = require("./models/advert_model");
-const { authWorker } = require("./routes/api/auth_work");
-const { workerProfileRoute } = require("./routes/api/workerProfileRoute");
-const { introModel } = require("./models/intro_model");
-const { introRoute } = require("./routes/api/intro_route");
+const { workerProfileRoute } = require("./routes/api/workerProfile.router");
 
 //Auth
 app.use(
@@ -92,7 +89,6 @@ app.use(express.urlencoded({ extended: false }));
 app.use(morgan("combined"));
 app.use(limiter);
 app.use("/auth", authRoutes);
-app.use("/auth-worker", authWorker);
 app.use("/user", userRoute);
 app.use("/search", searchRoute);
 app.use("/bookmark", bookmarkRoute);

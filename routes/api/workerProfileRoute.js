@@ -60,7 +60,7 @@ const {
   updateLocationValidator,
   updateDateValidator,
 } = require("../../validators/worker.validator");
-const { workerVerifyJWT } = require("../../passport/common_worker");
+const { workerVerifyJWT } = require("../../passport/common");
 
 
 router.get("/:worker", workerVerifyJWT, getWorkerProfileCache, async (req, res) => {
@@ -1676,4 +1676,4 @@ router.get(
   }
 );
 
-module.exports.workerProfileRoute = router;
+// module.exports.workerProfileRoute = router;

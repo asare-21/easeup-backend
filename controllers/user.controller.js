@@ -1,4 +1,4 @@
-const UserService = require("../services/user.services");
+const UserService = require("../services/user.service");
 
 class UserController {
   deleteUser = async (req, res, next) => {

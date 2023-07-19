@@ -4,10 +4,11 @@ const { JoiValidator } = require("../joi.validator");
 const createWorkerValidator = (params) => {
   const schema = Joi.object({
     email: Joi.string().required().label("Email"),
-    profile_name: Joi.string().required().label("Profile Name"),
-    last_login: Joi.string().required().label("Last login"),
-    worker: Joi.string().required().label("Worker"),
-    token: Joi.string().required().label("Worker"),
+    username: Joi.string().required().label("Username"),
+    password: Joi.string().required().label("Password"),
+    name: Joi.string().required().label("Name"),
+    token: Joi.string().required().label("Token"),
+    last_login: Joi.string().required().label("Last Login"),
   }).strict();
 
   const joiValidationResult = JoiValidator.validate(schema, params);
@@ -19,10 +20,25 @@ const createWorkerValidator = (params) => {
   return { status: 200, msg: "success" };
 };
 
+const loginWorkerValidator = (params) => {
+  const schema = Joi.object({
+    email: Joi.string().required().label("Email"),
+    password: Joi.string().required().label("Password"),
+  }).strict();
+
+  const joiValidationResult = JoiValidator.validate(schema, params);
+
+  if (joiValidationResult) {
+    return { status: 400, msg: joiValidationResult };
+  }
+
+  return { status: 200, msg: "success" };
+};
+
+
 const updateWorkerLocationValidator = (params) => {
   const schema = Joi.object({
     updates: Joi.string().required().label("Updates"),
-    worker: Joi.string().required().label("Worker"),
   }).strict();
 
   const joiValidationResult = JoiValidator.validate(schema, params);
@@ -36,7 +52,6 @@ const updateWorkerLocationValidator = (params) => {
 
 const updateWorkerTokenValidator = (params) => {
   const schema = Joi.object({
-    user_id: Joi.string().required().label("UserId"),
     token: Joi.string().optional().label("Token"),
   }).strict();
 
@@ -86,4 +101,5 @@ module.exports = {
   updateWorkerTokenValidator,
   updateWorkerGhcValidator,
   updateUserNotificationsValidator,
+  loginWorkerValidator
 };
