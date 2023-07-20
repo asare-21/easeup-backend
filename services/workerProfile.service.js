@@ -610,12 +610,12 @@ class WorkerProfileService {
 
       // set cache
       workerCache.set(`completed-bookings/${worker}`, JSON.stringify(bookings));
-      return res.status(200).json({
+      return {
         msg: "Worker Profile Fetched Successfully",
         status: 200,
         success: true,
         bookings,
-      });
+      }
     } catch (e) {
       log.warn(e.message);
       console.log(e);
