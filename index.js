@@ -71,21 +71,21 @@ const { workerProfileRoute } = require("./routes/api/workerProfile.router");
 
 //options object for swaggerjs
 const options = {
-	definition: {
-		openapi: '3.0.0',
-		info: {
-			title: 'Easeup',
-			version: '1.0.0',
-			description: "The ultimate mobile app that revolutionizes how you book handyman services effortlessly.",
-		},
-		servers: [
-			{
-				//update to production url
-				url: 'localhost:3000',
-			},
-		],
-	},
-	apis: ['./routes/*.js'],
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'Easeup',
+      version: '1.0.0',
+      description: "The ultimate mobile app that revolutionizes how you book handyman services effortlessly.",
+    },
+    servers: [
+      {
+        //update to production url
+        url: 'localhost:3000',
+      },
+    ],
+  },
+  apis: ['./routes/*.js'],
 };
 
 const specs = swaggerJdDoc(options)
@@ -130,9 +130,11 @@ app.use("/j-requests", jobRequestRoute)
 app.use("/adverts", advertRoute)
 app.use("/intro", introRoute)
 
-// setting up swagger doc
-app.use('/docs',swaggerUI.serve,swaggerUI.setup(specs))
-
+// only available in development
+if (process.env.NODE_ENV === "development") {
+  // setting up swagger doc
+  app.use('/docs', swaggerUI.serve, swaggerUI.setup(specs))
+}
 // handle 404
 app.use((req, res, next) => {
   return res.status(404).json({
