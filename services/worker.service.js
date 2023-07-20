@@ -170,7 +170,7 @@ class WorkerService {
         };
       }
 
-      const { email, username, password, name, token, last_login } = req.body;
+      const { email, username, password, name } = req.body;
 
       // check if email exist
       const existingEmail = await userModel.findOne({ email });
@@ -202,12 +202,11 @@ class WorkerService {
       // Create the user
       const worker = new workerModel({
         email,
+        profile_name: name,
         name,
         hashedPassword,
         passwordSalt,
         username,
-        token,
-        last_login,
       });
 
       const savedWorker = await worker.save();
@@ -261,7 +260,7 @@ class WorkerService {
 
       // check if email exist
       const workerExists = await workerModel.findOne({ email });
-
+      console.log(workerExists)
       if (!workerExists) {
         // User Already Exists
         return {
@@ -327,7 +326,7 @@ class WorkerService {
       const workerId = req.user.id;
 
       locationModel.findOneAndUpdate(
-        { worker:workerId },
+        { worker: workerId },
         {
           $push: {
             logs: updates,
@@ -341,7 +340,7 @@ class WorkerService {
           if (!result) {
             //create and update
             locationModel({
-              worker:workerId,
+              worker: workerId,
               logs: updates,
             }).save((err) => {
               if (err)
@@ -472,15 +471,15 @@ class WorkerService {
       if (!workerId) return { msg: "Bad Request", status: 400, success: false }; // User ID is required
       //check firebase if uid exists
       await // Find the user
-      notificationModel.find({ user: userId }, (err, notifications) => {
-        if (err) return { msg: err.message, status: 500, success: false }; // Internal Server Error
-        return {
-          msg: "Notifications Found",
-          status: 200,
-          success: true,
-          notifications,
-        }; // Notifications Found and returned
-      });
+        notificationModel.find({ user: userId }, (err, notifications) => {
+          if (err) return { msg: err.message, status: 500, success: false }; // Internal Server Error
+          return {
+            msg: "Notifications Found",
+            status: 200,
+            success: true,
+            notifications,
+          }; // Notifications Found and returned
+        });
     } catch (e) {
       log.warn(e.message);
       console.log(e);
@@ -510,21 +509,21 @@ class WorkerService {
       if (!userId) return { msg: "Bad Request", status: 400, success: false }; // User ID is required
       //check firebase if uid exists
       await // Find the user
-      notificationModel.findOneAndUpdate(
-        { user: workerId, _id: id },
-        {
-          read: true,
-        },
-        (err, notification) => {
-          if (err) return { msg: err.message, status: 500, success: false }; // Internal Server Error
-          return {
-            msg: "Notification updated",
-            status: 200,
-            success: true,
-            notification,
-          }; // Notifications Found and returned
-        }
-      );
+        notificationModel.findOneAndUpdate(
+          { user: workerId, _id: id },
+          {
+            read: true,
+          },
+          (err, notification) => {
+            if (err) return { msg: err.message, status: 500, success: false }; // Internal Server Error
+            return {
+              msg: "Notification updated",
+              status: 200,
+              success: true,
+              notification,
+            }; // Notifications Found and returned
+          }
+        );
     } catch (e) {
       log.warn(e.message);
       console.log(e);

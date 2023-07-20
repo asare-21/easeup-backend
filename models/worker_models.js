@@ -12,7 +12,7 @@ const workerSchema = new Schema({
   },
   token: {
     type: String,
-    required: true,
+    default: "",
   },
   phone: {
     type: String,
@@ -32,7 +32,7 @@ const workerSchema = new Schema({
   },
   last_login: {
     type: Date,
-    required: true,
+    default: Date.now,
   },
   profile_verified: {
     type: Boolean,
@@ -62,14 +62,6 @@ const workerSchema = new Schema({
     type: String,
     required: true,
     unique: true,
-  },
-  googleId: {
-    type: String,
-    default: "",
-  },
-  facebookId: {
-    type: String,
-    default: "",
   },
   profile_name: {
     type: String,
