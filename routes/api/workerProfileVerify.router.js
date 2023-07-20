@@ -1,64 +1,64 @@
 const router = require("express").Router();
 const workerProfileVerifyController = require("../../controllers/workerProfileVerify.controller");
-const { verifyJWT } = require("../../passport/common");
+const { workerVerifyJWT} = require("../../passport/common");
 
 router.get(
   "/:worker",
-  verifyJWT,
+  workerVerifyJWT,
   workerProfileVerifyController.getWorkerProfileVerification
 );
 
 router.post(
   "/update/image",
-  verifyJWT,
+  workerVerifyJWT,
   workerProfileVerifyController.updateWorkerSelfie
 );
 
 router.post(
   "/update/ghc-images",
-  verifyJWT,
+  workerVerifyJWT,
   workerProfileVerifyController.updateWorkerGhc
 );
 
 router.post(
   "/update/age-verify",
-  verifyJWT,
+  workerVerifyJWT,
   workerProfileVerifyController.workerAgeVerify
 );
 
 router.post(
   "/update/pos",
-  verifyJWT,
+  workerVerifyJWT,
   workerProfileVerifyController.updateWorkerPos
 );
 
 router.post(
   "/update/insurance",
-  verifyJWT,
+  workerVerifyJWT,
   workerProfileVerifyController.updateWorkerInsurance
 );
 
 router.post(
   "/update/address",
-  verifyJWT,
+  workerVerifyJWT,
   workerProfileVerifyController.updateWorkerAddress
 );
 
 router.post(
   "/update/gender",
-  verifyJWT,
+  workerVerifyJWT,
   workerProfileVerifyController.updateworkerGender
 );
 
 router.post(
   "/phone/send-code",
-  verifyJWT,
+  workerVerifyJWT,
   workerProfileVerifyController.updateWorkerPhone
 );
 
 router.post(
   "/phone/verify-code",
-  verifyJWT,
+  workerVerifyJWT,
   workerProfileVerifyController.updateWorkerPhoneVerifyCode
 );
 

@@ -55,6 +55,8 @@ const limiter = rateLimit({
 });
 
 const session = require("express-session");
+const swaggerUI = require('swagger-ui-express')
+const swaggerJdDoc = require("swagger-jsdoc")
 const passport = require("passport");
 require("./passport/passport");
 const cors = require("cors");
@@ -66,6 +68,27 @@ const { jobRequestRoute } = require("./routes/api/job_requests_route");
 const { advertRoute } = require("./routes/api/advert_route");
 const { advertModel } = require("./models/advert_model");
 const { workerProfileRoute } = require("./routes/api/workerProfile.router");
+
+//options object for swaggerjs
+const options = {
+	definition: {
+		openapi: '3.0.0',
+		info: {
+			title: 'Easeup',
+			version: '1.0.0',
+			description: "The ultimate mobile app that revolutionizes how you book handyman services effortlessly.",
+		},
+		servers: [
+			{
+				//update to production url
+				url: 'localhost:3000',
+			},
+		],
+	},
+	apis: ['./routes/*.js'],
+};
+
+const specs = swaggerJdDoc(options)
 
 //Auth
 app.use(
@@ -106,6 +129,9 @@ app.use("/services", servicesRoute)
 app.use("/j-requests", jobRequestRoute)
 app.use("/adverts", advertRoute)
 app.use("/intro", introRoute)
+
+// setting up swagger doc
+app.use('/docs',swaggerUI.serve,swaggerUI.setup(specs))
 
 // handle 404
 app.use((req, res, next) => {
