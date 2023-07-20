@@ -2,6 +2,7 @@ const router = require("express").Router();
 const userController = require("../../controllers/user.controller");
 const { verifyJWT } = require("../../passport/common");
 
+
 router.delete(
   "/:user",
   verifyJWT,
@@ -70,7 +71,6 @@ router.post(
 
 router.post(
   "/create",
-  verifyJWT,
   userController.createUser
 );
 

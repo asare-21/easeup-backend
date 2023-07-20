@@ -36,6 +36,8 @@
     "passport-twitter": "^1.0.4",
     "pm2": "^5.2.2",
     "socket.io": "^4.5.4",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.0",
     "vhost": "^3.0.2"
   }
 }
