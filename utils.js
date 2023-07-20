@@ -3,7 +3,7 @@ const { userModel } = require("./models/user_model");
 const { notificationModel } = require("./models/nofications");
 const { workerModel } = require("./models/worker_models");
 const { workerProfileModel } = require("./models/worker_profile_model");
-const {workerProfileVerificationModel} = require("./models/worker_profile_verification_model")
+const { workerProfileVerificationModel } = require("./models/worker_profile_verification_model")
 const { mediaModel } = require("./models/mediaModel");
 const log = require("npmlog");
 const admin = require("firebase-admin");
@@ -124,7 +124,7 @@ async function createNotification(user_id, title, body, type, token) {
 
 //Function that generates Salt and Hash
 function generatePassword(password) {
-  const salt = crypto.randomBytes(32).toString("hex");
+  const salt = crypto.randomBytes(64).toString("hex");
   const genHash = crypto
     .pbkdf2Sync(password, salt, 10000, 64, "sha512")
     .toString("hex");
