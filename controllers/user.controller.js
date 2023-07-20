@@ -1,23 +1,11 @@
 const UserService = require("../services/user.service");
 
 class UserController {
-  /**
-   * @desc Create a user
-   * @route POST
-   * @route /api/v1/admin/user
-   * @access Public
-   */
   deleteUser = async (req, res, next) => {
     const { status, ...responseData } = await UserService.deleteUser(req, res);
     res.status(status).send(responseData);
   };
 
-  /**
-   * @desc Update user
-   * @route PUT
-   * @route /api/user/:id
-   * @access Private/Admin
-   */
   getUserProfile = async (req, res, next) => {
     const { status, ...responseData } = await UserService.getUserProfile(
       req,
