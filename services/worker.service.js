@@ -82,7 +82,7 @@ class WorkerService {
         msg: "Worker Profile",
         status: 200,
         success: true,
-        date: result,
+        data: result,
       };
     } catch (e) {
       log.warn(e.message);
