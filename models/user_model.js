@@ -11,8 +11,22 @@ const addressSchema = new Schema({
   },
 });
 
-const userSchema = new Schema({
+const ghanaCardDetailsSchema = new Schema({
+  ghanaCardImage: {
+    type: Array,
+    default: [], // shoild contains the front and back image and image of the worker holding the card to face
+  },
+  ghanaCardNumber: {
+    type: String,
+    default: "",
+  },
+  ghanaCardExpiry: {
+    type: String,
+    default: "",
+  },
+});
 
+const userSchema = new Schema({
   email: {
     type: String,
     unique: true,
@@ -66,17 +80,9 @@ const userSchema = new Schema({
     type: [String],
     default: [],
   },
-  ghc_number: {
-    type: String,
-    default: "",
-  },
-  ghc_exp: {
-    type: String,
-    default: "",
-  },
-  ghc_image: {
-    type: Array,
-    default: [], // shoild contains the front and back image and image of the worker holding the card to face
+  ghanaCardDetails: {
+    type: ghanaCardDetailsSchema,
+    default: {},
   },
   googleId: {
     type: String,
