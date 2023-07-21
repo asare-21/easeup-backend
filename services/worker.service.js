@@ -174,6 +174,7 @@ class WorkerService {
 
       // check if email exist
       const existingEmail = await userModel.findOne({ email });
+      console.log(existingEmail)
 
       if (existingEmail) {
         return {
@@ -198,7 +199,6 @@ class WorkerService {
       const saltHash = generatePassword(password);
       const passwordSalt = saltHash.salt;
       const hashedPassword = saltHash.hash;
-
       // Create the user
       const worker = new workerModel({
         email,
@@ -229,6 +229,7 @@ class WorkerService {
       //   "update_profile",
       //   token
       // );
+      console.log("Hashed ", hashedPassword, "Salt ", passwordSalt)
       return {
         msg: "User Created",
         status: 200,

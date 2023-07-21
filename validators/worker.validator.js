@@ -7,8 +7,8 @@ const createWorkerValidator = (params) => {
     username: Joi.string().required().label("Username"),
     password: Joi.string().required().label("Password"),
     name: Joi.string().required().label("Name"),
-    token: Joi.string().required().label("Token"),
-    last_login: Joi.string().required().label("Last Login"),
+    token: Joi.string().optional().label("Token"),
+    last_login: Joi.string().optional().label("Last Login"),
   }).strict();
 
   const joiValidationResult = JoiValidator.validate(schema, params);
