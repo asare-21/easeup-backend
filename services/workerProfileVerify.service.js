@@ -70,14 +70,21 @@ class WorkerProfileVerificationService {
       }
 
       // Update the worker
-      const updatedWorkerSelfie = await workerProfileModel.findOneAndUpdate(
+   await Promise.all([
+    workerProfileModel.findOneAndUpdate(
         {
           worker,
         },
         {
           profile_url: selfie,
         }
-      );
+      )
+      , workerProfileVerificationModel.findOneAndUpdate(
+      { worker },
+      {
+        selfie,
+      },)  
+   ])
       cache.del(`worker-profile/${worker}`);
       return {
         msg: "Profile updated",
