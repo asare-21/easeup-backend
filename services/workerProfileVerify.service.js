@@ -1,6 +1,7 @@
 const log = require("npmlog");
 const otpGenerator = require("otp-generator");
 const { cache } = require("../cache/user_cache");
+const axios = require("axios");
 const {
   workerProfileVerificationModel,
 } = require("../models/worker_profile_verification_model");
