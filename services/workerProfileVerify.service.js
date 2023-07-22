@@ -61,37 +61,31 @@ class WorkerProfileVerificationService {
 
       const { worker, selfie } = req.body;
 
-      // check if user exist
-      const userExist = await workerProfileVerificationModel.findOne({
-        worker,
-      });
-
-      if (!userExist) {
-        return { status: 404, msg: "worker not found", success: false };
-      }
 
       // Update the worker
-   await Promise.all([
-    workerProfileModel.findOneAndUpdate(
-        {
-          worker,
-        },
-        {
-          profile_url: selfie,
-        }
-      )
-      , workerProfileVerificationModel.findOneAndUpdate(
-      { worker },
-      {
-        selfie,
-      },)  
-   ])
+      const response = await Promise.all([
+        workerProfileModel.findOneAndUpdate(
+          {
+            worker,
+          },
+          {
+            profile_url: selfie,
+          }
+        )
+        , workerProfileVerificationModel.findOneAndUpdate(
+          { worker },
+          {
+            selfie,
+          },)
+      ])
+      if (!response[0] || !response[1]) return { status: 404, msg: "worker not found", success: false };
+
       cache.del(`worker-profile/${worker}`);
       return {
         msg: "Profile updated",
         status: 200,
         success: true,
-        
+
       };
     } catch (e) {
       log.warn(e.message);
@@ -124,14 +118,7 @@ class WorkerProfileVerificationService {
         gh_card_to_face,
       } = req.body;
 
-      // check if user exist
-      const userExist = await workerProfileVerificationModel.findOne({
-        worker,
-      });
 
-      if (!userExist) {
-        return { status: 404, msg: "worker not found", success: false };
-      }
 
       // update worker
       const updatedWorker =
@@ -143,6 +130,11 @@ class WorkerProfileVerificationService {
             gh_card_image_back,
           }
         );
+
+      if (!updatedWorker) {
+        return { status: 404, msg: "worker not found", success: false };
+      }
+
       return {
         msg: "Profile updated",
         status: 200,
@@ -169,14 +161,7 @@ class WorkerProfileVerificationService {
       }
       const { worker, age_doc } = req.body;
 
-      // check if user exist
-      const userExist = await workerProfileVerificationModel.findOne({
-        worker,
-      });
 
-      if (!userExist) {
-        return { status: 404, msg: "worker not found", success: false };
-      }
 
       // Find the user
       const updatedWorkerAge =
@@ -186,7 +171,9 @@ class WorkerProfileVerificationService {
             age_verification_document: age_doc,
           }
         );
-
+      if (!updatedWorkerAge) {
+        return { status: 404, msg: "worker not found", success: false };
+      }
       return {
         msg: "Profile updated",
         status: 200,
@@ -216,14 +203,7 @@ class WorkerProfileVerificationService {
       }
       const { worker, proof_skill } = req.body;
 
-      // check if user exist
-      const userExist = await workerProfileVerificationModel.findOne({
-        worker,
-      });
 
-      if (!userExist) {
-        return { status: 404, msg: "worker not found", success: false };
-      }
 
       // Update worker proof of skill
       const updatedWorkerPos =
@@ -233,7 +213,9 @@ class WorkerProfileVerificationService {
             proof_skill,
           }
         );
-
+      if (!updatedWorkerPos) {
+        return { status: 404, msg: "worker not found", success: false };
+      }
       return {
         msg: "Profile updated",
         status: 200,
@@ -261,14 +243,8 @@ class WorkerProfileVerificationService {
       }
       const { worker, insurance_doc } = req.body;
 
-      // check if user exist
-      const userExist = await workerProfileVerificationModel.findOne({
-        worker,
-      });
 
-      if (!userExist) {
-        return { status: 404, msg: "worker not found", success: false };
-      }
+
 
       // Update worker insurance
       const updatedWorkerInsurance =
@@ -278,7 +254,9 @@ class WorkerProfileVerificationService {
             insurance_document: insurance_doc,
           }
         );
-
+      if (!updatedWorkerInsurance) {
+        return { status: 404, msg: "worker not found", success: false };
+      }
       return {
         msg: "Profile updated",
         status: 200,
@@ -306,14 +284,8 @@ class WorkerProfileVerificationService {
       }
       const { worker, address, latlng } = req.body;
 
-      // check if user exist
-      const userExist = await workerProfileVerificationModel.findOne({
-        worker,
-      });
 
-      if (!userExist) {
-        return { status: 404, msg: "worker not found", success: false };
-      }
+
 
       // update address
       const updatedAddress =
@@ -326,6 +298,9 @@ class WorkerProfileVerificationService {
             },
           }
         );
+      if (!updatedAddress) {
+        return { status: 404, msg: "worker not found", success: false };
+      }
 
       return {
         msg: "Profile updated",
@@ -355,14 +330,9 @@ class WorkerProfileVerificationService {
       }
       const { worker, gender } = req.body;
 
-      // check if user exist
-      const userExist = await workerProfileVerificationModel.findOne({
-        worker,
-      });
 
-      if (!userExist) {
-        return { status: 404, msg: "worker not found", success: false };
-      }
+
+
 
       // update worker gender
       const updateWorkerGender =
@@ -372,6 +342,9 @@ class WorkerProfileVerificationService {
             gender,
           }
         );
+      if (!updateWorkerGender) {
+        return { status: 404, msg: "worker not found", success: false };
+      }
       return {
         msg: "Profile updated",
         status: 200,
