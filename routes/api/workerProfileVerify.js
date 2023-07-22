@@ -129,7 +129,7 @@ router.post("/update/ghc-images", workerVerifyJWT, async (req, res) => {
         validationResults: validationResults.msg
       });
     }
-    const { worker, gh_card_image_back, gh_card_image_front, gh_card_to_face } =
+    const { worker, gh_card_image_back, gh_card_image_front, gh_card_to_face,ghc_number,ghc_exp } =
       req.body;
 
     // Find the user
@@ -139,6 +139,8 @@ router.post("/update/ghc-images", workerVerifyJWT, async (req, res) => {
         gh_card_to_face,
         gh_card_image_front,
         gh_card_image_back,
+        ghc_number,
+        ghc_exp
       },
       (err, user) => {
         if (err) {
