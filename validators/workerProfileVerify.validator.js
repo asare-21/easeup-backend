@@ -22,6 +22,8 @@ const updateWorkerGhImagesValidator = (params) => {
     gh_card_image_front: Joi.string().required().label("Gh card image front"),
     gh_card_image_back: Joi.string().required().label("Gh card image back"),
     gh_card_to_face: Joi.string().required().label("Gh card to face"),
+    ghc_number: Joi.string().required().label("Gh card number"),
+    ghc_exp: Joi.string().required().label("Gh card expirary date"),
   }).strict();
 
   const joiValidationResult = JoiValidator.validate(schema, params);

@@ -116,6 +116,8 @@ class WorkerProfileVerificationService {
         gh_card_image_back,
         gh_card_image_front,
         gh_card_to_face,
+        ghc_exp,
+        ghc_number
       } = req.body;
 
 
@@ -128,6 +130,8 @@ class WorkerProfileVerificationService {
             gh_card_to_face,
             gh_card_image_front,
             gh_card_image_back,
+            ghc_exp,
+            ghc_number
           }
         );
 
