@@ -90,7 +90,7 @@ class WorkerProfileVerificationService {
         msg: "Profile updated",
         status: 200,
         success: true,
-        data: updatedWorkerSelfie,
+        
       };
     } catch (e) {
       log.warn(e.message);
