@@ -4,7 +4,7 @@ const { model, Schema } = require('mongoose')
 const timeslotSchema = new Schema({
     worker: {
         type: Schema.Types.ObjectId,
-        ref: 'User',
+        ref: 'Worker',
         required: true
     },
     date: {
