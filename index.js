@@ -66,6 +66,7 @@ const { jobRequestRoute } = require("./routes/api/job_requests_route");
 const { advertRoute } = require("./routes/api/advert_route");
 const { advertModel } = require("./models/advert_model");
 const { authWorker } = require("./routes/api/auth_work");
+const { timeslotRoute } = require("./routes/api/timeslot");
 
 //Auth
 app.use(
@@ -105,6 +106,7 @@ app.use("/dashboard", dashboard);
 app.use("/services", servicesRoute)
 app.use("/j-requests", jobRequestRoute)
 app.use("/adverts", advertRoute)
+app.use("/timeslot", timeslotRoute)
 
 // handle 404
 app.use((req, res, next) => {
