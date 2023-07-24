@@ -89,6 +89,7 @@ const options = {
 };
 
 const specs = swaggerJdDoc(options)
+const { timeslotRoute } = require("./routes/api/timeslot");
 
 //Auth
 app.use(
@@ -129,6 +130,7 @@ app.use("/services", servicesRoute)
 app.use("/j-requests", jobRequestRoute)
 app.use("/adverts", advertRoute)
 app.use("/intro", introRoute)
+app.use("/timeslot", timeslotRoute)
 
 // only available in development
 if (process.env.NODE_ENV === "development") {
