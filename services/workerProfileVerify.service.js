@@ -7,13 +7,7 @@ const {
 } = require("../models/worker_profile_verification_model");
 const { workerProfileModel } = require("../models/worker_profile_model");
 const {
-  updateWorkerProfileImageValidator,
-  updateWorkerGhImagesValidator,
-  updateWorkerAgeValidator,
-  updateWorkerProofOfSkillValidator,
-  updateWorkerInsuranceValidator,
-  updateWorkerAddressValidator,
-  updateWorkerGenderValidator,
+  updateWorkerProfileValidator,
   updateWorkerPhoneValidator,
   updateWorkerPhoneVerifyCodeValidator,
 } = require("../validators/workerProfileVerify.validator");
@@ -22,10 +16,10 @@ class WorkerProfileVerificationService {
   // worker profile verification data
   async findWorkerProfileVerification(req, res) {
     try {
-      const { worker } = req.params;
+      const workerId = req.user.id;
       // check if worker is valid
       const retrievedWorker = await workerProfileVerificationModel.findOne({
-        worker,
+        worker: workerId,
       });
       if (!retrievedWorker) {
         return { status: 404, msg: "worker not found", success: false };
@@ -44,11 +38,9 @@ class WorkerProfileVerificationService {
   }
 
   // update selfie
-  async updateWorkerSelfie(req, res) {
+  async updateWorkerDetails(req, res) {
     try {
-      const validationResults = await updateWorkerProfileImageValidator(
-        req.body
-      );
+      const validationResults = await updateWorkerProfileValidator(req.body);
 
       if (validationResults.status !== 200) {
         return {
@@ -59,213 +51,50 @@ class WorkerProfileVerificationService {
         };
       }
 
-      const { worker, selfie } = req.body;
+      const {
+        selfie,
+        ghanaCardDetails,
+        address,
+        age_doc,
+        proof_skill,
+        insurance_doc,
+        gender,
+      } = req.body;
 
-
+      const workerId = req.user.id;
       // Update the worker
       const response = await Promise.all([
         workerProfileModel.findOneAndUpdate(
           {
-            worker,
+            worker: workerId,
           },
           {
             profile_url: selfie,
           }
-        )
-        , workerProfileVerificationModel.findOneAndUpdate(
-          { worker },
+        ),
+        workerProfileVerificationModel.findOneAndUpdate(
+          { worker: workerId },
           {
-            selfie,
-          },)
-      ])
-      if (!response[0] || !response[1]) return { status: 404, msg: "worker not found", success: false };
-
-      cache.del(`worker-profile/${worker}`);
-      return {
-        msg: "Profile updated",
-        status: 200,
-        success: true,
-
-      };
-    } catch (e) {
-      log.warn(e.message);
-      console.log(e);
-      return { status: 500, msg: e.message, success: false };
-    }
-  }
-
-  //accepts url of front and back of ghana card
-  // update ghc front
-  // update ghc back
-  async updateWorkerGhanaCard(req, res) {
-    try {
-      const validationResults = await updateWorkerGhImagesValidator(req.body);
-
-      if (validationResults.status !== 200) {
-        return {
-          msg: "Bad Request. Missing fields",
-          status: 400,
-          success: false,
-          validationResults: validationResults.msg,
-        };
-      }
-
-      // destruct the request body
-      const {
-        worker,
-        gh_card_image_back,
-        gh_card_image_front,
-        gh_card_to_face,
-        ghc_exp,
-        ghc_number
-      } = req.body;
-
-
-
-      // update worker
-      const updatedWorker =
-        await workerProfileVerificationModel.findOneAndUpdate(
-          { worker },
-          {
-            gh_card_to_face,
-            gh_card_image_front,
-            gh_card_image_back,
-            ghc_exp,
-            ghc_number
+            $set: {
+              selfie,
+              ghanaCardDetails,
+              age_verification_document: age_doc,
+              proof_skill,
+              insurance_document: insurance_doc,
+              gender,
+              address,
+            },
           }
-        );
-
-      if (!updatedWorker) {
+        ),
+      ]);
+      if (!response[0] || !response[1])
         return { status: 404, msg: "worker not found", success: false };
-      }
 
+      cache.del(`worker-profile/${workerId}`);
       return {
         msg: "Profile updated",
         status: 200,
         success: true,
-        data: updatedWorker,
-      };
-    } catch (e) {
-      log.warn(e.message);
-      console.log(e);
-      return { status: 500, msg: e.message, success: false };
-    }
-  }
-  async updateWorkerAge(req, res) {
-    try {
-      const validationResults = await updateWorkerAgeValidator(req.body);
-
-      if (validationResults.status !== 200) {
-        return {
-          msg: "Bad Request. Missing fields",
-          status: 400,
-          success: false,
-          validationResults: validationResults.msg,
-        };
-      }
-      const { worker, age_doc } = req.body;
-
-
-
-      // Find the user
-      const updatedWorkerAge =
-        await workerProfileVerificationModel.findOneAndUpdate(
-          { worker },
-          {
-            age_verification_document: age_doc,
-          }
-        );
-      if (!updatedWorkerAge) {
-        return { status: 404, msg: "worker not found", success: false };
-      }
-      return {
-        msg: "Profile updated",
-        status: 200,
-        success: true,
-        data: updatedWorkerAge,
-      };
-    } catch (e) {
-      log.warn(e.message);
-      console.log(e);
-      return { status: 500, msg: e.message, success: false };
-    }
-  }
-
-  async updateWorkerProofOfSkill(req, res) {
-    try {
-      const validationResults = await updateWorkerProofOfSkillValidator(
-        req.body
-      );
-
-      if (validationResults.status !== 200) {
-        return {
-          msg: "Bad Request. Missing fields",
-          status: 400,
-          success: false,
-          validationResults: validationResults.msg,
-        };
-      }
-      const { worker, proof_skill } = req.body;
-
-
-
-      // Update worker proof of skill
-      const updatedWorkerPos =
-        await workerProfileVerificationModel.findOneAndUpdate(
-          { worker },
-          {
-            proof_skill,
-          }
-        );
-      if (!updatedWorkerPos) {
-        return { status: 404, msg: "worker not found", success: false };
-      }
-      return {
-        msg: "Profile updated",
-        status: 200,
-        success: true,
-        data: updatedWorkerPos,
-      };
-    } catch (e) {
-      log.warn(e.message);
-      console.log(e);
-      return { status: 500, msg: e.message, success: false };
-    }
-  }
-
-  async updateWorkerInsurance(req, res) {
-    try {
-      const validationResults = await updateWorkerInsuranceValidator(req.body);
-
-      if (validationResults.status !== 200) {
-        return {
-          msg: "Bad Request. Missing fields",
-          status: 400,
-          success: false,
-          validationResults: validationResults.msg,
-        };
-      }
-      const { worker, insurance_doc } = req.body;
-
-
-
-
-      // Update worker insurance
-      const updatedWorkerInsurance =
-        await workerProfileVerificationModel.findOneAndUpdate(
-          { worker },
-          {
-            insurance_document: insurance_doc,
-          }
-        );
-      if (!updatedWorkerInsurance) {
-        return { status: 404, msg: "worker not found", success: false };
-      }
-      return {
-        msg: "Profile updated",
-        status: 200,
-        success: true,
-        data: updatedWorkerInsurance,
       };
     } catch (e) {
       log.warn(e.message);
@@ -287,9 +116,6 @@ class WorkerProfileVerificationService {
         };
       }
       const { worker, address, latlng } = req.body;
-
-
-
 
       // update address
       const updatedAddress =
@@ -319,49 +145,6 @@ class WorkerProfileVerificationService {
     }
   }
 
-  async updateWorkerGender(req, res) {
-    try {
-      // required field : worker
-      const validationResults = await updateWorkerGenderValidator(req.body);
-
-      if (validationResults.status !== 200) {
-        return {
-          msg: "Bad Request. Missing fields",
-          status: 400,
-          success: false,
-          validationResults: validationResults.msg,
-        };
-      }
-      const { worker, gender } = req.body;
-
-
-
-
-
-      // update worker gender
-      const updateWorkerGender =
-        await workerProfileVerificationModel.findOneAndUpdate(
-          { worker },
-          {
-            gender,
-          }
-        );
-      if (!updateWorkerGender) {
-        return { status: 404, msg: "worker not found", success: false };
-      }
-      return {
-        msg: "Profile updated",
-        status: 200,
-        success: true,
-        data: updateWorkerGender,
-      };
-    } catch (e) {
-      log.warn(e.message);
-      console.log(e);
-      return { status: 500, msg: e.message, success: false };
-    }
-  }
-
   async updateWorkerPhone(req, res) {
     try {
       const validationResults = await updateWorkerPhoneValidator(req.body);
@@ -374,9 +157,12 @@ class WorkerProfileVerificationService {
           validationResults: validationResults.msg,
         };
       }
-      const { worker, phone } = req.body;
+      const { phone } = req.body;
+      const workerId = req.user.id;
       // check if the phone number is equal to the one in the database
-      const user = await workerProfileVerificationModel.findOne({ worker });
+      const user = await workerProfileVerificationModel.findOne({
+        worker: workerId,
+      });
 
       if (!user) {
         return { status: 404, msg: "worker not found", success: false };
@@ -413,7 +199,7 @@ class WorkerProfileVerificationService {
 
       //update user with code
       await workerProfileVerificationModel.findOneAndUpdate(
-        { worker },
+        { worker: workerId },
         {
           code: code,
         }
@@ -444,11 +230,14 @@ class WorkerProfileVerificationService {
           validationResults: validationResults.msg,
         };
       }
-      const { worker, phone, code } = req.body;
+      const { phone, code } = req.body;
+      const workerId = req.user.id;
       // Find the user
 
       // check if the phone number is equal to the one in the database
-      const user = await workerProfileVerificationModel.findOne({ worker });
+      const user = await workerProfileVerificationModel.findOne({
+        worker: workerId,
+      });
 
       if (!user) {
         return { status: 404, msg: "worker not found", success: false };
@@ -463,7 +252,7 @@ class WorkerProfileVerificationService {
         }; // Verification code is incorrect
       // Update the user if code matched
       await workerProfileVerificationModel.findOneAndUpdate(
-        { worker },
+        { worker: workerId },
         { code: "", phone }
       );
 

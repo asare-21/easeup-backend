@@ -6,40 +6,48 @@ const {
   getWorkerTokenCache,
 } = require("../../cache/worker_cache");
 
+router.post("/", workerController.createWorker);
+
 router.get(
-  "/:worker",
+  "/:workerId",
   workerVerifyJWT,
   getWorkerCache,
   workerController.getWorker
 );
 
-router.delete("/:worker", workerVerifyJWT, workerController.deleteWorker);
+router.delete("/:workerId", workerVerifyJWT, workerController.deleteWorker);
 
 router.get(
-  "/token/:worker",
+  "/:workerId/token",
   workerVerifyJWT,
   getWorkerTokenCache,
   workerController.getWorkerToken
 );
 
-router.post("/create", workerController.createWorker);
-
 router.post("/login", workerController.loginWorker);
 
-router.post("/location", workerVerifyJWT, workerController.saveLocation);
+router.post(
+  "/:workerId/location",
+  workerVerifyJWT,
+  workerController.saveLocation
+);
 
-router.post("/update/token", workerVerifyJWT, workerController.updateToken);
+router.patch("/:workerId/token", workerVerifyJWT, workerController.updateToken);
 
-router.get("/update/ghc", workerVerifyJWT, workerController.updateGhanaCard);
+router.patch(
+  "/:workerId/ghc",
+  workerVerifyJWT,
+  workerController.updateGhanaCard
+);
 
 router.get(
-  "/nofications/:user_id",
+  "/:workerId/notifications",
   workerVerifyJWT,
   workerController.getNotifications
 );
 
-router.post(
-  "/nofications/update/:user_id",
+router.patch(
+  "/:workerId/notifications",
   workerVerifyJWT,
   workerController.updateNotification
 );

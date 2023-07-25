@@ -50,3 +50,49 @@ URL : {BASE_URL}/worker/login
 
 ## Swagger Documentation Url
 http://localhost:3000/docs
+
+## New worker endpoints 
+
+Get worker   = GET /worker/:worker => GET /workers/:workerId
+
+Delete User = DELETE /worker/:worker  => DELETE /workers/:workerId
+
+Get Token = GET /worker/token/:worker => GET /workers/:workerId/token
+
+Create worker = POST /worker/create => POST /workers
+
+Login worker = POST /worker/login => PATCH /workers/login
+
+Update worker location = POST /worker/location => POST /workers/:workerId/location
+
+Update worker token = PATCH /worker/location => PATCH/workers/:workerId/token
+
+Update worker ghana card = PATCH /worker/location => PATCH /workers/:workerId/ghc
+
+Get worker notifications = PATCH /worker/nofications/:user_id => PATCH /workers/:workerId/notifications
+
+Update worker notifications = PATCH /worker/nofications/update/:user_id => PATCH /workers/:workerId/notifications
+
+
+## New verify worker profile endpoints 
+
+Get worker verification profile   = GET verify-worker-profile/:worker => GET /verify-worker-profiles/:workerId
+
+Update Image = POST verify-worker-profile/update/image => PATCH /verify-worker-profiles/:workerId
+
+Update Ghc Image = POST verify-worker-profile/update/ghc-image => PATCH /verify-worker-profiles/:workerId
+
+Worker age verify = POST verify-worker-profile/update/age-verify => PATCH /verify-worker-profiles/:workerId
+
+Update worker proof of skill = POST verify-worker-profile/worker/update/pos => PATCH /verify-worker-profiles/:workerId
+
+Update worker insurance = POST verify-worker-profile/worker/update/insurance => PATCH /verify-worker-profiles/:workerId
+
+Update worker address = POST verify-worker-profile/worker/update/address => PATCH /verify-worker-profiles/:workerId
+
+Update worker gender = POST verify-worker-profile/worker/update/gender => PATCH /verify-worker-profiles/:workerId
+
+Update worker phone send code = POST verify-worker-profile/worker/phone/send-code=> POST /verify-worker-profiles/:workerId/phone/send-code
+
+Update worker verify code = POST verify-worker-profile/worker/phone/verify-code => POST /verify-worker-profiles/:workerId/phone/verify-code
+
