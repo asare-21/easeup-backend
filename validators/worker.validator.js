@@ -66,10 +66,9 @@ const updateWorkerTokenValidator = (params) => {
 
 const updateWorkerGhcValidator = (params) => {
   const schema = Joi.object({
-    user_id: Joi.string().required().label("UserId"),
-    ghc: Joi.string().optional().label("Ghc"),
-    ghc_n: Joi.string().optional().label("Ghc_n"),
-    ghc_exp: Joi.string().optional().label("Ghc_exp"),
+    ghc: Joi.array().required().label("Ghc"),
+    ghc_n: Joi.string().required().label("Ghc_n"),
+    ghc_exp: Joi.string().required().label("Ghc_exp"),
   }).strict();
 
   const joiValidationResult = JoiValidator.validate(schema, params);
