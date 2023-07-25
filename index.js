@@ -116,7 +116,7 @@ app.use("/auth", authRoutes);
 app.use("/user", userRoute);
 app.use("/search", searchRoute);
 app.use("/bookmark", bookmarkRoute);
-app.use("/verify-worker-profile", workerProfileVerificationRoute);
+app.use("/verify-worker-profiles", workerProfileVerificationRoute);
 app.use("/workers", workerRoute);
 app.use("/worker-profile", workerProfileRoute);
 app.use("/room", chatRoute);

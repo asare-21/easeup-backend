@@ -3,7 +3,9 @@ const { userModel } = require("./models/user_model");
 const { notificationModel } = require("./models/nofications");
 const { workerModel } = require("./models/worker_models");
 const { workerProfileModel } = require("./models/worker_profile_model");
-const { workerProfileVerificationModel } = require("./models/worker_profile_verification_model")
+const {
+  workerProfileVerificationModel,
+} = require("./models/worker_profile_verification_model");
 const { mediaModel } = require("./models/mediaModel");
 const log = require("npmlog");
 const admin = require("firebase-admin");
