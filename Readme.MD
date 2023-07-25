@@ -50,3 +50,27 @@ URL : {BASE_URL}/worker/login
 
 ## Swagger Documentation Url
 http://localhost:3000/docs
+
+## New worker endpoints 
+
+
+
+Get worker   = GET /worker/:worker => GET /workers/:workerId
+
+Delete User = DELETE /worker/:worker  => DELETE /workers/:workerId
+
+Get Token = GET /worker/token/:worker => GET /workers/:workerId/token
+
+Create worker = POST /worker/create => POST /workers
+
+Login worker = POST /worker/login => PATCH /workers/login
+
+Update worker location = POST /worker/location => POST /workers/:workerId/location
+
+Update worker token = PATCH /worker/location => PATCH/workers/:workerId/token
+
+Update worker ghana card = PATCH /worker/location => PATCH /workers/:workerId/ghc
+
+Get worker notifications = PATCH /worker/nofications/:user_id => PATCH /workers/:workerId/notifications
+
+Update worker notifications = PATCH /worker/nofications/update/:user_id => PATCH /workers/:workerId/notifications
