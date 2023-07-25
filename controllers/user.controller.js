@@ -53,8 +53,8 @@ class UserController {
     res.status(status).send(responseData);
   };
 
-  updateInfo = async (req, res, next) => {
-    const { status, ...responseData } = await UserService.updateUser(req, res);
+  updateUser = async (req, res, next) => {
+    const { status, ...responseData } = await UserService.updateUserDetails(req, res);
     res.status(status).send(responseData);
   };
 

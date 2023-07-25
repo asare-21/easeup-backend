@@ -24,12 +24,12 @@ const {
   getUserNotificationsCache,
 } = require("../cache/user_cache");
 const {
-  updateImageValidator,
-  updateAddressValidator,
-  updateGenderValidator,
-  updateTokenValidator,
-  updatePhoneValidator,
-  updateGhcValidator,
+  // updateImageValidator,
+  // updateAddressValidator,
+  // updateGenderValidator,
+  // updateTokenValidator,
+  // updatePhoneValidator,
+  // updateGhcValidator,
   updateUserValidator,
   sendCodeValidator,
   verifyCodeValidator,
@@ -41,9 +41,9 @@ class UserService {
   // get worker
   async deleteUser(req, res) {
     try {
-      const { user } = req.params;
+      const { userId } = req.user.Id;
 
-      await Promise.all([userModel.findByIdAndDelete(user)]);
+      await Promise.all([userModel.findByIdAndDelete(userId)]);
       return {
         msg: "user Profile Deleted",
         status: 200,
@@ -64,11 +64,11 @@ class UserService {
       // Find the user
       const userData = await userModel.findById(userId);
       // cache data
-      console.log("User data ", userData)
+      console.log("User data ", userData);
       if (!userData)
         return {
-          msg: "Something went wrong. User not found",
-          status: 500,
+          msg: "User not found",
+          status: 400,
           success: false,
         }; // Internal Server Error
 
@@ -99,214 +99,7 @@ class UserService {
     }
   }
 
-  async updateImage(req, res) {
-    try {
-      const validationResults = await updateImageValidator(req.body);
-      if (validationResults.status !== 200) {
-        return {
-          msg: "Bad Request. Missing fields",
-          status: 400,
-          success: false,
-          validationResults: validationResults.msg,
-        };
-      }
-      const { profile_picture } = req.body;
-      const userId = req.user.id;
-      if (!userId) return { msg: "Bad Request", status: 400, success: false };
-      // Find the user
-      const updatedUser = await userModel.findByIdAndUpdate(userId, {
-        profile_picture: profile_picture,
-      });
-      // load user from cache and update
-      userCache.del(`user/${userId}`);
-      return {
-        msg: "Profile updated",
-        status: 200,
-        success: true,
-        updatedUser,
-      }; // User Found and returned
-    } catch (e) {
-      log.warn(e.message);
-      console.log(e);
-      return { status: 500, msg: e.message, success: false };
-    }
-  }
-
-  async updateAddress(req, res) {
-    try {
-      // validate endpoint
-      const validationResults = await updateAddressValidator(req.body);
-      if (validationResults.status !== 200) {
-        return {
-          msg: "Bad Request. Missing fields",
-          status: 400,
-          success: false,
-          validationResults: validationResults.msg,
-        };
-      }
-      const { address, latlng } = req.body;
-      const userId = req.user.id;
-      if (!userId) return { msg: "Bad Request", status: 400, success: false };
-
-      // Find the user
-      const updatedUser = await userModel.findByIdAndUpdate(userId, {
-        address: {
-          address,
-          latlng,
-        },
-      });
-      userCache.del(`user/${userId}`);
-
-      return {
-        msg: "Profile updated",
-        status: 200,
-        success: true,
-        updatedUser,
-      }; // User Found and returnedI
-    } catch (e) {
-      log.warn(e.message);
-      console.log(e);
-      return { status: 500, msg: e.message, success: false };
-    }
-  }
-
-  async updateGender(req, res) {
-    try {
-      // update gender
-      const validationResults = await updateGenderValidator(req.body);
-      if (validationResults.status !== 200) {
-        return {
-          msg: "Bad Request. Missing fields",
-          status: 400,
-          success: false,
-          validationResults: validationResults.msg,
-        };
-      }
-      const { gender } = req.body;
-      const userId = req.user.id;
-
-      // Find the user
-      const updatedUser = await userModel.findByIdAndUpdate(userId, {
-        gender: gender,
-      });
-      userCache.del(`user/${userId}`);
-
-      return {
-        msg: "Profile updated",
-        status: 200,
-        success: true,
-        updatedUser,
-      }; // User Found and returned
-    } catch (e) {
-      log.warn(e.message);
-      console.log(e);
-      return { status: 500, msg: e.message, success: false };
-    }
-  }
-
-  // get worker
-  async updateToken(req, res) {
-    try {
-      // required field : user_id
-      const validationResults = await updateTokenValidator(req.body);
-      if (validationResults.status !== 200) {
-        return {
-          msg: "Bad Request. Missing fields",
-          status: 400,
-          success: false,
-          validationResults: validationResults.msg,
-        };
-      }
-      const { token } = req.body;
-      const userId = req.user.id;
-      // Find the user
-      const updatedUser = await userModel.findByIdAndUpdate(userId, {
-        token,
-      });
-      userCache.del(`user/${userId}`);
-
-      return {
-        msg: "Profile token updated",
-        status: 200,
-        success: true,
-        updatedUser,
-      }; // User Found and returned
-    } catch (e) {
-      log.warn(e.message);
-      console.log(e);
-      return { status: 500, msg: e.message, success: false };
-    }
-  }
-
-  async updatePhone(req, res) {
-    try {
-      const validationResults = await updatePhoneValidator(req.body);
-      if (validationResults.status !== 200) {
-        return {
-          msg: "Bad Request. Missing fields",
-          status: 400,
-          success: false,
-          validationResults: validationResults.msg,
-        };
-      }
-      const { phone } = req.body;
-      const userId = req.user.id;
-
-      // Find the user
-      const updatedUser = await userModel.findByIdAndUpdate(userId, {
-        phone: phone,
-      });
-      userCache.del(`user/${userId}`);
-
-      return {
-        msg: "Profile updated",
-        status: 200,
-        success: true,
-        updatedUser,
-      }; // User Found and returned
-    } catch (e) {
-      log.warn(e.message);
-      console.log(e);
-      return { status: 500, msg: e.message, success: false };
-    }
-  }
-
-  async updateGhanaCard(req, res) {
-    try {
-      const validationResults = await updateGhcValidator(req.body);
-      if (validationResults.status !== 200) {
-        return {
-          msg: "Bad Request. Missing fields",
-          status: 400,
-          success: false,
-          validationResults: validationResults.msg,
-        };
-      }
-      const { ghc, ghc_n, ghc_exp } = req.body;
-      const userId = req.user.id;
-
-      // Find the user
-      const updatedUser = await userModel.findByIdAndUpdate(userId, {
-        ghc_image: ghc,
-        ghc_number: ghc_n,
-        ghc_exp: ghc_exp,
-      });
-      userCache.del(`user/${userId}`);
-
-      return {
-        msg: "Profile updated",
-        status: 200,
-        success: true,
-        updatedUser,
-      }; // User Found and returned
-    } catch (e) {
-      log.warn(e.message);
-      console.log(e);
-      return { status: 500, msg: e.message, success: false };
-    }
-  }
-
-  async updateUser(req, res) {
+  async updateUserDetails(req, res) {
     try {
       const validationResults = await updateUserValidator(req.body);
       if (validationResults.status !== 200) {
@@ -317,7 +110,15 @@ class UserService {
           validationResults: validationResults.msg,
         };
       }
-      const { gender, dob, phone, address } = req.body;
+      const {
+        gender,
+        dob,
+        phone,
+        address,
+        profile_picture,
+        token,
+        ghanaCardDetails,
+      } = req.body;
       const userId = req.user.id;
 
       // Find the user
@@ -325,8 +126,12 @@ class UserService {
         $set: {
           phone: phone,
           address: address,
-          dob: dob,
+          dob,
           gender: gender,
+          profile_picture: profile_picture,
+          token,
+          ghanaCardDetails,
+          address,
         },
       });
       // Update the user
@@ -471,7 +276,7 @@ class UserService {
         };
       }
       const { email, profile_name, last_login, token } = req.body;
-       const userId = req.user.id;
+      const userId = req.user.id;
 
       const existingWorker = await workerModel.findById(userId).exec();
       if (existingWorker) {
@@ -627,17 +432,17 @@ class UserService {
 
   async deleteBookmark(req, res) {
     try {
-      const { bookmark_id } = req.body;
+      const { bookmarkId } = req.params;
       const userId = req.user.id;
 
-      if (!userId || !bookmark_id)
+      if (!userId || !bookmarkId)
         return { msg: "Bad Request", status: 400, success: false }; // User ID and Bookmark ID are required
       //check firebase if uid exists
 
       // Find the user
       await userModel.findById(userId),
         // Find the bookmark and delete it
-      await bookmarkModel.findByIdAndDelete(bookmark_id);
+        await bookmarkModel.findByIdAndDelete(bookmarkId);
       return { msg: "Bookmark Deleted", status: 200, success: true }; // Bookmark Deleted
     } catch (e) {
       log.warn(e.message);

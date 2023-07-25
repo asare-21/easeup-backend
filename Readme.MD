@@ -50,3 +50,39 @@ URL : {BASE_URL}/worker/login
 
 ## Swagger Documentation Url
 http://localhost:3000/docs
+
+## New user endpoints 
+
+Delete User = DELETE /user/:user  => DELETE /users/:userId
+
+Get User   = GET user/profile/:user_id => GET /users/:userId
+
+Update image = POST /user/update/image => PATCH /users/:userId
+
+Update address = POST /user/update/address => PATCH /users/:userId
+
+Update gender = POST /user/update/gender => PATCH /users/:userId
+
+Update token = POST /user/update/token => PATCH /users/:userId
+
+Update phone = POST /user/update/phone => PATCH /users/:userId
+
+Update gender = POST /user/update/gender => PATCH /users/:userId
+
+Update ghana card = POST /user/update/ghc => PATCH /users/:userId
+
+Update phone send code = POST /user/phone/send-code => PATCH /users/:userId/phone/send-code
+
+Update phone verify code = POST /user/phone//verify-code => PATCH /users/:userId/phone/verify-code
+
+Create user = POST /user/update => POST /users
+
+Update user = POST /user/update => PATCH /users/:userId
+
+Get user notifications = GET /user/nofications/:user_ide => POST /users/:userId/notifications
+
+Update user notifications = POST /user/update => PATCH /users/:userId/notifications/:notificationsId
+
+Get bookmarks = GET /user/bookmarks => GET /users/:userId/bookmarks
+
+Delete bookmarks = DELETE /user/bookmarks/delete => DELETE /users/:userId/bookmarks/:bookmarkId
