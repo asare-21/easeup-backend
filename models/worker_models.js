@@ -5,6 +5,8 @@ const workerSchema = new Schema({
     type: String,
     required: true,
     unique: true,
+    immutable: true,
+
   },
   name: {
     type: String,
@@ -67,6 +69,8 @@ const workerSchema = new Schema({
     type: String,
     default: "",
   },
+}, {
+  timestamps: true
 });
 
 module.exports.workerModel = model("Worker", workerSchema);

@@ -17,6 +17,8 @@ const IntroSchema = Schema({
         trim: true,
         required: true
     }
+}, {
+    timestamps: true
 })
 
 module.exports.introModel = model('Intro', IntroSchema)

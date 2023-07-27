@@ -19,6 +19,8 @@ const bookmarkSchema = new Schema({
         type: Date,
         default: Date.now
     }
+}, {
+    timestamps: true
 });
 
 module.exports.bookmarkModel = model('Bookmark', bookmarkSchema);

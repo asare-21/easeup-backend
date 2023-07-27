@@ -39,6 +39,8 @@ const reviewSchema = new Schema({
         type: [String],
         default: []
     },
+}, {
+    timestamps: true
 });
 
 module.exports.reviewModel = model('Review', reviewSchema);

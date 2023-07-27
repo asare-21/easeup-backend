@@ -13,7 +13,6 @@ router.get('/all', verifyJWT, async (req, res) => {
             msg: "You are not a worker"
         })
         const slots = await timeslotModel.find({ worker: req.user.id })
-
             .populate('bookingId').sort({ date: "desc" }).exec()
 
         if (!slots) return res.status(500).json({

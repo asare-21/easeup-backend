@@ -16,6 +16,8 @@ const servicesSchema = new Schema({
         required: true
 
     }
+}, {
+    timestamps: true
 })
 
 const servicesModel = model('services', servicesSchema)

@@ -41,6 +41,8 @@ const timeslotSchema = new Schema({
         default: false
     }
 
+}, {
+    timestamps: true
 })
 
 module.exports.timeslotModel = model('Timeslot', timeslotSchema)

@@ -14,6 +14,20 @@ const updateImageValidator = (params) => {
 
   return { status: 200, msg: "success" };
 };
+const loginUserValidator = (params) => {
+  const schema = Joi.object({
+    email: Joi.string().required().label("Email"),
+    password: Joi.string().required().label("Password"),
+  }).strict();
+
+  const joiValidationResult = JoiValidator.validate(schema, params);
+
+  if (joiValidationResult) {
+    return { status: 400, msg: joiValidationResult };
+  }
+
+  return { status: 200, msg: "success" };
+};
 
 const updateAddressValidator = (params) => {
   const schema = Joi.object({
@@ -136,9 +150,11 @@ const verifyCodeValidator = (params) => {
 
 const createUserValidator = (params) => {
   const schema = Joi.object({
-    email: Joi.string().optional().label("Email"),
-    profile_name: Joi.string().optional().label("Profile Name"),
+    email: Joi.string().required().label("Email"),
+    profile_name: Joi.string().required().label("Profile Name"),
     last_login: Joi.string().optional().label("Last Login"),
+    username: Joi.string().required().label("Username"),
+    password: Joi.string().required().label("Password"),
     token: Joi.string().optional().label("Token"),
   }).strict();
 
@@ -176,5 +192,6 @@ module.exports = {
   sendCodeValidator,
   verifyCodeValidator,
   createUserValidator,
+  loginUserValidator,
   updateUserNotificationValidator,
 };

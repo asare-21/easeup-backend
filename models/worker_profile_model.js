@@ -126,6 +126,8 @@ const workerProfileSchema = new Schema({
             radius: 0
         }
     },
+}, {
+    timestamps: true
 });
 
 module.exports.workerProfileModel = model('WorkerProfile', workerProfileSchema);

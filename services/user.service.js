@@ -35,7 +35,11 @@ const {
   verifyCodeValidator,
   createUserValidator,
   updateUserNotificationValidator,
+  loginUserValidator,
 } = require("../validators/user.validator");
+const { isValidPassword, generatePassword } = require("../utils");
+const { generateToken } = require("../passport/common");
+const { createNotification } = require("./worker.service");
 const userCache = cache;
 class UserService {
   // get worker
@@ -458,6 +462,62 @@ class UserService {
       return { status: 500, msg: e.message, success: false };
     }
   }
+  async userLogin(req, res) {
+    try {
+      // validating request body submitted
+      const validationResults = await loginUserValidator(req.body);
+
+      if (validationResults.status !== 200) {
+        return {
+          msg: "Bad Request. Missing fields",
+          status: 400,
+          success: false,
+          validationResults: validationResults.msg,
+        };
+      }
+
+      const { email, password } = req.body;
+
+      // check if email exist
+      const userExists = await userModel.findOne({ email });
+      console.log(userExists)
+      if (!userExists) {
+        // User Already Exists
+        return {
+          msg: "Email or password incorrect",
+          status: 400,
+          success: false,
+        };
+      }
+
+      const isPasswordValid = isValidPassword(
+        password,
+        userExists.passwordSalt,
+        userExists.hashedPassword
+      );
+
+      if (isPasswordValid === false) {
+        return {
+          msg: "Incorrect email or password.",
+          status: 400,
+          success: false,
+        };
+      }
+
+      const token = generateToken(userExists);
+
+      return {
+        msg: "login successfull",
+        status: 200,
+        success: true,
+        token,
+      };
+    } catch (e) {
+      log.warn(e.message);
+      console.log(e);
+      return { status: 500, msg: e.message, success: false };
+    }
+  }
 
   async createUser(req, res) {
     try {
@@ -470,63 +530,62 @@ class UserService {
           validationResults: validationResults.msg,
         };
       }
-      const { email, profile_name, last_login, token } = req.body;
-       const userId = req.user.id;
+      const { email, profile_name, username, password } = req.body;
 
-      const existingWorker = await workerModel.findById(userId).exec();
+      const existingWorker = await workerModel.findOne({
+        email
+      }).exec();
       if (existingWorker) {
         // Worker Already Exists
         return {
-          user: existingWorker,
-          msg: "An account with this email exists as a worker. Sign in request denied.",
+          msg: "An account with this email exists. Account not created.",
           status: 400,
           success: false,
         };
       }
       // check if user already exists
-      const userExists = await userModel.findOne({ _id: userId }).exec();
+      const userExists = await userModel.findOne({ email });
       console.log(userExists);
       if (userExists) {
         // User Already Exists
         return {
-          user: userExists,
-          msg: "User exists. Account not created",
-          status: 200,
-          success: true,
+          msg: "An account with this email exists. Account not created.",
+          status: 400,
+          success: false,
         };
       } // User Already Exists
+
+      const saltHash = generatePassword(password);
+      const passwordSalt = saltHash.salt;
+      const hashedPassword = saltHash.hash;
       // Create the user
       const user = new userModel({
         email,
         profile_name,
-        last_login,
-        _id: userId, // firebase uid. Required
-        token,
-        phone: req.body.phone || "",
-        address: req.body.address || {},
-        email_verified: req.body.email_verified || false,
-        profile_picture: req.body.profile_picture || "",
+        hashedPassword,
+        passwordSalt,
+        username
       });
       await user.save();
 
-      // create notification
-      await createNotification(
-        userId,
-        "Welcome to Easeup",
-        "We're glad to have you on board. Enjoy your stay",
-        "welcome",
-        token
-      );
-      // send notification to update user profile
-      await createNotification(
-        userId,
-        "Update your profile",
-        "We noticed you haven't updated your profile. Please update your profile to enjoy the full experience",
-        "update_profile",
-        token
-      );
+      // // create notification
+      // await createNotification(
+      //   user._id,
+      //   "Welcome to Easeup",
+      //   "We're glad to have you on board. Enjoy your stay",
+      //   "welcome",
+      //   token
+      // );
+      // // send notification to update user profile
+      // await createNotification(
+      //   user._id,
+      //   "Update your profile",
+      //   "We noticed you haven't updated your profile. Please update your profile to enjoy the full experience",
+      //   "update_profile",
+      //   token
+      // );
 
-      return { msg: "User Created", status: 200, success: true }; // User Created
+      return { msg: "User Created", status: 200, success: true, }; // User Created
     } catch (e) {
       log.warn(e.message);
       console.log(e);
@@ -637,7 +696,7 @@ class UserService {
       // Find the user
       await userModel.findById(userId),
         // Find the bookmark and delete it
-      await bookmarkModel.findByIdAndDelete(bookmark_id);
+        await bookmarkModel.findByIdAndDelete(bookmark_id);
       return { msg: "Bookmark Deleted", status: 200, success: true }; // Bookmark Deleted
     } catch (e) {
       log.warn(e.message);

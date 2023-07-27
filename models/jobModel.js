@@ -25,6 +25,8 @@ const jobSchema = new Schema({
         type: Array,
         required: true
     }
+}, {
+    timestamps: true
 });
 
 

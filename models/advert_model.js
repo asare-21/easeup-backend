@@ -29,6 +29,8 @@ const advertSchema = Schema({
         type: String,
         trim: true
     }
+}, {
+    timestamps: true
 })
 
 module.exports.advertModel = model('Advert', advertSchema)

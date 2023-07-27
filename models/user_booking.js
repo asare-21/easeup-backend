@@ -43,6 +43,8 @@ const userBookingSchema = new Schema({
         type: Boolean,
         default: false
     },
+}, {
+    timestamps: true
 })
 
 module.exports.userBooking = model('UserBooking', userBookingSchema);

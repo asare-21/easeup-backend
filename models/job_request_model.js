@@ -34,6 +34,8 @@ const jobrequestSchema = Schema({
     }, date: {
         type: String, required: true
     }
+}, {
+    timestamps: true
 })
 
 

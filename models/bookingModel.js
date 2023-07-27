@@ -106,6 +106,8 @@ const bookingSchema = new Schema({
         type: Boolean,
         default: false
     }
+}, {
+    timestamps: true
 })
 
 

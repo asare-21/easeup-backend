@@ -79,6 +79,14 @@ class UserController {
     res.status(status).send(responseData);
   };
 
+  loginUser = async (req, res, next) => {
+    const { status, ...responseData } = await UserService.userLogin(
+      req,
+      res
+    );
+    res.status(status).send(responseData);
+  };
+
   getUserNotifications = async (req, res, next) => {
     const { status, ...responseData } = await UserService.getNotifications(
       req,

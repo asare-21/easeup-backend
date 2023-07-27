@@ -39,6 +39,8 @@ const commentSchema = new Schema({
         default: Date.now
     },
 
+}, {
+    timestamps: true
 });
 
 module.exports.commentModel = model('Comment', commentSchema);

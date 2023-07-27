@@ -148,6 +148,8 @@ const workerProfileVerificationSchema = new Schema({
         type: Date,
         default: Date.now
     }
+}, {
+    timestamps: true
 });
 
 module.exports.workerProfileVerificationModel = model('WorkerProfileVerification', workerProfileVerificationSchema);

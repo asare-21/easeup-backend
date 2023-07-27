@@ -42,6 +42,8 @@ const workerLocationSchema = new Schema({
         type: Date,
         default: Date.now()
     }
+}, {
+    timestamps: true
 })
 
 workerLocationSchema.index({ location: '2dsphere' });

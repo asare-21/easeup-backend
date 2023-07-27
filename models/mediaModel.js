@@ -46,6 +46,8 @@ const media = new Schema({
         ref: 'Worker',
         required: true
     }
+}, {
+    timestamps: true
 });
 
 const mediaModelSchema = new Schema({
