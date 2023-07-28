@@ -3,16 +3,17 @@ const {
     model
 } = require('mongoose');
 
-const addressSchema = new Schema({
-    address: {
+const pointSchema = Schema({
+    type: {
         type: String,
-        default: ''
+        enum: ['Point'],
+        required: true
     },
-    latlng: {
-        type: Array,
-        default: []
+    coordinates: {
+        type: [Number],
+        required: true
     }
-})
+});
 
 const workerProfileVerificationSchema = new Schema({
     worker: {
@@ -103,12 +104,9 @@ const workerProfileVerificationSchema = new Schema({
         default: ''
     },
     address: {
-        type: addressSchema,
+        type: pointSchema,
         required: false,
-        default: {
-            address: '',
-            latlng: []
-        }
+
     },
     proof_skill: {
         type: String,

@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { workerLocation } = require('../../models/workerLocation');
+const { workerProfileVerificationModel } = require('../../models/worker_profile_verification_model');
 const { commonError } = require('./user_route')
 
 // Route to recommend workers to users
@@ -16,8 +16,8 @@ router.post('/suggest', async (req, res) => {
         const { coords, service, id, rejected } = req.body;
 
         // Find all workers that are close to the user
-        const foundWorkers = await workerLocation.find({
-            location: {
+        const foundWorkers = await workerProfileVerificationModelfind({
+            address: {
                 $near: {
                     $maxDistance: 10000,
                     $geometry: {
