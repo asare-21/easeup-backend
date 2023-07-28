@@ -106,7 +106,6 @@ const workerProfileVerificationSchema = new Schema({
     address: {
         type: pointSchema,
         required: false,
-
     },
     proof_skill: {
         type: String,
@@ -149,5 +148,5 @@ const workerProfileVerificationSchema = new Schema({
 }, {
     timestamps: true
 });
-
+workerProfileVerificationSchema.index({ address: '2dsphere' });
 module.exports.workerProfileVerificationModel = model('WorkerProfileVerification', workerProfileVerificationSchema);

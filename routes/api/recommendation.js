@@ -16,7 +16,7 @@ router.post('/suggest', async (req, res) => {
         const { coords, service, id, rejected } = req.body;
 
         // Find all workers that are close to the user
-        const foundWorkers = await workerProfileVerificationModelfind({
+        const foundWorkers = await workerProfileVerificationModel.find({
             address: {
                 $near: {
                     $maxDistance: 10000,
@@ -77,6 +77,7 @@ router.post('/suggest', async (req, res) => {
         })
     }
     catch (e) {
+        console.log(e)
         return commonError(res, e.message)
     }
 })
