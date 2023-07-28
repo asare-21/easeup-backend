@@ -119,7 +119,7 @@ app.use("/search", searchRoute);
 app.use("/bookmark", bookmarkRoute);
 app.use("/verify-worker-profile", workerProfileVerificationRoute);
 app.use("/worker", workerRoute);
-app.use("/worker-profile", workerProfileRoute);
+app.use("/worker-profiles", workerProfileRoute);
 app.use("/room", chatRoute);
 app.use("/jobs", jobs);
 app.use("/subscribe", subscribeRoute);
@@ -314,3 +314,8 @@ async function createNewRoom(_room) {
 
 
 module.exports.admin = FBadmin;
+
+
+
+
+

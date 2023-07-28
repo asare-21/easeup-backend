@@ -8,9 +8,9 @@ class WorkerController {
     );
     res.status(status).send(responseData);
   };
-  getWorkerReviews = async (req, res, next) => {
+  getWorkerReview = async (req, res, next) => {
     const { status, ...responseData } =
-      await WorkerProfileService.findWorkerReviews(req, res);
+      await WorkerProfileService.findWorkerReview(req, res);
     res.status(status).send(responseData);
   };
   getWorkerComments = async (req, res, next) => {
@@ -23,33 +23,9 @@ class WorkerController {
       await WorkerProfileService.addWorkerComments(req, res);
     res.status(status).send(responseData);
   };
-  addWorkerCharge = async (req, res, next) => {
+  updateWorkerProfileDetails= async (req, res, next) => {
     const { status, ...responseData } =
-      await WorkerProfileService.addWorkerCharge(req, res);
-    res.status(status).send(responseData);
-  };
-  addWorkerSkills = async (req, res, next) => {
-    const { status, ...responseData } =
-      await WorkerProfileService.addWorkerSkills(req, res);
-    res.status(status).send(responseData);
-  };
-
-  addWorkerBio = async (req, res, next) => {
-    const { status, ...responseData } = await WorkerProfileService.addWorkerBio(
-      req,
-      res
-    );
-    res.status(status).send(responseData);
-  };
-  addWorkerInstagram = async (req, res, next) => {
-    const { status, ...responseData } =
-      await WorkerProfileService.addWorkerInstagram(req, res);
-    res.status(status).send(responseData);
-  };
-
-  addWorkerTwitter = async (req, res, next) => {
-    const { status, ...responseData } =
-      await WorkerProfileService.addWorkeTwitter(req, res);
+      await WorkerProfileService.updateWorkerProfileDetails(req, res);
     res.status(status).send(responseData);
   };
   addWorkerPortfolio = async (req, res, next) => {

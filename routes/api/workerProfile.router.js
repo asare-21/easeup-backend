@@ -19,47 +19,52 @@ const { mediaCache } = require("../../cache/media_cache");
 const { getWorkerProfileCache } = require("../../cache/worker_profile");
 
 router.get(
-  "/:worker",
+  "/:workerId",
   workerVerifyJWT,
   getWorkerProfileCache,
   workerProfileController.getWorkerProfile
 );
 
 router.get(
-  "/reviews/:worker",
+  "/:workerId/reviews",
   workerVerifyJWT,
   getReviewsCache,
-  workerProfileController.getWorkerReviews
+  workerProfileController.getWorkerReview
 );
 router.get(
-  "/comments/:worker/:post",
+  "/:workerId/comments/:postId",
   workerVerifyJWT,
   getCommentsCache,
   workerProfileController.getWorkerComments
 );
 router.post(
-  "/comments/:worker",
+  "/:workerId/comments",
   workerVerifyJWT,
   workerProfileController.addWorkerComments
 );
-router.post("/charge", workerVerifyJWT, workerProfileController.addWorkerCharge);
-router.post("/skills", workerVerifyJWT, workerProfileController.addWorkerSkills);
-router.post("/bio", workerVerifyJWT, workerProfileController.addWorkerBio);
-router.post("/instagram", workerVerifyJWT, workerProfileController.addWorkerInstagram);
-router.post("/portfolio", workerVerifyJWT, workerProfileController.addWorkerPortfolio);
+router.patch(
+  "/:workerId",
+  workerVerifyJWT,
+  workerProfileController.updateWorkerProfileDetails
+);
+router.post(
+  "/:workerId/portfolio",
+  workerVerifyJWT,
+  workerProfileController.addWorkerPortfolio
+);
 router.get(
-  "/portfolio/:worker/:page",
+  "/:worker/portfolio/:page",
   workerVerifyJWT,
   mediaCache,
   workerProfileController.getWorkerPortfolio
 );
 router.post(
-  "/work-radius",
+  "/:workerId/work-radius",
   workerVerifyJWT,
   workerProfileController.addWorkerRadius
 );
 router.get(
-  "/booking/:worker",
+  "/:workerId/booking",
   workerVerifyJWT,
   getBookingCache,
   workerProfileController.getBooking
@@ -71,29 +76,29 @@ router.get(
   workerProfileController.getPaidBooking
 );
 router.get(
-  "/booking-upcoming/:worker",
+  "/:workerId/booking-upcoming",
   workerVerifyJWT,
   getUpcomingBookingCache,
   workerProfileController.getUpcomingBooking
 );
 router.get(
-  "/booking-pending/:worker",
+  "/:workerId/booking-pending",
   workerVerifyJWT,
   workerProfileController.getPendingBooking
 );
 router.get(
-  "/booking-progress/:worker",
+  "/:workerId/booking-progress",
   workerVerifyJWT,
   workerProfileController.getBookingInProgress
 );
 router.get(
-  "/booking-completed/:worker",
+  "/:workerId/booking-completed",
   workerVerifyJWT,
   getCompletedBookingCache,
   workerProfileController.getCompletedBooking
 );
 router.get(
-  "/booking-cancelled/:worker",
+  "/:workerId/booking-cancelled",
   workerVerifyJWT,
   getCancelledBookingCache,
   workerProfileController.getCancelledBooking
@@ -114,17 +119,21 @@ router.post(
   workerProfileController.addWorkerReviews
 );
 router.get(
-  "/worker-review/:worker",
+  "/:workerId/worker-review",
   workerVerifyJWT,
   getWorkerReviewCache,
   workerProfileController.getWorkerReviews
 );
 router.post(
-  "/available-slots/:worker",
+  "/:workerId/available-slots",
   workerVerifyJWT,
   workerProfileController.addAvailableSlots
 );
-router.post("/book-slot", workerVerifyJWT, workerProfileController.bookWorkerSlot);
+router.post(
+  "/book-slot",
+  workerVerifyJWT,
+  workerProfileController.bookWorkerSlot
+);
 router.post(
   "/verify-payment",
   workerVerifyJWT,
@@ -151,7 +160,7 @@ router.patch(
   workerProfileController.updateDate
 );
 router.get(
-  "/notify/:worker",
+  "/:worker/notify/",
   workerVerifyJWT,
   workerProfileController.notifyWorker
 );
