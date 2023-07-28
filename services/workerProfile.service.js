@@ -26,11 +26,7 @@ const {
 const { notificationModel } = require("../models/nofications");
 const {
   profileCommentsValidator,
-  profileChargeValidator,
-  profileSkillsUpdateValidator,
-  profileBioUpdateValidator,
-  profileIGUpdateValidator,
-  profileTwitterUpdateValidator,
+  updateWorkerProfileDetails,
   profilePortfolioUpdateValidator,
   profileWorkRadiusUpdateValidator,
   profileReceieveWorkerReviewValidator,
@@ -39,18 +35,22 @@ const {
   refundPaymentValidator,
   updateLocationValidator,
   updateDateValidator,
+  profileBookingStatusUpdateValidator,
 } = require("../validators/workerProfile.validator");
+const {
+  updateBookingStatus,
+} = require("../controllers/workerProfile.controller");
 class WorkerProfileService {
   // get worker
   async findWorker(req, res) {
     try {
-      const { worker } = req.params;
+      const workerId = req.user.id;
       // check if uid is valid
-      const workerPromise = workerProfileModel.findOne({ worker });
+      const workerPromise = workerProfileModel.findOne({ worker: workerId });
       const rating = reviewModel
         .aggregate([
           {
-            $match: { worker },
+            $match: { worker: workerId },
           },
           {
             $group: {
@@ -62,11 +62,15 @@ class WorkerProfileService {
         .exec();
 
       let avgRating = 0;
-      let response = await Promise.all([workerPromise, rating, reviewModel.countDocuments({ worker })])
+      let response = await Promise.all([
+        workerPromise,
+        rating,
+        reviewModel.countDocuments({ worker: workerId }),
+      ]);
 
       if (response[1].length > 0) avgRating = response[1].avgRating ?? 0;
 
-      const totalReviews = response[2]
+      const totalReviews = response[2];
 
       response[0].rating = avgRating;
       response[0].totalReviews = totalReviews;
@@ -86,14 +90,14 @@ class WorkerProfileService {
     }
   }
   // get worker reviews
-  async findWorkerReviews(req, res) {
+  async findWorkerReview(req, res) {
     try {
-      const { worker } = req.params;
+      const workerId = req.user.id;
       // check if uid is valid
-      const foundWorker = await reviewModel.find({ worker });
+      const foundWorker = await reviewModel.find({ worker: workerId });
 
       if (foundWorker)
-        workerCache.set(`reviews/${worker}`, JSON.stringify(foundWorker));
+        workerCache.set(`reviews/${workerId}`, JSON.stringify(foundWorker));
 
       return {
         msg: "Worker Profile",
@@ -110,16 +114,56 @@ class WorkerProfileService {
   // get worker comments
   async findWorkerComments(req, res) {
     try {
-      const { worker, post } = req.params;
+      const { postId } = req.params;
       // check if uid is valid
-      const posts = await commentModel.find({ post });
+      const posts = await commentModel.find({ post: postId });
       // set cache
-      workerCache.set(`comments/${post}`, JSON.stringify(posts));
+      workerCache.set(`comments/${postId}`, JSON.stringify(posts));
       return {
         msg: "Comments fetched",
         status: 200,
         success: true,
         posts,
+      };
+    } catch (e) {
+      log.warn(e.message);
+      console.log(e);
+      return { status: 500, msg: e.message, success: false };
+    }
+  }
+
+  async updateWorkerProfileDetails(req, res) {
+    try {
+      const workerId = req.user.id;
+      const validationResults = await updateWorkerProfileDetails(req.body);
+      const { charge, skills, bio, ig, twitter } = req.body;
+      if (validationResults.status !== 200) {
+        return {
+          msg: "Bad Request. Missing fields",
+          status: 400,
+          success: false,
+          validationResults: validationResults.msg,
+        };
+      }
+      // check if worker is valid
+      const foundWorker = await workerProfileModel.findOneAndUpdate(
+        { worker: workerId },
+        {
+          $set: {
+            base_price: charge,
+            skills,
+            bio,
+            "links.instagram": ig,
+            "links.twitter": twitter,
+          },
+        }
+      );
+      workerCache.del(`worker-profile/${workerId}`);
+      return {
+        msg: "Worker Profile Updated",
+        status: 200,
+        success: true,
+        worker: foundWorker,
       };
     } catch (e) {
       log.warn(e.message);
@@ -141,30 +185,30 @@ class WorkerProfileService {
         };
       }
 
-      const { worker } = req.params;
-      const { comment, image, from, post, name } = req.body;
+      const workerId = req.user.id;
+      const { comment, image, from, postId, name } = req.body;
 
       // check if uid is valid
       const newComment = new commentModel({
         comment,
         image,
         from,
-        post,
+        post: postId,
         name,
       });
       // get worker
-      const workerData = await workerModel.findById(worker);
-      // send notification to worker
-      await admin.messaging().sendToDevice(workerData.token, {
-        notification: {
-          title: "New comment",
-          body: `${name} commented on your post`,
-        },
-        data: {
-          type: "comment",
-          post,
-        },
-      });
+      const workerData = await workerModel.findById(workerId);
+      // // send notification to worker
+      // await admin.messaging().sendToDevice(workerData.token, {
+      //   notification: {
+      //     title: "New comment",
+      //     body: `${name} commented on your post`,
+      //   },
+      //   data: {
+      //     type: "comment",
+      //     post:postId,
+      //   },
+      // });
       await newComment.save();
       return {
         msg: "Comment Added",
@@ -178,191 +222,13 @@ class WorkerProfileService {
       return { status: 500, msg: e.message, success: false };
     }
   }
-  // add worker charge
-  async addWorkerCharge(req, res) {
-    try {
-      const { worker, charge } = req.body;
-      const validationResults = await profileChargeValidator(req.body);
 
-      if (validationResults.status !== 200) {
-        return {
-          msg: "Bad Request. Missing fields",
-          status: 400,
-          success: false,
-          validationResults: validationResults.msg,
-        };
-      }
-      // check if worker is valid
-      const foundWorker = await workerProfileModel.findOneAndUpdate(
-        { worker },
-        {
-          base_price: charge,
-        }
-      );
-      workerCache.del(`worker-profile/${worker}`);
-      return {
-        msg: "Worker Profile Updated",
-        status: 200,
-        success: true,
-        worker: foundWorker,
-      };
-    } catch (e) {
-      log.warn(e.message);
-      console.log(e);
-      return { status: 500, msg: e.message, success: false };
-    }
-  }
-  // add worker skills
-  async addWorkerSkills(req, res) {
-    try {
-      const validationResults = await profileSkillsUpdateValidator(req.body);
-
-      if (validationResults.status !== 200) {
-        return {
-          msg: "Bad Request. Missing fields",
-          status: 400,
-          success: false,
-          validationResults: validationResults.msg,
-        };
-      }
-      const { worker, skills } = req.body;
-      // check if worker is valid
-      const foundWorker = await workerProfileModel.findOneAndUpdate(
-        { worker },
-        {
-          $set: {
-            skills,
-          },
-        }
-      );
-      workerCache.del(`worker-profile/${worker}`);
-      return {
-        msg: "Worker Profile Updated",
-        status: 200,
-        success: true,
-        worker: foundWorker,
-      };
-    } catch (e) {
-      log.warn(e.message);
-      console.log(e);
-      return { status: 500, msg: e.message, success: false };
-    }
-  }
-  // add worker bio
-  async addWorkerBio(req, res) {
-    try {
-      const { worker, bio } = req.body;
-      const validationResults = await profileBioUpdateValidator(req.body);
-
-      if (validationResults.status !== 200) {
-        return {
-          msg: "Bad Request. Missing fields",
-          status: 400,
-          success: false,
-          validationResults: validationResults.msg,
-        };
-      }
-      // check if worker is valid
-      const foundWorker = await workerProfileModel.findOneAndUpdate(
-        { worker },
-        {
-          $set: {
-            bio,
-          },
-        }
-      );
-      workerCache.del(`worker-profile/${worker}`);
-      return {
-        msg: "Worker Profile Updated",
-        status: 200,
-        success: true,
-        worker: foundWorker,
-      };
-    } catch (e) {
-      log.warn(e.message);
-      console.log(e);
-      return { status: 500, msg: e.message, success: false };
-    }
-  }
-  // get worker instagram
-  async addWorkerInstagram(req, res) {
-    try {
-      const { worker, ig } = req.body;
-      const validationResults = await profileIGUpdateValidator(req.body);
-
-      if (validationResults.status !== 200) {
-        return {
-          msg: "Bad Request. Missing fields",
-          status: 400,
-          success: false,
-          validationResults: validationResults.msg,
-        };
-      }
-      // check if worker is valid
-      const foundWorker = await workerProfileModel.findOneAndUpdate(
-        { worker },
-        {
-          $set: {
-            "links.instagram": ig,
-          },
-        }
-      );
-      workerCache.del(`worker-profile/${worker}`);
-
-      return {
-        msg: "Worker Profile Updated",
-        status: 200,
-        success: true,
-        worker: foundWorker,
-      };
-    } catch (e) {
-      log.warn(e.message);
-      console.log(e);
-      return { status: 500, msg: e.message, success: false };
-    }
-  }
-  // add worker twitter
-  async addWorkeTwitter(req, res) {
-    try {
-      const { worker, twitter } = req.body;
-      const validationResults = await profileTwitterUpdateValidator(req.body);
-
-      if (validationResults.status !== 200) {
-        return {
-          msg: "Bad Request. Missing fields",
-          status: 400,
-          success: false,
-          validationResults: validationResults.msg,
-        };
-      }
-      // check if worker is valid
-      const foundWorker = await workerProfileModel.findOneAndUpdate(
-        { worker },
-        {
-          $set: {
-            "links.twitter": twitter,
-          },
-        }
-      );
-      workerCache.del(`worker-profile/${worker}`);
-
-      return {
-        msg: "Worker Profile Updated",
-        status: 200,
-        success: true,
-        worker: foundWorker,
-      };
-    } catch (e) {
-      log.warn(e.message);
-      console.log(e);
-      return { status: 500, msg: e.message, success: false };
-    }
-  }
   // add worker portfolio
   async addWorkerPortfolio(req, res) {
     try {
-      const { worker, media, description, thumbnail, image } = req.body;
+      const { media, description, thumbnail, image } = req.body;
       const validationResults = await profilePortfolioUpdateValidator(req.body);
+      const workerId = req.user.id;
 
       if (validationResults.status !== 200) {
         return {
@@ -374,24 +240,19 @@ class WorkerProfileService {
       }
       // check if worker is valid
       const newMedia = new mediaModel({
-        worker,
+        worker: workerId,
         url: media,
         description,
         image,
         thumbnail,
       });
-      newMedia.save((err, worker) => {
-        if (err) {
-          console.log(err);
-          return commonError(res, err.message);
-        }
-        return {
-          msg: "Worker Profile Updated",
-          status: 200,
-          success: true,
-          worker,
-        };
-      });
+      const updatedWorker = await newMedia.save();
+      return {
+        msg: "Worker Profile Updated",
+        status: 200,
+        success: true,
+        updatedWorker,
+      };
     } catch (e) {
       log.warn(e.message);
       console.log(e);
@@ -402,15 +263,16 @@ class WorkerProfileService {
   // get worker portfolio
   async getWorkerPortfolioPage(req, res) {
     try {
-      const { worker, page } = req.params;
+      const { page } = req.params;
+      const workerId = req.user.id;
       const pageSize = 10;
       // check if worker is valid
       const posts = await mediaModel
-        .find({ worker })
+        .find({ worker: workerId })
         .limit(pageSize)
         .skip((page - 1) * pageSize); // get 5 posts per page
       if (!posts) return commonError(res, "No portfolio found");
-      workerCache.set(`portfolio/${page}/${worker}`, JSON.stringify(posts));
+      workerCache.set(`portfolio/${page}/${workerId}`, JSON.stringify(posts));
       return {
         msg: "Worker Profile Media Fetched Successfully",
         status: 200,
@@ -426,10 +288,11 @@ class WorkerProfileService {
 
   async addWorkerRadius(req, res) {
     try {
-      const { worker, radius } = req.body;
       const validationResults = await profileWorkRadiusUpdateValidator(
         req.body
       );
+      const { radius } = req.body;
+      const workerId = req.user.id;
 
       if (validationResults.status !== 200) {
         return {
@@ -442,24 +305,19 @@ class WorkerProfileService {
       // check if worker is valid
       if (radius.radius > 50 || radius.radius < 5)
         return commonError(res, "Radius must be between 5 and 50");
-      workerProfileModel.findOneAndUpdate(
-        { worker },
+      const updatedWorker = await workerProfileModel.findOneAndUpdate(
+        { worker: workerId },
         {
           work_radius: radius,
-        },
-        (err, worker) => {
-          if (err) {
-            return commonError(res, err.message);
-          }
-
-          return {
-            msg: "Worker Profile Updated",
-            status: 200,
-            success: true,
-            worker,
-          };
         }
       );
+
+      return {
+        msg: "Worker Profile Updated",
+        status: 200,
+        success: true,
+        updatedWorker,
+      };
     } catch (e) {
       log.warn(e.message);
       console.log(e);
@@ -470,11 +328,11 @@ class WorkerProfileService {
   //get worker booking
   async findBooking(req, res) {
     try {
-      const { worker } = req.params;
+      const workerId = req.user.id;
       // check if worker is valid
-      const bookings = await bookingModel.find({ worker });
+      const bookings = await bookingModel.find({ worker: workerId });
       // set cache
-      workerCache.set(`booking/${worker}`, JSON.stringify(bookings));
+      workerCache.set(`booking/${workerId}`, JSON.stringify(bookings));
       return {
         msg: "Worker Profile Fetched Successfully",
         status: 200,
@@ -511,19 +369,22 @@ class WorkerProfileService {
   // get upcoming booking
   async findUpcomingBooking(req, res) {
     try {
-      const { worker } = req.params;
+      const workerId = req.user.id;
       const { user } = req.query;
       // check if worker is valid
       // console.log("User variable ", user)
       const bookings = await bookingModel.find({
-        [user === "true" ? "client" : "worker"]: worker,
+        [user === "true" ? "client" : "worker"]: workerId,
         isPaid: true,
         cancelled: false,
         started: false,
       });
       console.log("Fetched bookings ", bookings);
       // set cahce
-      workerCache.set(`upcoming-bookings/${worker}`, JSON.stringify(bookings));
+      workerCache.set(
+        `upcoming-bookings/${workerId}`,
+        JSON.stringify(bookings)
+      );
 
       return {
         msg: "Worker Profile Fetched Successfully",
@@ -598,24 +459,27 @@ class WorkerProfileService {
   // get completed booking
   async findCompletedBooking(req, res) {
     try {
-      const { worker } = req.params;
+      const workerId = req.user.id;
       const { user } = req.query;
       // check if worker is valid
       const bookings = await bookingModel.find({
-        [user === "true" ? "client" : "worker"]: worker,
+        [user === "true" ? "client" : "worker"]: workerId,
         isPaid: true,
         completed: true,
         started: true,
       });
 
       // set cache
-      workerCache.set(`completed-bookings/${worker}`, JSON.stringify(bookings));
+      workerCache.set(
+        `completed-bookings/${workerId}`,
+        JSON.stringify(bookings)
+      );
       return {
         msg: "Worker Profile Fetched Successfully",
         status: 200,
         success: true,
         bookings,
-      }
+      };
     } catch (e) {
       log.warn(e.message);
       console.log(e);
@@ -625,18 +489,21 @@ class WorkerProfileService {
   // get worker
   async findCancelledBooking(req, res) {
     try {
-      const { worker } = req.params;
+      const workerId = req.user.id;
       const { user } = req.query;
       // check if worker is valid
       // const bookings = await bookingModel.find({ [user == true || 'true' ? 'client' : 'worker']: worker, isPaid: true, completed: false, cancelled: true })
       const bookings = await bookingModel.find({
-        [user === "true" ? "client" : "worker"]: worker,
+        [user === "true" ? "client" : "worker"]: workerId,
         isPaid: true,
         completed: false,
         cancelled: true,
       });
       // set cache
-      workerCache.set(`cancelled-bookings/${worker}`, JSON.stringify(bookings));
+      workerCache.set(
+        `cancelled-bookings/${workerId}`,
+        JSON.stringify(bookings)
+      );
       return {
         msg: "Worker Profile Fetched Successfully",
         status: 200,
@@ -652,7 +519,7 @@ class WorkerProfileService {
   // update booking status
   async updateBookingStatus(req, res) {
     try {
-      const validationResults = await profileWorkRadiusUpdateValidator(
+      const validationResults = await profileBookingStatusUpdateValidator(
         req.body
       );
 
@@ -664,12 +531,13 @@ class WorkerProfileService {
           validationResults: validationResults.msg,
         };
       }
-      const { worker, client, ref } = req.body;
+      const { client, ref } = req.body;
       const { started, completed } = req.query;
+      const workerId = req.user.id;
       if (!completed) {
         // check if any bookng has been started but not completed
         const bookingStarted = await bookingModel.findOne({
-          worker,
+          worker: workerId,
           client,
           ref,
           started: true,
@@ -683,7 +551,7 @@ class WorkerProfileService {
       }
       const booking = await bookingModel.findOneAndUpdate(
         {
-          worker,
+          worker: workerId,
           client,
           ref,
         },
@@ -697,8 +565,8 @@ class WorkerProfileService {
       );
       console.log(booking);
       if (!booking) return commonError(res, "Booking not found");
-      workerCache.del(`in-progress-bookings/${worker}`);
-      workerCache.del(`upcoming-bookings/${worker}`);
+      workerCache.del(`in-progress-bookings/${workerId}`);
+      workerCache.del(`upcoming-bookings/${workerId}`);
 
       return {
         msg: "Booking Updated Successfully",
@@ -715,7 +583,7 @@ class WorkerProfileService {
   // mark booking as pending
   async markBookingAsPending(req, res) {
     try {
-      const validationResults = await profileWorkRadiusUpdateValidator(
+      const validationResults = await profileBookingStatusUpdateValidator(
         req.body
       );
 
@@ -727,9 +595,10 @@ class WorkerProfileService {
           validationResults: validationResults.msg,
         };
       }
-      const { worker, client, ref } = req.body;
+      const { client, ref } = req.body;
+      const workerId = req.user.id;
       const bookingStarted = await bookingModel.findOne({
-        worker,
+        worker: workerId,
         client,
         ref,
         started: true,
@@ -742,17 +611,17 @@ class WorkerProfileService {
       bookingStarted.pending = true;
       bookingStarted.save();
 
-      workerCache.del(`in-progress-bookings/${worker}`);
-      workerCache.del(`upcoming-bookings/${worker}`);
-      workerCache.del(`pending-bookings/${worker}`);
+      workerCache.del(`in-progress-bookings/${workerId}`);
+      workerCache.del(`upcoming-bookings/${workerId}`);
+      workerCache.del(`pending-bookings/${workerId}`);
 
       // send notifcation to worker
-      const workerfuture = await workerModel.findById(worker);
-      if (worker) {
+      const workerfuture = await workerModel.findById(workerId);
+      if (workerId) {
         // send notification to worker
         notificationModel;
         const notification = new notificationModel({
-          user: worker,
+          user: workerId,
           title: "Booking Pending",
           body: `Your booking with ${bookingStarted.clientName} has been marked as pending. Please contact the client to resolve the issue.`,
         });
@@ -793,10 +662,11 @@ class WorkerProfileService {
           validationResults: validationResults.msg,
         };
       }
-      const { worker, user, rating, review, userImage, name } = req.body;
+      const { workerId, user, rating, review, userImage, name } = req.body;
+
       // check if worker is valid
       const reviewM = new reviewModel({
-        worker,
+        worker: workerId,
         user,
         rating,
         review,
@@ -819,17 +689,17 @@ class WorkerProfileService {
   // get worker
   async findWorkerReviews(req, res) {
     try {
-      const worker = req.params.worker;
+      const workerId = req.user.id;
       // check if worker is valid
-
+      console.log(6666);
       const reviewsPromise = await reviewModel
-        .find({ worker })
+        .find({ worker: workerId })
         .limit(80)
         .sort({ date: -1 });
       const avgRatingPromise = await reviewModel
         .aggregate([
           {
-            $match: { worker },
+            $match: { worker: workerId },
           },
           {
             $group: {
@@ -839,28 +709,32 @@ class WorkerProfileService {
           },
         ])
         .exec();
-      const totalReviewsPromise = await reviewModel.countDocuments({ worker });
+      const totalReviewsPromise = await reviewModel.countDocuments({
+        worker: workerId,
+      });
       const result = await Promise.all([
         reviewsPromise,
         avgRatingPromise,
         totalReviewsPromise,
       ]);
+
       const reviews = result[0];
       const avgRating = result[1];
       const totalReviews = result[2];
-
-      reviews.avgRating = avgRating[0].avgRating ?? 0;
-      reviews.total = totalReviews;
+      if (reviews.length > 0) {
+        reviews.avgRating = avgRating[0].avgRating ?? 0;
+        reviews.total = totalReviews;
+      }
 
       // set cache
-      workerCache.set(`worker-review/${worker}`, JSON.stringify(reviews));
+      workerCache.set(`worker-review/${workerId}`, JSON.stringify(reviews));
 
       return {
         msg: "Review saved",
         status: 200,
         success: true,
         reviews,
-        avgRating: avgRating[0].avgRating ?? 0,
+        avgRating: avgRating.length > 0 ? avgRating[0].avgRating : 0,
         total: totalReviews,
       };
     } catch (e) {
@@ -972,7 +846,6 @@ class WorkerProfileService {
         };
       }
       const {
-        worker,
         client,
         skills,
         name,
@@ -987,7 +860,9 @@ class WorkerProfileService {
         basePrice,
       } = req.body;
 
-      const start = await findEarliestAvailableTimeSlot(worker, day); // find earliest availble timeslor
+      const workerId = req.user.id;
+
+      const start = await findEarliestAvailableTimeSlot(workerId, day); // find earliest availble timeslor
       console.log("Generated start time ", start);
       if (!start) {
         return commonError(
@@ -1001,15 +876,15 @@ class WorkerProfileService {
       const clientPhone = await userModel.findById(client);
 
       const workerPhone = await workerProfileVerificationModel.findOne({
-        worker,
+        worker: workerId,
       });
-      const workerToken = await workerModel.findById(worker);
+      const workerToken = await workerModel.findById(workerId);
       // check if the phone numbers are available
-      if (!clientPhone.phone || !workerPhone.phone) {
+      if (!clientPhone?.phone || !workerPhone?.phone) {
         return commonError(res, "Phone number not found.");
       }
       const newBooking = new bookingModel({
-        worker,
+        worker: workerId,
         client,
         start,
         end,
@@ -1025,15 +900,15 @@ class WorkerProfileService {
         date: start,
         photos,
         basePrice,
-        clientPhone: clientPhone.phone,
-        workerPhone: workerPhone.phone,
+        clientPhone: clientPhone?.phone,
+        workerPhone: workerPhone?.phone,
       });
 
       const result = await newBooking.save(); // save booking
       // clear cache
-      workerCache.del(`booking/${worker}`);
+      workerCache.del(`booking/${workerId}`);
       workerCache.del(`upcoming-bookings/${client}`);
-      workerCache.del(`upcoming-bookings/${worker}`);
+      workerCache.del(`upcoming-bookings/${workerId}`);
 
       // Send notifications to the worker and client
       if (workerPhone && clientPhone)
@@ -1150,7 +1025,8 @@ class WorkerProfileService {
           validationResults: validationResults.msg,
         };
       }
-      const { worker, reason } = req.body;
+      const { reason } = req.body;
+      const workerId = req.user.id;
       const options = {
         method: "POST",
         hostname: "api.paystack.co",
@@ -1163,7 +1039,7 @@ class WorkerProfileService {
       const { ref } = req.params;
       const foundBooking = await bookingModel.findOne({ ref }); // find booking
       // user and worker device tokens to send an alert that the refund has been process and booking cancelled
-      const workerToken = await workerModel.findById(worker);
+      const workerToken = await workerModel.findById(workerId);
       const userToken = await userModel.findById(foundBooking.client);
       // Set refund details
       const refundDetails = JSON.stringify({
@@ -1191,16 +1067,16 @@ class WorkerProfileService {
         response.on("end", async () => {
           console.log(JSON.parse(data));
           await bookingModel.findOneAndUpdate(
-            { ref, worker },
+            { ref, worker: workerId },
             {
               cancelled: true,
               cancelledReason: reason,
               endTime: Date.now(),
             }
           );
-          workerCache.del(`in-progress-bookings/${worker}`);
-          workerCache.del(`upcoming-bookings/${worker}`);
-          workerCache.del(`cancelled-bookings/${worker}`);
+          workerCache.del(`in-progress-bookings/${workerId}`);
+          workerCache.del(`upcoming-bookings/${workerId}`);
+          workerCache.del(`cancelled-bookings/${workerId}`);
           return {
             msg: "Refund Processed",
             status: 200,
@@ -1299,12 +1175,13 @@ class WorkerProfileService {
         };
       }
       const { worker, client, location, ref } = req.body;
+      const workerId = req.user.id;
       // check if worker is valid
       // check if worker is valid
       const bookings = await bookingModel
         .findOneAndUpdate(
           {
-            worker,
+            worker: workerId,
             client,
             ref,
           },
@@ -1347,6 +1224,7 @@ class WorkerProfileService {
       return { status: 500, msg: e.message, success: false };
     }
   }
+
   // get worker
   async updateDate(req, res) {
     try {
@@ -1359,12 +1237,13 @@ class WorkerProfileService {
           validationResults: validationResults.msg,
         };
       }
-      const { worker, client, date, day, ref } = req.body;
+      const { client, date, day, ref } = req.body;
+      const workerId = req.user.id;
       // check if worker is valid
       // check if worker is valid
       const bookings = await bookingModel.findOneAndUpdate(
         {
-          worker,
+          worker: workerId,
           client,
           ref,
         },
@@ -1378,7 +1257,7 @@ class WorkerProfileService {
 
       console.log(bookings);
       // send notification to device of worker and client
-      const workerToken = await workerModel.findById(worker);
+      const workerToken = await workerModel.findById(workerId);
       const userToken = await userModel.findById(client);
       Promise.all([
         await admin.messaging().sendToDevice(userToken.token, {

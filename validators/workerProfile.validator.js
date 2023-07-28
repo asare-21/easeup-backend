@@ -6,7 +6,7 @@ const profileCommentsValidator = (params) => {
     comment: Joi.string().required().label("Comment"),
     image: Joi.string().required().label("Image"),
     from: Joi.string().required().label("From"),
-    post: Joi.string().required().label("Post"),
+    postId: Joi.string().required().label("PostId"),
     name: Joi.string().required().label("Name"),
   }).strict();
 
@@ -19,71 +19,14 @@ const profileCommentsValidator = (params) => {
   return { status: 200, msg: "success" };
 };
 
-const profileChargeValidator = (params) => {
+const updateWorkerProfileDetails = (params) => {
   const schema = Joi.object({
-    worker: Joi.string().required().label("Worker"),
-    charge: Joi.number().required().label("Charge"),
-  }).strict();
-
-  const joiValidationResult = JoiValidator.validate(schema, params);
-
-  if (joiValidationResult) {
-    return { status: 400, msg: joiValidationResult };
-  }
-
-  return { status: 200, msg: "success" };
-};
-
-const profileSkillsUpdateValidator = (params) => {
-  const schema = Joi.object({
-    worker: Joi.string().required().label("Worker"),
-    skills: Joi.array().required().label("Skiils"),
-  }).strict();
-
-  const joiValidationResult = JoiValidator.validate(schema, params);
-
-  if (joiValidationResult) {
-    return { status: 400, msg: joiValidationResult };
-  }
-
-  return { status: 200, msg: "success" };
-};
-
-const profileBioUpdateValidator = (params) => {
-  const schema = Joi.object({
-    worker: Joi.string().required().label("Worker"),
-    bio: Joi.string().required().label("Bio"),
-  }).strict();
-
-  const joiValidationResult = JoiValidator.validate(schema, params);
-
-  if (joiValidationResult) {
-    return { status: 400, msg: joiValidationResult };
-  }
-
-  return { status: 200, msg: "success" };
-};
-
-const profileIGUpdateValidator = (params) => {
-  const schema = Joi.object({
-    worker: Joi.string().required().label("Worker"),
-    ig: Joi.string().required().label("IG"),
-  }).strict();
-
-  const joiValidationResult = JoiValidator.validate(schema, params);
-
-  if (joiValidationResult) {
-    return { status: 400, msg: joiValidationResult };
-  }
-
-  return { status: 200, msg: "success" };
-};
-
-const profileTwitterUpdateValidator = (params) => {
-  const schema = Joi.object({
-    worker: Joi.string().required().label("Worker"),
-    twitter: Joi.string().required().label("Twitter"),
-  }).strict();
+    charge: Joi.number().optional().label("Charge"),
+    skills: Joi.array().optional().label("Skiils"),
+    ig: Joi.string().optional().label("IG"),
+    twitter: Joi.string().optional().label("Twitter"),
+    bio: Joi.string().optional().label("Bio"),
+  }).strict().min(1);
 
   const joiValidationResult = JoiValidator.validate(schema, params);
 
@@ -96,7 +39,6 @@ const profileTwitterUpdateValidator = (params) => {
 
 const profilePortfolioUpdateValidator = (params) => {
   const schema = Joi.object({
-    worker: Joi.string().required().label("Worker"),
     media: Joi.array().required().label("Media"),
     description: Joi.string().required().label("Description"),
     thumbnail: Joi.string().optional().label("Thumbnail"),
@@ -114,8 +56,10 @@ const profilePortfolioUpdateValidator = (params) => {
 
 const profileWorkRadiusUpdateValidator = (params) => {
   const schema = Joi.object({
-    worker: Joi.string().required().label("Worker"),
-    radius: Joi.number().required().label("Raduis"),
+    radius: Joi.object({
+      latlng: Joi.array().required().label("Lat lng"),
+      radius: Joi.number().required().label("Raduis"),
+    }).required(),
   }).strict();
 
   const joiValidationResult = JoiValidator.validate(schema, params);
@@ -129,7 +73,6 @@ const profileWorkRadiusUpdateValidator = (params) => {
 
 const profileBookingStatusUpdateValidator = (params) => {
   const schema = Joi.object({
-    worker: Joi.string().required().label("Ref"),
     client: Joi.string().optional().label("Client"),
     ref: Joi.string().optional().label("Ref"),
   }).strict();
@@ -145,7 +88,7 @@ const profileBookingStatusUpdateValidator = (params) => {
 
 const profileReceieveWorkerReviewValidator = (params) => {
   const schema = Joi.object({
-    worker: Joi.string().required().label("worker"),
+    workerId: Joi.string().required().label("worker"),
     user: Joi.string().optional().label("User"),
     rating: Joi.number().optional().label("Rating"),
     review: Joi.string().optional().label("review"),
@@ -187,7 +130,7 @@ const bookSlotValidator = (params) => {
     latlng: Joi.array().required().label("latlng"),
     image: Joi.string().optional().label("Image"),
     workerImage: Joi.string().required().label("Worker Image"),
-    day: Joi.string().string().label("Day"),
+    day: Joi.string().required().label("Day"),
     photos: Joi.array().optional().label("Photos"),
     clientName: Joi.string().required().label("ClientName"),
     basePrice: Joi.number().optional().label("Base Price"),
@@ -237,7 +180,7 @@ const updateDateValidator = (params) => {
   const schema = Joi.object({
     worker: Joi.string().required().label("Worker"),
     client: Joi.string().optional().label("Client"),
-    date: Joi.string().iso().optional().label("Date"),
+    date: Joi.date().iso().optional().label("Date"),
     day: Joi.string().iso().optional().label("Day"),
     ref: Joi.string().optional().label("Ref"),
   }).strict();
@@ -253,11 +196,7 @@ const updateDateValidator = (params) => {
 
 module.exports = {
   profileCommentsValidator,
-  profileChargeValidator,
-  profileSkillsUpdateValidator,
-  profileBioUpdateValidator,
-  profileIGUpdateValidator,
-  profileTwitterUpdateValidator,
+  updateWorkerProfileDetails,
   profilePortfolioUpdateValidator,
   profileWorkRadiusUpdateValidator,
   profileBookingStatusUpdateValidator,

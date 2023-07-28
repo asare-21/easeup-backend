@@ -4,7 +4,7 @@ const myCache = cache
 
 module.exports.getWorkerProfileCache = async function getWorkerProfileCache(req, res, next) {
     // use user id to get user cache
-    const worker = myCache.get(`worker-profile/${req.params.worker}`);
+    const worker = myCache.get(`worker-profile/${req.params.workerId}`);
 
     console.log('cached worker profile', worker);
 
