@@ -3,7 +3,17 @@ const {
     model
 } = require('mongoose');
 const { reviewSchema } = require('./reviews_model');
-
+const pointSchema = new Schema({
+    type: {
+        type: String,
+        enum: ['Point'],
+        required: true
+    },
+    coordinates: {
+        type: [Number],
+        required: true
+    }
+});
 const comment = new Schema({
     from: {
         type: String,
@@ -39,17 +49,7 @@ const media = new Schema({
     comments: [comment]
 });
 
-const workRadius = new Schema({
 
-    latlng: {
-        type: [Number],
-        required: false
-    },
-    radius: {
-        type: Number,
-        required: false
-    }
-})
 
 const workerProfileSchema = new Schema({
     worker: {
@@ -120,14 +120,12 @@ const workerProfileSchema = new Schema({
         default: 150 // GG¢ 150.00
     },
     work_radius: {
-        type: workRadius,
-        default: {
-            latlng: [],
-            radius: 0
-        }
+        type: pointSchema,
     },
 }, {
     timestamps: true
 });
+
+workerProfileSchema.index({ work_radius: '2dsphere' });
 
 module.exports.workerProfileModel = model('WorkerProfile', workerProfileSchema);

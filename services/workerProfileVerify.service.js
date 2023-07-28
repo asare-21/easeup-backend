@@ -292,17 +292,31 @@ class WorkerProfileVerificationService {
 
 
       // update address
+
+
       const updatedAddress =
-        await workerProfileVerificationModel.findOneAndUpdate(
-          { worker },
+        await Promise.all([workerProfileVerificationModel.findOneAndUpdate(
+          { worker: req.user.id },
           {
             address: {
               address,
-              latlng,
+              coordinates: latlng,
             },
-          }
-        );
-      if (!updatedAddress) {
+          },
+          { new: true }
+
+        ), workerProfileModel.findOneAndUpdate({ worker: req.user.id },
+          {
+            work_radius: {
+              coordinates:
+                latlng,
+            }
+          },
+          { new: true }
+        )])
+
+      console.log(updatedAddress[0].address, updatedAddress[1].work_radius)
+      if (!updatedAddress[0] || !updatedAddress[1]) {
         return { status: 404, msg: "worker not found", success: false };
       }
 
@@ -310,7 +324,7 @@ class WorkerProfileVerificationService {
         msg: "Profile updated",
         status: 200,
         success: true,
-        data: updatedAddress,
+
       };
     } catch (e) {
       log.warn(e.message);

@@ -3,7 +3,7 @@ const {
     model
 } = require('mongoose');
 
-const pointSchema = Schema({
+const pointSchema = new Schema({
     type: {
         type: String,
         enum: ['Point'],

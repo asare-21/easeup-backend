@@ -1,4 +1,5 @@
 const router = require('express').Router();
+const { workerProfileModel } = require('../../models/worker_profile_model');
 const { workerProfileVerificationModel } = require('../../models/worker_profile_verification_model');
 const { commonError } = require('./user_route')
 
@@ -16,8 +17,8 @@ router.post('/suggest', async (req, res) => {
         const { coords, service, id, rejected } = req.body;
 
         // Find all workers that are close to the user
-        const foundWorkers = await workerProfileVerificationModel.find({
-            address: {
+        const foundWorkers = await workerProfileModel.find({
+            work_radius: {
                 $near: {
                     $maxDistance: 10000,
                     $geometry: {
@@ -26,7 +27,7 @@ router.post('/suggest', async (req, res) => {
                     },
                 }
             },
-            service: service
+            skills: service
         })
 
         // if no worker is found
@@ -45,8 +46,8 @@ router.post('/suggest', async (req, res) => {
             if (b.rating !== a.rating) {
                 return b.rating - a.rating; // Higher rating first
             } else {
-                const distanceA = calculateDistance(coords, a.location.coordinates);
-                const distanceB = calculateDistance(coords, b.location.coordinates);
+                const distanceA = calculateDistance(coords, a.work_radius.coordinates);
+                const distanceB = calculateDistance(coords, b.work_radius.coordinates);
                 if (distanceA !== distanceB) {
                     return distanceA - distanceB; // Closer distance first
                 } else {
@@ -65,10 +66,10 @@ router.post('/suggest', async (req, res) => {
         const data = {
             name: recommended[0].name,
             rating: recommended[0].rating,
-            coords: recommended[0].location,
-            id: recommended[0].uid,
-            basePrice: recommended[0].basePrice,
-            service: recommended[0].service
+            coords: recommended[0].work_radius,
+            id: recommended[0]._id,
+            basePrice: recommended[0].base_price,
+            service: recommended[0].skills
         }
 
         return res.json({
