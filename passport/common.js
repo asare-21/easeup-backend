@@ -63,4 +63,4 @@ const workerVerifyJWT = async (req, res, next) => {
   }
 };
 
-module.exports = { generateToken, verifyJWT,workerVerifyJWT };
+module.exports = { generateToken, verifyJWT, workerVerifyJWT };

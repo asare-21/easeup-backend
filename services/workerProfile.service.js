@@ -40,6 +40,7 @@ const {
   updateLocationValidator,
   updateDateValidator,
 } = require("../validators/workerProfile.validator");
+const { timeslotModel } = require("../models/timeslot_model");
 class WorkerProfileService {
   // get worker
   async findWorker(req, res) {
@@ -1090,31 +1091,40 @@ class WorkerProfileService {
             },
             {
               isPaid: true,
-            }
+            },
+            { new: true }
           );
           console.log("Found booking ", booking);
           if (!booking) return commonError(res, "Booking not found");
+          // update time slot for worker
+          await timeslotModel.findOne({
+            worker: booking.worker,
+          },
+            {
+              bookingId: booking._id
+            }
+          )
           // send notification to device of worker and client
-          const workerToken = await workerModel.findById(booking.worker);
-          const userToken = await userModel.findById(booking.client);
-          await admin.messaging().sendToDevice(userToken.token, {
-            notification: {
-              title: "Payment Verified",
-              body: "Payment for your booking has been verified",
-            },
-          });
-          const date = new Date(workerToken.date);
-          const parseDate = date.toDateString();
-          await admin.messaging().sendToDevice(workerToken.token, {
-            notification: {
-              title: "Booking Confirmed",
-              body:
-                workerToken.name +
-                "has just booked you for " +
-                parseDate +
-                " Payment for your booking has been verified. Please check your dashboard for more details",
-            },
-          });
+          // const workerToken = await workerModel.findById(booking.worker);
+          // const userToken = await userModel.findById(booking.client);
+          // await admin.messaging().sendToDevice(userToken.token, {
+          //   notification: {
+          //     title: "Payment Verified",
+          //     body: "Payment for your booking has been verified",
+          //   },
+          // });
+          // const date = new Date(workerToken.date);
+          // const parseDate = date.toDateString();
+          // await admin.messaging().sendToDevice(workerToken.token, {
+          //   notification: {
+          //     title: "Booking Confirmed",
+          //     body:
+          //       workerToken.name +
+          //       "has just booked you for " +
+          //       parseDate +
+          //       " Payment for your booking has been verified. Please check your dashboard for more details",
+          //   },
+          // });
           return {
             msg: "Payment Verified",
             status: 200,
