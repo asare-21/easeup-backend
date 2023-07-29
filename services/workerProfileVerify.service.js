@@ -299,7 +299,7 @@ class WorkerProfileVerificationService {
           { worker: req.user.id },
           {
             address: {
-              address,
+              type: "Point",
               coordinates: latlng,
             },
           },
@@ -308,6 +308,7 @@ class WorkerProfileVerificationService {
         ), workerProfileModel.findOneAndUpdate({ worker: req.user.id },
           {
             work_radius: {
+              type: "Point",
               coordinates:
                 latlng,
             }
@@ -315,7 +316,8 @@ class WorkerProfileVerificationService {
           { new: true }
         )])
 
-      console.log(updatedAddress[0].address, updatedAddress[1].work_radius)
+      console.info(updatedAddress[0], updatedAddress[1])
+
       if (!updatedAddress[0] || !updatedAddress[1]) {
         return { status: 404, msg: "worker not found", success: false };
       }

@@ -39,7 +39,7 @@ router.post('/suggest', async (req, res) => {
 
 
         // extract the rejected worker from the found workers
-        const filteredWorkers = foundWorkers.filter((worker) => !rejected.includes(worker.uid))
+        const filteredWorkers = foundWorkers.filter((worker) => !rejected.includes(worker.worker))
 
         // sort the workers based on their rating
         const recommended = filteredWorkers.sort((a, b) => {
@@ -68,7 +68,7 @@ router.post('/suggest', async (req, res) => {
             name: recommended[0].name,
             rating: recommended[0].rating,
             coords: recommended[0].work_radius,
-            id: recommended[0]._id,
+            id: recommended[0].worker,
             basePrice: recommended[0].base_price,
             service: recommended[0].skills
         }
