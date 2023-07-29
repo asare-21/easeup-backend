@@ -117,7 +117,7 @@ const workerProfileSchema = new Schema({
     },
     base_price: {
         type: Number,
-        default: 150 // GG¢ 150.00
+        default: 150 // Gh¢ 150.00
     },
     work_radius: {
         type: pointSchema,

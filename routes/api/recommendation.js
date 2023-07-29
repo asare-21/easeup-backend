@@ -70,7 +70,8 @@ router.post('/suggest', async (req, res) => {
             coords: recommended[0].work_radius,
             id: recommended[0].worker,
             basePrice: recommended[0].base_price,
-            service: recommended[0].skills
+            service: recommended[0].skills,
+            profile: recommended[0].profile_url
         }
 
         return res.json({
