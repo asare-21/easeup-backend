@@ -17,6 +17,7 @@ router.post('/suggest', async (req, res) => {
         const { coords, service, id, rejected } = req.body;
 
         // Find all workers that are close to the user
+        // workerProfileModel.createIndexes
         const foundWorkers = await workerProfileModel.find({
             work_radius: {
                 $near: {

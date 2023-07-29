@@ -11,7 +11,7 @@ const pointSchema = new Schema({
     },
     coordinates: {
         type: [Number],
-        required: true
+        // required: true
     }
 });
 const comment = new Schema({
@@ -121,6 +121,12 @@ const workerProfileSchema = new Schema({
     },
     work_radius: {
         type: pointSchema,
+        index: "2dsphere"
+        , default: {
+            type: "Point",
+            coordinates: [0, 0]
+
+        }
     },
 }, {
     timestamps: true
