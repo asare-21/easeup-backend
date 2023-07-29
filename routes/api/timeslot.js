@@ -92,6 +92,34 @@ router.get("/slot/:id", verifyJWT, async (req, res) => {
         return res.status(500).json({ message: e.message })
     }
 })
+router.get("/worker/slot/:id", verifyJWT, async (req, res) => {
+    try {
+        // check if the id is a worker
+        const exists = await workerModel.findById(req.user.id)
+        if (!exists) return res.status(500).json({
+            success: false,
+            msg: "You are not a worker"
+        })
+
+        const slot = await timeslotModel.find({
+            worker: req.params.id
+        })
+            .populate('bookingId').exec()
+
+        if (!slot) return res.status(500).json({
+            success: false,
+            msg: "No slot"
+        })
+
+        return res.status(200).json({
+            success: true,
+            slot
+        })
+
+    } catch (e) {
+        return res.status(500).json({ message: e.message })
+    }
+})
 
 router.delete("/del/:id", verifyJWT, async (req, res) => {
     try {
