@@ -1,6 +1,7 @@
 const { verifyJWT } = require("../../passport/common");
 const { timeslotModel } = require("../../models/timeslot_model");
 const { workerModel } = require("../../models/worker_models");
+const { userModel } = require("../../models/user_model");
 
 const router = require("express").Router();
 
@@ -95,10 +96,10 @@ router.get("/slot/:id", verifyJWT, async (req, res) => {
 router.get("/worker/slot/:id", verifyJWT, async (req, res) => {
     try {
         // check if the id is a worker
-        const exists = await workerModel.findById(req.user.id)
+        const exists = await userModel.findById(req.user.id)
         if (!exists) return res.status(500).json({
             success: false,
-            msg: "You are not a worker"
+            msg: "You are not a client"
         })
 
         const slot = await timeslotModel.find({
