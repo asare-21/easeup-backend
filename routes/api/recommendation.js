@@ -71,7 +71,8 @@ router.post('/suggest', async (req, res) => {
             id: recommended[0].worker,
             basePrice: recommended[0].base_price,
             service: recommended[0].skills,
-            profile: recommended[0].profile_url
+            profile: recommended[0].profile_url,
+            description: recommended[0].bio
         }
 
         return res.json({
