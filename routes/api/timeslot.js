@@ -83,7 +83,7 @@ router.post("/create", verifyJWT, async (req, res) => {
                 const diff = slotDate.getTime() - today.getTime()
 
                 const hours = diff / (1000 * 3600)
-                if (hours < 1) return res.status(500).json({
+                if (hours < 1) return res.json({
                     success: false,
                     msg: "Slot cannot be less than 1 hour apart"
                 })
@@ -100,7 +100,7 @@ router.post("/create", verifyJWT, async (req, res) => {
             endDate
         })
 
-        if (!slot) return res.status(500).json({
+        if (!slot) return res.json({
             success: false,
             msg: "Failed to create slot"
         })
@@ -111,7 +111,7 @@ router.post("/create", verifyJWT, async (req, res) => {
         })
 
     } catch (e) {
-        return res.status(500).json({ message: e.message })
+        return res.json({ message: e.message })
     }
 })
 
@@ -119,7 +119,7 @@ router.get("/slot/:id", verifyJWT, async (req, res) => {
     try {
         // check if the id is a worker
         const exists = await workerModel.findById(req.user.id)
-        if (!exists) return res.status(500).json({
+        if (!exists) return res.json({
             success: false,
             msg: "You are not a worker"
         })
@@ -127,7 +127,7 @@ router.get("/slot/:id", verifyJWT, async (req, res) => {
         const slot = await timeslotModel.findById(req.params.id)
             .populate('bookingId').exec()
 
-        if (!slot) return res.status(500).json({
+        if (!slot) return res.json({
             success: false,
             msg: "No slot"
         })
