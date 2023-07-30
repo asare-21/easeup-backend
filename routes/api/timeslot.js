@@ -42,6 +42,54 @@ router.post("/create", verifyJWT, async (req, res) => {
             msg: "You are not a worker"
         })
         console.log("Worker id ", req.user.id)
+        // check and make sure the worker has not created a slot for the same date and time
+        const slotExists = await timeslotModel.findOne({
+            worker: req.user.id,
+            date,
+            startTime,
+            endTime
+        })
+        if (slotExists) return res.status(500).json({
+            success: false,
+            msg: "You have already created a slot for this time"
+        })
+        // check and make sure slot is not in the past and not more than 2 weeks
+        const today = new Date()
+        const slotDate = new Date(date)
+        const diff = slotDate.getTime() - today.getTime()
+        const days = diff / (1000 * 3600 * 24)
+        if (days < 0) return res.status(500).json({
+            success: false,
+            msg: "Slot cannot be in the past"
+        })
+        if (days > 14) return res.status(500).json({
+            success: false,
+            msg: "Slot cannot be more than 2 weeks"
+        })
+
+        // check and make sure slot is not less than 1 hour apart from already created slot
+        const slots = await timeslotModel.find({ worker: req.user.id })
+        if (slots.length > 0) {
+            const slot = slots.find((slot) => {
+                const slotDate = new Date(slot.date)
+                const diff = slotDate.getTime() - today.getTime()
+                const days = diff / (1000 * 3600 * 24)
+                if (days < 0) return false
+                if (days > 14) return false
+                return true
+            })
+            if (slot) {
+                const slotDate = new Date(slot.date)
+                const diff = slotDate.getTime() - today.getTime()
+
+                const hours = diff / (1000 * 3600)
+                if (hours < 1) return res.status(500).json({
+                    success: false,
+                    msg: "Slot cannot be less than 1 hour apart"
+                })
+            }
+        }
+
         const slot = await timeslotModel.create({
             worker: req.user.id,
             date,
