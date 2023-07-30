@@ -1099,6 +1099,8 @@ class WorkerProfileService {
           // update time slot for worker
           await timeslotModel.findOne({
             worker: booking.worker,
+            date: booking.date, // not sure about this
+            endTime: booking.endTime,
           },
             {
               bookingId: booking._id
