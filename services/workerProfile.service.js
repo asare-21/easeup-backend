@@ -978,6 +978,7 @@ class WorkerProfileService {
         skills,
         name,
         fee,
+
         ref,
         latlng,
         image,
@@ -986,19 +987,22 @@ class WorkerProfileService {
         photos,
         clientName,
         basePrice,
-        slot
+        slot,
+        date,
+
       } = req.body;
 
-      const start = await findEarliestAvailableTimeSlot(worker, day); // find earliest availble timeslor
-      console.log("Generated start time ", start);
-      if (!start) {
-        return commonError(
-          res,
-          "No available time slots for the selected day. Please choose another day."
-        );
-      }
+      // const start = await findEarliestAvailableTimeSlot(worker, day); // find earliest availble timeslor
+      // console.log("Generated start time ", start);
+      // if (!start) {
+      //   return commonError(
+      //     res,
+      //     "No available time slots for the selected day. Please choose another day."
+      //   );
+      // }
 
-      const end = new Date(start).getTime() + 2 * 60 * 60 * 1000; // Calculate the end time (2 hours after the start time)
+      // const end = new Date(start).getTime() + 2 * 60 * 60 * 1000; // Calculate the end time (2 hours after the start time)
+
       // get client and worker phone numbers
       const clientPhone = await userModel.findById(client);
 
@@ -1013,8 +1017,8 @@ class WorkerProfileService {
       const newBooking = new bookingModel({
         worker,
         client,
-        start,
-        end,
+        start: date,
+        end: req.body.end,
         skills,
         name,
         clientName,
