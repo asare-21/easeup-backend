@@ -1028,7 +1028,7 @@ class WorkerProfileService {
         workerImage,
         commitmentFee: fee,
         day,
-        date: start,
+        date,
         photos,
         basePrice,
         clientPhone: clientPhone.phone,
