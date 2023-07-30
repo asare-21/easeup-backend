@@ -1099,8 +1099,7 @@ class WorkerProfileService {
           console.log("Found booking ", booking);
           if (!booking) return commonError(res, "Booking not found");
           // update time slot for worker
-          await timeslotModel.findOne({
-            worker: booking.worker,
+          await timeslotModel.findOneAndUpdate({
             slot: booking.slot,
           },
             {

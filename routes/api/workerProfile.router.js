@@ -127,7 +127,6 @@ router.post(
 router.post("/book-slot", workerVerifyJWT, workerProfileController.bookWorkerSlot);
 router.post(
   "/verify-payment",
-  workerVerifyJWT,
   workerProfileController.verifyPaymentWebhook
 );
 router.post(
