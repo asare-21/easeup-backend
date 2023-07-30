@@ -105,6 +105,11 @@ const bookingSchema = new Schema({
     contactedCustomer: {
         type: Boolean,
         default: false
+    },
+    slot: {
+        type: Schema.Types.ObjectId,
+        ref: 'Timeslot',
+        required: true
     }
 }, {
     timestamps: true

@@ -986,6 +986,7 @@ class WorkerProfileService {
         photos,
         clientName,
         basePrice,
+        slot
       } = req.body;
 
       const start = await findEarliestAvailableTimeSlot(worker, day); // find earliest availble timeslor
@@ -1028,6 +1029,7 @@ class WorkerProfileService {
         basePrice,
         clientPhone: clientPhone.phone,
         workerPhone: workerPhone.phone,
+        slot
       });
 
       const result = await newBooking.save(); // save booking
@@ -1099,8 +1101,7 @@ class WorkerProfileService {
           // update time slot for worker
           await timeslotModel.findOne({
             worker: booking.worker,
-            date: booking.date, // not sure about this
-            endTime: booking.endTime,
+            slot: booking.slot,
           },
             {
               bookingId: booking._id
