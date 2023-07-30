@@ -517,7 +517,7 @@ class WorkerProfileService {
       // check if worker is valid
       // console.log("User variable ", user)
       const bookings = await bookingModel.find({
-        [user === "true" ? "client" : "worker"]: worker,
+        [user === "true" ? "client" : "worker"]: req.user.id,
         isPaid: true,
         cancelled: false,
         started: false,
@@ -546,7 +546,7 @@ class WorkerProfileService {
       // check if worker is valid
       console.log("User variable ", Boolean("false"));
       const bookings = await bookingModel.find({
-        [user === "true" ? "client" : "worker"]: worker,
+        [user === "true" ? "client" : "worker"]: req.user.id,
         isPaid: true,
         cancelled: false,
         started: true,
@@ -575,7 +575,7 @@ class WorkerProfileService {
       // check if worker is valid
       // console.log("User variable ", user)
       const bookings = await bookingModel.find({
-        [user === "true" ? "client" : "worker"]: worker,
+        [user === "true" ? "client" : "worker"]: req.user.id,
         isPaid: true,
         completed: false,
         started: true,
@@ -603,7 +603,7 @@ class WorkerProfileService {
       const { user } = req.query;
       // check if worker is valid
       const bookings = await bookingModel.find({
-        [user === "true" ? "client" : "worker"]: worker,
+        [user === "true" ? "client" : "worker"]: req.user.id,
         isPaid: true,
         completed: true,
         started: true,
@@ -631,7 +631,7 @@ class WorkerProfileService {
       // check if worker is valid
       // const bookings = await bookingModel.find({ [user == true || 'true' ? 'client' : 'worker']: worker, isPaid: true, completed: false, cancelled: true })
       const bookings = await bookingModel.find({
-        [user === "true" ? "client" : "worker"]: worker,
+        [user === "true" ? "client" : "worker"]: req.user.id,
         isPaid: true,
         completed: false,
         cancelled: true,
