@@ -54,7 +54,7 @@ class WorkerService {
         };
 
         await Promise.all([
-          admin.messaging().send(message),
+          // admin.messaging().send(message),
           notification.save(),
         ]);
       });
@@ -135,12 +135,12 @@ class WorkerService {
 
       workerCache.set(`worker-token/${result._id}`, result.token); //cache results
 
-      await admin.messaging().sendToDevice(result.token, {
-        notification: {
-          title: "New job request",
-          body: "You have a new job request from a user. Please check and accept or reject the request as soon as possible.",
-        },
-      });
+      // await admin.messaging().sendToDevice(result.token, {
+      //   notification: {
+      //     title: "New job request",
+      //     body: "You have a new job request from a user. Please check and accept or reject the request as soon as possible.",
+      //   },
+      // });
 
       return {
         msg: "Worker Profile",

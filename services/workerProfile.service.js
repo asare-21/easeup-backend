@@ -156,16 +156,16 @@ class WorkerProfileService {
       // get worker
       const workerData = await workerModel.findById(worker);
       // send notification to worker
-      await admin.messaging().sendToDevice(workerData.token, {
-        notification: {
-          title: "New comment",
-          body: `${name} commented on your post`,
-        },
-        data: {
-          type: "comment",
-          post,
-        },
-      });
+      // await admin.messaging().sendToDevice(workerData.token, {
+      //   notification: {
+      //     title: "New comment",
+      //     body: `${name} commented on your post`,
+      //   },
+      //   data: {
+      //     type: "comment",
+      //     post,
+      //   },
+      // });
       await newComment.save();
       return {
         msg: "Comment Added",
@@ -760,12 +760,12 @@ class WorkerProfileService {
         await notification.save();
         // send notification to client using Firebase Cloud Messaging
 
-        await admin.messaging().send(workerfuture.token, {
-          notification: {
-            title: "Booking Pending",
-            body: `Your booking with ${bookingStarted.clientName} has been marked as pending. Please contact the client to resolve the issue.`,
-          },
-        });
+        // await admin.messaging().send(workerfuture.token, {
+        //   notification: {
+        //     title: "Booking Pending",
+        //     body: `Your booking with ${bookingStarted.clientName} has been marked as pending. Please contact the client to resolve the issue.`,
+        //   },
+        // });
       }
 
       return {
@@ -1041,20 +1041,20 @@ class WorkerProfileService {
       // Send notifications to the worker and client
       if (workerPhone && clientPhone)
         await Promise.all([
-          admin.messaging().sendToDevice(workerToken.token, {
-            notification: {
-              title: "New Booking",
-              body: "You have a new booking. Please check your dashboard for more details.",
-            },
-            // token: workerToken.token
-          }),
-          admin.messaging().sendToDevice(clientPhone.token, {
-            notification: {
-              title: "New Booking",
-              body: "Your booking was successful. Awaiting payment.",
-            },
-            // token: clientPhone.token
-          }),
+          // admin.messaging().sendToDevice(workerToken.token, {
+          //   notification: {
+          //     title: "New Booking",
+          //     body: "You have a new booking. Please check your dashboard for more details.",
+          //   },
+          //   // token: workerToken.token
+          // }),
+          // admin.messaging().sendToDevice(clientPhone.token, {
+          //   notification: {
+          //     title: "New Booking",
+          //     body: "Your booking was successful. Awaiting payment.",
+          //   },
+          //   // token: clientPhone.token
+          // }),
         ]);
 
       return {
@@ -1184,18 +1184,18 @@ class WorkerProfileService {
         // 'amount': (foundBooking.commitmentFee * 100),
       });
       // send notification to device of worker and client
-      await admin.messaging().sendToDevice(userToken.token, {
-        notification: {
-          title: "Refund Processed",
-          body: "Your booking has been cancelled and refund processed",
-        },
-      });
-      await admin.messaging().sendToDevice(workerToken.token, {
-        notification: {
-          title: "Sorry, Booking Cancelled",
-          body: "The customer has cancelled the booking. Please check your dashboard for more details",
-        },
-      });
+      // await admin.messaging().sendToDevice(userToken.token, {
+      //   notification: {
+      //     title: "Refund Processed",
+      //     body: "Your booking has been cancelled and refund processed",
+      //   },
+      // });
+      // await admin.messaging().sendToDevice(workerToken.token, {
+      //   notification: {
+      //     title: "Sorry, Booking Cancelled",
+      //     body: "The customer has cancelled the booking. Please check your dashboard for more details",
+      //   },
+      // });
       const refundRequest = https.request(options, (response) => {
         let data = "";
         response.on("data", (chunk) => {
@@ -1254,20 +1254,20 @@ class WorkerProfileService {
         transaction: foundBooking.ref,
         amount: foundBooking.commitmentFee * 100 * 0.7,
       });
-      await Promise.all([
-        await admin.messaging().sendToDevice(userToken.token, {
-          notification: {
-            title: "Booking Cancelled.",
-            body: "Your booking has been cancelled successfully. You will a 70% refund within 3-5 working days",
-          },
-        }),
-        await admin.messaging().sendToDevice(workerToken.token, {
-          notification: {
-            title: "Sorry, Booking Cancelled",
-            body: "The customer has cancelled the booking. Please check your dashboard for more details",
-          },
-        }),
-      ]); // parallel async
+      // await Promise.all([
+      //   await admin.messaging().sendToDevice(userToken.token, {
+      //     notification: {
+      //       title: "Booking Cancelled.",
+      //       body: "Your booking has been cancelled successfully. You will a 70% refund within 3-5 working days",
+      //     },
+      //   }),
+      //   await admin.messaging().sendToDevice(workerToken.token, {
+      //     notification: {
+      //       title: "Sorry, Booking Cancelled",
+      //       body: "The customer has cancelled the booking. Please check your dashboard for more details",
+      //     },
+      //   }),
+      // ]); // parallel async
       const refundRequest = https.request(options, (response) => {
         let data = "";
         response.on("data", (chunk) => {
@@ -1333,20 +1333,20 @@ class WorkerProfileService {
       // send notification to device of worker and client
       const workerToken = await workerModel.findById(worker);
       const userToken = await userModel.findById(client);
-      Promise.all([
-        await admin.messaging().sendToDevice(userToken.token, {
-          notification: {
-            title: "Location update successfull",
-            body: "Your location has been updated. We will notify the worker.",
-          },
-        }),
-        await admin.messaging().sendToDevice(workerToken.token, {
-          notification: {
-            title: "Job location update.",
-            body: "The client has updated their location. Please check your dashboard for more details",
-          },
-        }),
-      ]);
+      // Promise.all([
+      //   await admin.messaging().sendToDevice(userToken.token, {
+      //     notification: {
+      //       title: "Location update successfull",
+      //       body: "Your location has been updated. We will notify the worker.",
+      //     },
+      //   }),
+      //   await admin.messaging().sendToDevice(workerToken.token, {
+      //     notification: {
+      //       title: "Job location update.",
+      //       body: "The client has updated their location. Please check your dashboard for more details",
+      //     },
+      //   }),
+      // ]);
 
       return {
         msg: "Address Update Successfull",
@@ -1393,20 +1393,20 @@ class WorkerProfileService {
       // send notification to device of worker and client
       const workerToken = await workerModel.findById(worker);
       const userToken = await userModel.findById(client);
-      Promise.all([
-        await admin.messaging().sendToDevice(userToken.token, {
-          notification: {
-            title: "Date update successfull",
-            body: "New date has been updated. We will notify the worker.",
-          },
-        }),
-        await admin.messaging().sendToDevice(workerToken.token, {
-          notification: {
-            title: "Job date update.",
-            body: "The client has updated the date and time for the job. Please check your dashboard for more details",
-          },
-        }),
-      ]);
+      // Promise.all([
+      //   await admin.messaging().sendToDevice(userToken.token, {
+      //     notification: {
+      //       title: "Date update successfull",
+      //       body: "New date has been updated. We will notify the worker.",
+      //     },
+      //   }),
+      //   await admin.messaging().sendToDevice(workerToken.token, {
+      //     notification: {
+      //       title: "Job date update.",
+      //       body: "The client has updated the date and time for the job. Please check your dashboard for more details",
+      //     },
+      //   }),
+      // ]);
 
       return {
         msg: "Update Successfull",
@@ -1425,13 +1425,13 @@ class WorkerProfileService {
     try {
       if (!req.params.worker) return commonError(res, "Worker ID not provided");
       const workerToken = await workerModel.findById(req.params.worker);
-      admin.messaging().sendToDevice(workerToken.token, {
-        notification: {
-          title: "Booking request",
-          body: "You have a new booking request. Please check your dashboard to accept/reject the booking.",
-        },
-        // token: workerToken.token
-      });
+      // admin.messaging().sendToDevice(workerToken.token, {
+      //   notification: {
+      //     title: "Booking request",
+      //     body: "You have a new booking request. Please check your dashboard to accept/reject the booking.",
+      //   },
+      //   // token: workerToken.token
+      // });
       // set cache
       return {
         msg: "Notification sent",
