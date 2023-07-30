@@ -187,7 +187,7 @@ const bookSlotValidator = (params) => {
     latlng: Joi.array().required().label("latlng"),
     image: Joi.string().optional().label("Image"),
     workerImage: Joi.string().required().label("Worker Image"),
-    day: Joi.string().string().label("Day"),
+    day: Joi.string().required().label("Day"),
     photos: Joi.array().optional().label("Photos"),
     clientName: Joi.string().required().label("ClientName"),
     basePrice: Joi.number().optional().label("Base Price"),
