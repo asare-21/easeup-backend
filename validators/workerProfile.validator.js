@@ -189,11 +189,13 @@ const bookSlotValidator = (params) => {
     workerImage: Joi.string().required().label("Worker Image"),
     day: Joi.string().required().label("Day"),
     date: Joi.string().required().label("Date"),
-
+    end: Joi.string().required().label("End"),
     photos: Joi.array().optional().label("Photos"),
     clientName: Joi.string().required().label("ClientName"),
     basePrice: Joi.number().optional().label("Base Price"),
-  });
+    ref: Joi.string().required().label("Ref"),
+    slot: Joi.string().required().label("Slot id"),
+  }).strict();
 
   const joiValidationResult = JoiValidator.validate(schema, params);
 
