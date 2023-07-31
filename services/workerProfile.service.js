@@ -1014,6 +1014,20 @@ class WorkerProfileService {
       if (!clientPhone.phone || !workerPhone.phone) {
         return commonError(res, "Phone number not found.");
       }
+      // before saving booing, check to see if the timeslot has a booking id.
+      // if it has a booking id, request for that booking and check if it has been cancelled.
+      // proceed with the booking if it has been cancelled
+      const timeslot = await timeslotModel.findById(slot);
+      if (timeslot.bookingId) {
+        const booking = await bookingModel.findById(timeslot.bookingId);
+        if (!booking.cancelled) {
+          return commonError(
+            res,
+            "Sorry, this slot has been booked. Please choose another slot."
+          );
+        }
+      }
+      // save booking
       const newBooking = new bookingModel({
         worker,
         client,
