@@ -599,7 +599,7 @@ router.get(
       // check if worker is valid
       // console.log("User variable ", user)
       const bookings = await bookingModel.find({
-        [user === "true" ? "client" : "worker"]: worker,
+        [user === "true" ? "client" : "worker"]: req.user.id,
         isPaid: true,
         cancelled: false,
         started: false,

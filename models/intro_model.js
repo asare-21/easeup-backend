@@ -6,16 +6,22 @@ const IntroSchema = Schema({
         type: String,
         required: true,
         trim: true,
+        unique: true
     },
     subtitle: {
         type: String,
         required: true,
-        trim: true
+        trim: true,
+        unique: true
     },
     url: {
         type: String,
         trim: true,
         required: true
+    },
+    user: {
+        type: Boolean,
+        default: false
     }
 }, {
     timestamps: true
