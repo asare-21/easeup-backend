@@ -233,7 +233,7 @@ class UserService {
         msg: "Profile token updated",
         status: 200,
         success: true,
-        updatedUser,
+
       }; // User Found and returned
     } catch (e) {
       log.warn(e.message);

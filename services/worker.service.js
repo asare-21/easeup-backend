@@ -402,7 +402,6 @@ class WorkerService {
             msg: "Profile token updated",
             status: 200,
             success: true,
-            user,
           }; // User Found and returned
         }
       );
