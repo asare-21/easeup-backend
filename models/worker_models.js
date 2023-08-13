@@ -16,6 +16,10 @@ const workerSchema = new Schema({
     type: String,
     default: "",
   },
+  deviceToken: {
+    type: String,
+    default: "",
+  },
   phone: {
     type: String,
     default: "",

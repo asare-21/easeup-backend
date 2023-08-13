@@ -22,6 +22,10 @@ const userSchema = new Schema({
     type: String,
     default: "",
   },
+  deviceToken: {
+    type: String,
+    default: "",
+  },
   hashedPassword: {
     type: String,
     default: "",

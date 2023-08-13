@@ -17,7 +17,7 @@ router.post('/notifications', async (req, res) => {
         const client = await userModel.findById(booking.client)
         // run aysnc in parallel
         await Promise.all([
-            admin.messaging().sendToDevice(client.token, {
+            admin.messaging().sendToDevice(client.deviceToken, {
                 data: {
                     message
                 }

@@ -121,11 +121,10 @@ const workerProfileSchema = new Schema({
     },
     work_radius: {
         type: pointSchema,
-        index: "2dsphere"
-        , default: {
+        index: "2dsphere",
+        default: {
             type: "Point",
             coordinates: [0, 0]
-
         }
     },
 }, {

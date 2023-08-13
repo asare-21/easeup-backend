@@ -110,6 +110,11 @@ const bookingSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Timeslot',
         required: true
+    },
+    jobId: {
+        type: Schema.Types.ObjectId,
+        ref: 'Job Plan',
+        required: true
     }
 }, {
     timestamps: true

@@ -195,6 +195,7 @@ const bookSlotValidator = (params) => {
     basePrice: Joi.number().optional().label("Base Price"),
     ref: Joi.string().required().label("Ref"),
     slot: Joi.string().required().label("Slot id"),
+    jobId: Joi.string().optional().label("Job description Id")
   }).strict();
 
   const joiValidationResult = JoiValidator.validate(schema, params);

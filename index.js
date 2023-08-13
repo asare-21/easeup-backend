@@ -137,6 +137,8 @@ if (process.env.NODE_ENV === "development") {
   // setting up swagger doc
   app.use('/docs', swaggerUI.serve, swaggerUI.setup(specs))
 }
+
+
 // handle 404
 app.use((req, res, next) => {
   return res.status(404).json({
@@ -146,6 +148,7 @@ app.use((req, res, next) => {
     path: req.path,
   });
 });
+
 
 // enforce https
 app.use(function (req, res, next) {
@@ -234,7 +237,7 @@ io.on("connection", (socket) => {
         message: chat.message,
         media: chat.media,
       },
-      token: chat.from === chat.user ? worker.token : user.token,
+      token: chat.from === chat.user ? worker.deviceToken : user.deviceToken,
     });
 
     await saveChat(chat);
