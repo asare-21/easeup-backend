@@ -225,7 +225,7 @@ class UserService {
       const userId = req.user.id;
       // Find the user
       const updatedUser = await userModel.findByIdAndUpdate(userId, {
-        token,
+        deviceToken: req.body.token,
       });
       userCache.del(`user/${userId}`);
 
