@@ -324,7 +324,7 @@ router.post("/update/token", verifyJWT, async (req, res) => {
     userModel.findByIdAndUpdate(
       user_id,
       {
-        token,
+        deviceToken: token,
       },
       (err, user) => {
         if (err) {

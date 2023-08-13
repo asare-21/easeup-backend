@@ -54,7 +54,7 @@ class WorkerService {
         };
 
         await Promise.all([
-          admin.messaging().send(message),
+          // admin.messaging().send(message),
           notification.save(),
         ]);
       });
@@ -387,7 +387,7 @@ class WorkerService {
       workerModel.findByIdAndUpdate(
         workerId,
         {
-          token,
+          deviceToken:req.body.token,
         },
         (err, user) => {
           if (err) {
