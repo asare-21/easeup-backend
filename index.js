@@ -322,14 +322,17 @@ http.listen(PORT, async () => {
 async function saveKeys() {
   // await keyModel.create({
   //   title: "sk_live",
-  //   key: "sk_live_2cfdeeefd1e204d612700b937f6002a808d022d0"
+  //   key: "sk_test_9d35509c32d93084950c94010e4bbbcc13996520"
   // })
   // await keyModel.create({
   //   title: "sk_test",
   //   key: "sk_test_9d35509c32d93084950c94010e4bbbcc13996520"
   // })
 
-
+  // await keyModel.create({
+  //   title: "live_paystack",
+  //   key: "sk_live_2cfdeeefd1e204d612700b937f6002a808d022d0"
+  // })
 }
 
 

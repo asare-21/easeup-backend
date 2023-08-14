@@ -473,7 +473,7 @@ class WorkerProfileService {
     try {
       const { worker } = req.params;
       // check if worker is valid
-      const bookings = await bookingModel.find({ worker }).populate();
+      const bookings = await bookingModel.find({ worker }).populate("jobId").populate("slot").exec();
       // set cache
       workerCache.set(`booking/${worker}`, JSON.stringify(bookings));
       return {
@@ -493,7 +493,7 @@ class WorkerProfileService {
   async findPaidBooking(req, res) {
     try {
       const { user } = req.params;
-      const bookings = await bookingModel.find({ client: user, isPaid: true }).populate();
+      const bookings = await bookingModel.find({ client: user, isPaid: true }).populate("jobId").populate("slot").exec();
       // set cache
       workerCache.set(`paid-bookings/${user}`, JSON.stringify(bookings));
       return {
@@ -521,7 +521,7 @@ class WorkerProfileService {
         isPaid: true,
         cancelled: false,
         started: false,
-      }).populate();
+      }).populate("jobId").populate("slot").exec();
       console.log("Fetched bookings ", bookings);
       // set cahce
       workerCache.set(`upcoming-bookings/${worker}`, JSON.stringify(bookings));
@@ -551,7 +551,7 @@ class WorkerProfileService {
         cancelled: false,
         started: true,
         pending: true,
-      }).populate();
+      }).populate("jobId").populate("slot").exec();
       console.log("Fetched bookings ", bookings);
       // set cahce
 
@@ -580,7 +580,7 @@ class WorkerProfileService {
         completed: false,
         started: true,
         pending: false,
-      }).populate();
+      }).populate("jobId").populate("slot").exec();
       console.log("Fetched bookings ", bookings);
       // set cahce
 
@@ -607,7 +607,7 @@ class WorkerProfileService {
         isPaid: true,
         completed: true,
         started: true,
-      }).populate();
+      }).populate("jobId").populate("slot").exec();
 
       // set cache
       workerCache.set(`completed-bookings/${worker}`, JSON.stringify(bookings));
@@ -635,7 +635,7 @@ class WorkerProfileService {
         isPaid: true,
         completed: false,
         cancelled: true,
-      }).populate();
+      }).populate("jobId").populate("slot").exec();
       // set cache
       workerCache.set(`cancelled-bookings/${worker}`, JSON.stringify(bookings));
       return {
@@ -675,7 +675,7 @@ class WorkerProfileService {
           ref,
           started: true,
           completed: false,
-        }).populate();
+        }).populate("jobId").populate("slot").exec();
         if (bookingStarted)
           return commonError(
             res,
@@ -694,7 +694,7 @@ class WorkerProfileService {
           pending: false,
           endTime: Date.now(),
         }
-      ).populate();
+      ).populate("jobId").populate("slot").exec();
 
       console.log(booking);
       if (!booking) return commonError(res, "Booking not found");
@@ -735,7 +735,7 @@ class WorkerProfileService {
         ref,
         started: true,
         completed: false,
-      }).populate();
+      }).populate("jobId").populate("slot").exec();
       if (!bookingStarted)
         return commonError(res, "Sorry, something went wrong.");
 
@@ -1056,7 +1056,8 @@ class WorkerProfileService {
       workerCache.del(`upcoming-bookings/${client}`);
       workerCache.del(`upcoming-bookings/${worker}`);
 
-      // Send notifications to the worker and client
+      // Send notifications to the worker and client    
+
       // if (workerPhone && clientPhone)
       // await Promise.all([
       //   admin.messaging().sendToDevice(workerToken.deviceToken, {
