@@ -1057,23 +1057,23 @@ class WorkerProfileService {
       workerCache.del(`upcoming-bookings/${worker}`);
 
       // Send notifications to the worker and client
-      if (workerPhone && clientPhone)
-        await Promise.all([
-          admin.messaging().sendToDevice(workerToken.deviceToken, {
-            notification: {
-              title: "New Booking",
-              body: "You have a new booking. Please check your dashboard for more details.",
-            },
-            // token: workerToken.deviceToken
-          }),
-          admin.messaging().sendToDevice(clientPhone.deviceToken, {
-            notification: {
-              title: "New Booking",
-              body: "Your booking was successful. Awaiting payment.",
-            },
-            // token: clientPhone.deviceToken
-          }),
-        ]);
+      // if (workerPhone && clientPhone)
+      // await Promise.all([
+      //   admin.messaging().sendToDevice(workerToken.deviceToken, {
+      //     notification: {
+      //       title: "New Booking",
+      //       body: "You have a new booking. Please check your dashboard for more details.",
+      //     },
+      //     // token: workerToken.deviceToken
+      //   }),
+      //   admin.messaging().sendToDevice(clientPhone.deviceToken, {
+      //     notification: {
+      //       title: "New Booking",
+      //       body: "Your booking was successful. Awaiting payment.",
+      //     },
+      //     // token: clientPhone.deviceToken
+      //   }),
+      // ]);
 
       return {
         msg: "Booking Successful",
@@ -1352,14 +1352,14 @@ class WorkerProfileService {
       // send notification to device of worker and client
       const workerToken = await workerModel.findById(worker);
       const userToken = await userModel.findById(client);
-     await Promise.all([
-         admin.messaging().sendToDevice(userToken.deviceToken, {
+      await Promise.all([
+        admin.messaging().sendToDevice(userToken.deviceToken, {
           notification: {
             title: "Location update successfull",
             body: "Your location has been updated. We will notify the worker.",
           },
         }),
-         admin.messaging().sendToDevice(workerToken.deviceToken, {
+        admin.messaging().sendToDevice(workerToken.deviceToken, {
           notification: {
             title: "Job location update.",
             body: "The client has updated their location. Please check your dashboard for more details",
@@ -1412,14 +1412,14 @@ class WorkerProfileService {
       // send notification to device of worker and client
       const workerToken = await workerModel.findById(worker);
       const userToken = await userModel.findById(client);
-     await Promise.all([
-         admin.messaging().sendToDevice(userToken.deviceToken, {
+      await Promise.all([
+        admin.messaging().sendToDevice(userToken.deviceToken, {
           notification: {
             title: "Date update successfull",
             body: "New date has been updated. We will notify the worker.",
           },
         }),
-         admin.messaging().sendToDevice(workerToken.deviceToken, {
+        admin.messaging().sendToDevice(workerToken.deviceToken, {
           notification: {
             title: "Job date update.",
             body: "The client has updated the date and time for the job. Please check your dashboard for more details",
