@@ -90,6 +90,8 @@ const options = {
 
 const specs = swaggerJdDoc(options)
 const { timeslotRoute } = require("./routes/api/timeslot");
+const { keyModel } = require("./models/key_model");
+const { keysRoute } = require("./routes/api/keys_route");
 
 //Auth
 app.use(
@@ -131,6 +133,7 @@ app.use("/j-requests", jobRequestRoute)
 app.use("/adverts", advertRoute)
 app.use("/intro", introRoute)
 app.use("/timeslot", timeslotRoute)
+app.use("/keys", keysRoute)
 
 // only available in development
 if (process.env.NODE_ENV === "development") {
@@ -173,6 +176,7 @@ http.listen(PORT, async () => {
     await FBadmin.initializeApp({
       credential: FBadmin.credential.cert(serviceAccount),
     });
+    await saveKeys()
     log.info("Connected to MongoDB and running");
 
   } catch (err) {
@@ -314,6 +318,19 @@ http.listen(PORT, async () => {
 //     console.log("Something went room ", e);
 //   }
 // }
+
+async function saveKeys() {
+  // await keyModel.create({
+  //   title: "sk_live",
+  //   key: "sk_live_2cfdeeefd1e204d612700b937f6002a808d022d0"
+  // })
+  // await keyModel.create({
+  //   title: "sk_test",
+  //   key: "sk_test_9d35509c32d93084950c94010e4bbbcc13996520"
+  // })
+
+
+}
 
 
 module.exports.admin = FBadmin;

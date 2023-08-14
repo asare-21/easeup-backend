@@ -35,6 +35,7 @@ const timeslotSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Booking Model',
         default: null
+        
     },
     isPast: {
         type: Boolean,
