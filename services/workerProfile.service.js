@@ -1201,19 +1201,7 @@ class WorkerProfileService {
         transaction: foundBooking.ref,
         // 'amount': (foundBooking.commitmentFee * 100),
       });
-      // send notification to device of worker and client
-      await admin.messaging().sendToDevice(userToken.deviceToken, {
-        notification: {
-          title: "Refund Processed",
-          body: "Your booking has been cancelled and refund processed",
-        },
-      });
-      await admin.messaging().sendToDevice(workerToken.deviceToken, {
-        notification: {
-          title: "Sorry, Booking Cancelled",
-          body: "The customer has cancelled the booking. Please check your dashboard for more details",
-        },
-      });
+
       const refundRequest = https.request(options, (response) => {
         let data = "";
         response.on("data", (chunk) => {
@@ -1233,6 +1221,21 @@ class WorkerProfileService {
           workerCache.del(`in-progress-bookings/${worker}`);
           workerCache.del(`upcoming-bookings/${worker}`);
           workerCache.del(`cancelled-bookings/${worker}`);
+          await Promise.all([
+            admin.messaging().sendToDevice(userToken.deviceToken, {
+              notification: {
+                title: "Refund Processed",
+                body: "Your booking has been cancelled and refund processed",
+              },
+            }),
+            admin.messaging().sendToDevice(workerToken.deviceToken, {
+              notification: {
+                title: "Sorry, Booking Cancelled",
+                body: "The customer has cancelled the booking. Please check your dashboard for more details",
+              },
+            })
+          ])
+          // send notification to device of worker and client
 
           return {
             msg: "Refund Processed",
@@ -1274,20 +1277,7 @@ class WorkerProfileService {
         transaction: foundBooking.ref,
         amount: foundBooking.commitmentFee * 100 * 0.7,
       });
-      await Promise.all([
-        await admin.messaging().sendToDevice(userToken.deviceToken, {
-          notification: {
-            title: "Booking Cancelled.",
-            body: "Your booking has been cancelled successfully. You will a 70% refund within 3-5 working days",
-          },
-        }),
-        await admin.messaging().sendToDevice(workerToken.deviceToken, {
-          notification: {
-            title: "Sorry, Booking Cancelled",
-            body: "The customer has cancelled the booking. Please check your dashboard for more details",
-          },
-        }),
-      ]); // parallel async
+
       const refundRequest = https.request(options, (response) => {
         let data = "";
         response.on("data", (chunk) => {
@@ -1304,6 +1294,20 @@ class WorkerProfileService {
               endTime: Date.now(),
             }
           );
+          await Promise.all([
+            admin.messaging().sendToDevice(userToken.deviceToken, {
+              notification: {
+                title: "Booking Cancelled.",
+                body: "Your booking has been cancelled successfully. You will a 70% refund within 3-5 working days",
+              },
+            }),
+            admin.messaging().sendToDevice(workerToken.deviceToken, {
+              notification: {
+                title: "Sorry, Booking Cancelled",
+                body: "The customer has cancelled the booking. Please check your dashboard for more details",
+              },
+            }),
+          ]); // parallel async
           return {
             msg: "Refund Processed",
             status: 200,
