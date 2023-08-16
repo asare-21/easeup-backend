@@ -1058,23 +1058,23 @@ class WorkerProfileService {
 
       // Send notifications to the worker and client    
 
-      // if (workerPhone && clientPhone)
-      // await Promise.all([
-      //   admin.messaging().sendToDevice(workerToken.deviceToken, {
-      //     notification: {
-      //       title: "New Booking",
-      //       body: "You have a new booking. Please check your dashboard for more details.",
-      //     },
-      //     // token: workerToken.deviceToken
-      //   }),
-      //   admin.messaging().sendToDevice(clientPhone.deviceToken, {
-      //     notification: {
-      //       title: "New Booking",
-      //       body: "Your booking was successful. Awaiting payment.",
-      //     },
-      //     // token: clientPhone.deviceToken
-      //   }),
-      // ]);
+      if (workerPhone && clientPhone)
+        await Promise.all([
+          admin.messaging().sendToDevice(workerToken.deviceToken, {
+            notification: {
+              title: "New Booking",
+              body: "You have a new booking. Please check your dashboard for more details.",
+            },
+            // token: workerToken.deviceToken
+          }),
+          admin.messaging().sendToDevice(clientPhone.deviceToken, {
+            notification: {
+              title: "New Booking",
+              body: "Your booking was successful. Awaiting payment.",
+            },
+            // token: clientPhone.deviceToken
+          }),
+        ]);
 
       return {
         msg: "Booking Successful",
@@ -1119,15 +1119,15 @@ class WorkerProfileService {
           if (!booking) return commonError(res, "Booking not found");
           // update time slot for worker
           await timeslotModel.findOneAndUpdate({
-            slot: booking.slot,
+            _id: booking.slot,
           },
             {
               bookingId: booking._id
             }
           )
           // send notification to device of worker and client
-          // const workerToken = await workerModel.findById(booking.worker);
-          // const userToken = await userModel.findById(booking.client);
+          const workerToken = await workerModel.findById(booking.worker);
+          const userToken = await userModel.findById(booking.client);
           await admin.messaging().sendToDevice(userToken.deviceToken, {
             notification: {
               title: "Payment Verified",
