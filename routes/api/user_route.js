@@ -79,7 +79,7 @@ async function createNotification(user_id, title, body, type, token) {
           },
           token: token,
         };
-        await admin.messaging().send(message);
+        // await admin.messaging().send(message);
         log.info("Notification sent to the user");
         return log.info("Notification created");
       });

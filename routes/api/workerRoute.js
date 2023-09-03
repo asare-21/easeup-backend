@@ -57,7 +57,9 @@ async function createNotification(worker, title, body, type, token) {
         token: token,
       };
 
-      await Promise.all([admin.messaging().send(message), notification.save()]);
+      await Promise.all([
+        // admin.messaging().send(message),
+        notification.save()]);
     });
   } catch (e) {
     if (e.errorInfo) {
@@ -138,12 +140,12 @@ router.get(
 
       workerCache.set(`worker-token/${result._id}`, result.token); //cache results
 
-      await admin.messaging().sendToDevice(result.token, {
-        notification: {
-          title: "New job request",
-          body: "You have a new job request from a user. Please check and accept or reject the request as soon as possible.",
-        },
-      });
+      // await admin.messaging().sendToDevice(result.token, {
+      //   notification: {
+      //     title: "New job request",
+      //     body: "You have a new job request from a user. Please check and accept or reject the request as soon as possible.",
+      //   },
+      // });
 
       return res.status(200).json({
         msg: "Worker Profile",

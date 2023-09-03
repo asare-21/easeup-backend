@@ -24,12 +24,12 @@ module.exports.getWorkerTokenCache = async function getWorkerTokenCache(req, res
     if (worker !== null && worker !== undefined) {
         console.log('Worker found in cache');
 
-        await admin.messaging().sendToDevice(worker, {
-            notification: {
-                title: 'New job request',
-                body: 'You have a new job request from a user. Please check and accept or reject the request as soon as possible.'
-            }
-        })
+        // await admin.messaging().sendToDevice(worker, {
+        //     notification: {
+        //         title: 'New job request',
+        //         body: 'You have a new job request from a user. Please check and accept or reject the request as soon as possible.'
+        //     }
+        // })
 
         return res.status(200).json({
             msg: 'worker Found', status: 200, success: true, token: worker

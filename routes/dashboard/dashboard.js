@@ -535,7 +535,7 @@ cron.schedule('*/15 * * * *', async () => {
                 },
             };
 
-            await admin.messaging().sendToDevice(workerProfile.deviceToken, message);
+            // await admin.messaging().sendToDevice(workerProfile.deviceToken, message);
             worker.notified = true; // Update notified field to true
             await worker.save();
             messages.push({
