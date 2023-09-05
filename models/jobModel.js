@@ -24,7 +24,8 @@ const jobSchema = new Schema({
     photos: {
         type: Array,
         required: true
-    }
+    },
+
 }, {
     timestamps: true
 });

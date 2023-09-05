@@ -823,11 +823,11 @@ class WorkerProfileService {
       const worker = req.params.worker;
       // check if worker is valid
 
-      const reviewsPromise = await reviewModel
+      const reviewsPromise = reviewModel
         .find({ worker })
         .limit(80)
         .sort({ date: -1 });
-      const avgRatingPromise = await reviewModel
+      const avgRatingPromise = reviewModel
         .aggregate([
           {
             $match: { worker },
@@ -840,7 +840,7 @@ class WorkerProfileService {
           },
         ])
         .exec();
-      const totalReviewsPromise = await reviewModel.countDocuments({ worker });
+      const totalReviewsPromise = reviewModel.countDocuments({ worker });
       const result = await Promise.all([
         reviewsPromise,
         avgRatingPromise,

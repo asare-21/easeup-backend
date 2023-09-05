@@ -109,12 +109,14 @@ const bookingSchema = new Schema({
     slot: {
         type: Schema.Types.ObjectId,
         ref: 'Timeslot',
-        required: true
+        required: true,
+        immutable: true
     },
     jobId: {
         type: Schema.Types.ObjectId,
         ref: 'Job Plan',
-        required: true
+        required: true,
+        immutable: true
     }
 }, {
     timestamps: true
