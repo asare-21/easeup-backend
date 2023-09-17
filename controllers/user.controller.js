@@ -118,6 +118,22 @@ class UserController {
     );
     res.status(status).send(responseData);
   };
+
+  resetPassword = async (req, res, next) => {
+    const { status, ...responseData } = await UserService.resetPassword(
+      req,
+      res
+    );
+    res.status(status).send(responseData);
+  };
+
+  sendResetPasswordCode = async (req, res, next) => {
+    const { status, ...responseData } = await UserService.sendResetCode(
+      req,
+      res
+    );
+    res.status(status).send(responseData);
+  };
 }
 
 module.exports = new UserController();

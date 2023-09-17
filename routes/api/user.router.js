@@ -102,4 +102,16 @@ router.delete(
   userController.deleteBookmarks
 );
 
+// password reset routes
+router.post(
+  "/request-password-reset",
+  verifyJWT,
+  userController.sendResetPasswordCode
+);
+
+router.post(
+  "/verify-password-reset",
+  verifyJWT,
+  userController.resetPassword
+);
 module.exports.userRoute = router;
