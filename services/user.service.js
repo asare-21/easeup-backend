@@ -881,6 +881,7 @@ class UserService {
         "Your password has been reset successfully. If you did not request for this, please change your password immediately.",
         "password_reset",
         "");
+      return { msg: "Password reset successful", status: 200, success: true };
     }
     catch (e) {
       log.warn(e.message);
