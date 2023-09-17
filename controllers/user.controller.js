@@ -120,6 +120,7 @@ class UserController {
   };
 
   resetPassword = async (req, res, next) => {
+    // Password reset when user is logged in
     const { status, ...responseData } = await UserService.resetPassword(
       req,
       res
@@ -128,6 +129,7 @@ class UserController {
   };
 
   sendResetPasswordCode = async (req, res, next) => {
+    // Password reset when user is logged in
     const { status, ...responseData } = await UserService.sendResetCode(
       req,
       res

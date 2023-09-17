@@ -766,7 +766,6 @@ class UserService {
 
       // check if email and phone match
       const user = await userModel.findById(userId)
-      console.log(user)
       if (!user) return { msg: "User not found", status: 404, success: false };
 
       // check if phone number matches the phone number on record
@@ -774,6 +773,28 @@ class UserService {
 
       // check if email matches the email on record
       if (user.email !== email) return { msg: "Email does not match", status: 400, success: false };
+
+      // check password reset model if there is an existing code that has not been used and is not expired
+      const exisitingCode = await PasswordReset.findOne({ user: userId, used: false, expiresAt: { $gt: Date.now() } })
+
+      if (exisitingCode) {
+        const message = `Your Easeup password reset code is ${exisitingCode.currentCode}. If you did not request for this code, please ignore this message. Also, do not share this code with anyone!`;
+
+        const response = await axios.get(
+          `https://api.smsonlinegh.com/v4/message/sms/send?key=${process.env.EASEUP_SMS_API_KEY}&text=${message}&type=0&sender=${process.env.EASEUP_SMS_SENDER}&to=${phone}`
+        ); // wait for the sms to be sent
+
+        if (response.data.handshake.label !== "HSHK_OK")
+          return {
+            msg: "Handshake error. Access Denied",
+            status: 500,
+            success: false,
+          };
+        else {
+          log.info("Code sent successfully. Code was reused", exisitingCode.currentCode);
+          return { msg: "Code sent successfully. Code was reused ", status: 200, success: true };
+        }
+      }
 
       // generate OTP
       const code = otpGenerator.generate(6, {
