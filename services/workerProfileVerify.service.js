@@ -509,7 +509,7 @@ class WorkerProfileVerificationService {
 
 // wrtie a cron job to update workerModel with data from workerverificationmodel
 // cron job runs every 15 minutes
-cron.schedule('*/1 * * * *', async () => {
+cron.schedule('*/15 * * * *', async () => {
   try {
     // Fetch data from workerProfileVerificationModel
     const verificationData = await workerProfileVerificationModel.find({});

@@ -2,7 +2,7 @@ const {
     Schema,
     model
 } = require('mongoose');
-const { reviewSchema } = require('./reviews_model');
+
 const pointSchema = new Schema({
     type: {
         type: String,
