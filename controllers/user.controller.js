@@ -136,6 +136,23 @@ class UserController {
     );
     res.status(status).send(responseData);
   };
+  resetPasswordOutside = async (req, res, next) => {
+    // Password reset when user is logged in
+    const { status, ...responseData } = await UserService.resetPasswordOutside(
+      req,
+      res
+    );
+    res.status(status).send(responseData);
+  };
+
+  sendResetPasswordCodeOutside = async (req, res, next) => {
+    // Password reset when user is logged in
+    const { status, ...responseData } = await UserService.sendResetCodeOutside(
+      req,
+      res
+    );
+    res.status(status).send(responseData);
+  };
 }
 
 module.exports = new UserController();

@@ -114,4 +114,14 @@ router.post(
   verifyJWT,
   userController.resetPassword
 );
+// password reset routes outside app
+router.post(
+  "/request-password-reset-outside",
+  userController.sendResetPasswordCodeOutside
+);
+
+router.post(
+  "/verify-password-reset-outside",
+  userController.resetPasswordOutside
+);
 module.exports.userRoute = router;

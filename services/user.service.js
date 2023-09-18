@@ -2,7 +2,7 @@ const log = require("npmlog");
 const { workerModel } = require("../models/worker_models");
 const { bookmarkModel } = require("../models/bookmark_model");
 const { userModel } = require("../models/user_model");
-const { notificationModel } = require("../models/nofications");
+const { notificationUserModel } = require("../models/nofications");
 const admin = require("firebase-admin");
 const otpGenerator = require("otp-generator");
 const axios = require("axios");
@@ -40,11 +40,10 @@ const {
 } = require("../validators/user.validator");
 const { isValidPassword, generatePassword } = require("../utils");
 const { generateToken } = require("../passport/common");
-const { createNotification } = require("./worker.service");
 const { PasswordReset } = require("../models/password_reset_model");
 const userCache = cache;
 class UserService {
-  async createNotification(user, title, body, type, token) {
+  async createUserNotification(user, title, body, type, token) {
     try {
       // required field : user
       if (!user) return { msg: "Bad Request", status: 400, success: false }; // User ID is required
@@ -55,11 +54,11 @@ class UserService {
         if (err) return log.error("Internal Server Error"); // Internal Server Error
         if (!user) return log.warn("User Not Found"); // User Not Found
         // Create the notification
-        const notification = new notificationModel({
-          user: user,
-          title: title,
+        const notification = new notificationUserModel({
+          user,
+          title,
           message: body,
-          type: type,
+          type,
         });
 
         const message = {
@@ -128,17 +127,7 @@ class UserService {
         success: true,
         user: userData,
       };
-      // userModel.findById(user_id, (err, user) => {
-      //     if (err) {
-      //         log.warn(err.message)
-      //         return res.status(500).json({ msg: err.message, status: 500, success: false }) // Internal Server Error
-      //     }
-      //     if (!user) return res.status(404).json({ msg: 'User Not Found', status: 404, success: false }) // User Not Found
-      //     userCache.set(`user/${user_id}`, user);
-      //     return res.status(200).json({
-      //         msg: 'User Found', status: 200, success: true, user
-      //     }) // User Found and returned
-      // })
+
     } catch (e) {
       log.warn(e.message);
       console.log(e);
@@ -270,6 +259,11 @@ class UserService {
       const updatedUser = await userModel.findByIdAndUpdate(userId, {
         deviceToken: req.body.token,
       });
+      if (!updatedUser) return {
+        msg: "User not found",
+        status: 404,
+        success: false
+      }
       userCache.del(`user/${userId}`);
 
       return {
@@ -303,6 +297,13 @@ class UserService {
       const updatedUser = await userModel.findByIdAndUpdate(userId, {
         phone: phone,
       });
+      if (!updatedUser) {
+        return {
+          msg: "User not found",
+          status: 404,
+          success: false,
+        };
+      }
       userCache.del(`user/${userId}`);
 
       return {
@@ -338,6 +339,13 @@ class UserService {
         ghc_number: ghc_n,
         ghc_exp: ghc_exp,
       });
+      if (!updatedUser) {
+        return {
+          msg: "User not found",
+          status: 404,
+          success: false,
+        };
+      }
       userCache.del(`user/${userId}`);
 
       return {
@@ -368,7 +376,7 @@ class UserService {
       const userId = req.user.id;
 
       // Find the user
-      await userModel.findByIdAndUpdate(userId, {
+      const user = await userModel.findByIdAndUpdate(userId, {
         $set: {
           phone: phone,
           address: address,
@@ -376,6 +384,13 @@ class UserService {
           gender: gender,
         },
       });
+      if (!user) {
+        return {
+          msg: "User not found",
+          status: 404,
+          success: false,
+        };
+      }
       // Update the user
       return { msg: "User Updated", status: 200, success: true };
     } catch (e) {
@@ -443,9 +458,16 @@ class UserService {
           success: false,
         }; // Internal Server Error
       // Find the user
-      await userModel.findByIdAndUpdate(userId, {
+      const foundUser = await userModel.findByIdAndUpdate(userId, {
         code: code,
       });
+      if (!foundUser) {
+        return {
+          msg: "User not found",
+          status: 404,
+          success: false,
+        };
+      }
       userCache.del(`user/${userId}`);
 
       // Update the user
@@ -491,7 +513,16 @@ class UserService {
       }
       // Verification code is incorrect
       // Update the user if code matched
-      await userModel.findByIdAndUpdate(userId, { code: "", phone });
+      const updatedUser = await userModel.findByIdAndUpdate(userId, { code: "", phone });
+
+      if (!updatedUser) {
+        return {
+          msg: "User not found",
+          status: 404,
+          success: false,
+        };
+      }
+
       userCache.del(`user/${userId}`);
 
       return {
@@ -642,7 +673,15 @@ class UserService {
       if (!userId) return { msg: "Bad Request", status: 400, success: false }; // User ID is required
       //check firebase if uid exists
       // Find the user
-      const userNotifications = await notificationModel.find({ user: userId });
+      const userNotifications = await notificationUserModel.find({ user: userId });
+
+      if (!userNotifications) {
+        return {
+          msg: "User Not Found",
+          status: 404,
+          success: false,
+        };
+      }
 
       // cache data
       userCache.set(
@@ -656,7 +695,6 @@ class UserService {
         userNotifications,
       }; // Notifications Found and returned
     } catch (e) {
-      console.log(77);
       log.warn(e.message);
       console.log(e);
       return { status: 500, msg: e.message, success: false };
@@ -681,12 +719,21 @@ class UserService {
       //check firebase if uid exists
 
       // Find the user
-      const notification = await notificationModel.findOneAndUpdate(
+      const notification = await notificationUserModel.findOneAndUpdate(
         { user: userId, _id: id },
         {
           read: true,
         }
       );
+
+      if (!notification) {
+        return {
+          msg: "Notification Not Found",
+          status: 404,
+          success: false,
+        };
+      }
+
       return {
         msg: "Notification updated",
         status: 200,
@@ -736,10 +783,8 @@ class UserService {
         return { msg: "Bad Request", status: 400, success: false }; // User ID and Bookmark ID are required
       //check firebase if uid exists
 
-      // Find the user
-      await userModel.findById(userId),
-        // Find the bookmark and delete it
-        await bookmarkModel.findByIdAndDelete(bookmark_id);
+      // Find the bookmark and delete it
+      await bookmarkModel.findByIdAndDelete(bookmark_id);
       return { msg: "Bookmark Deleted", status: 200, success: true }; // Bookmark Deleted
     } catch (e) {
       log.warn(e.message);
@@ -748,6 +793,7 @@ class UserService {
     }
   }
 
+  // Password reset within app
   // password reset OTP
   async sendResetCode(req, res) {
     try {
@@ -875,7 +921,7 @@ class UserService {
       await PasswordReset.findOneAndUpdate({ _id: passwordReset._id }, { used: true })
 
       // send notification to user
-      await createNotification(
+      await this.createUserNotification(
         userId,
         "Password reset successful",
         "Your password has been reset successfully. If you did not request for this, please change your password immediately.",
@@ -890,6 +936,154 @@ class UserService {
     }
 
   }
+
+  // Password reset outside app
+  async sendResetCodeOutside(req, res) {
+    try {
+      const { email, phone } = req.body;
+      const user = await userModel.findOne({ email });
+      if (!user) return {
+        msg: "User not found",
+        status: 404,
+        success: false
+      }
+
+      const validationResults = await passwordResetValidator(req.body);
+      if (validationResults.status !== 200) {
+        return {
+          msg: "Bad Request. Missing fields",
+          status: 400,
+          success: false,
+          validationResults: validationResults.msg,
+        };
+      }
+
+
+      if (!user) return { msg: "User not found", status: 404, success: false };
+      const userId = user._id
+
+
+      // check if phone number matches the phone number on record
+      if (user.phone !== phone) return { msg: "Phone number does not match", status: 400, success: false };
+
+      // check if email matches the email on record
+      if (user.email !== email) return { msg: "Email does not match", status: 400, success: false };
+
+      // check password reset model if there is an existing code that has not been used and is not expired
+      const exisitingCode = await PasswordReset.findOne({ user: userId, used: false, expiresAt: { $gt: Date.now() } })
+
+      if (exisitingCode) {
+        const message = `Your Easeup password reset code is ${exisitingCode.currentCode}. If you did not request for this code, please ignore this message. Also, do not share this code with anyone!`;
+
+        const response = await axios.get(
+          `https://api.smsonlinegh.com/v4/message/sms/send?key=${process.env.EASEUP_SMS_API_KEY}&text=${message}&type=0&sender=${process.env.EASEUP_SMS_SENDER}&to=${phone}`
+        ); // wait for the sms to be sent
+
+        if (response.data.handshake.label !== "HSHK_OK")
+          return {
+            msg: "Handshake error. Access Denied",
+            status: 500,
+            success: false,
+          };
+        else {
+          log.info("Code sent successfully. Code was reused", exisitingCode.currentCode);
+          return { msg: "Code sent successfully. Code was reused ", status: 200, success: true };
+        }
+      }
+
+      // generate OTP
+      const code = otpGenerator.generate(6, {
+        digits: true,
+        alphabets: false,
+        lowerCaseAlphabets: false,
+        upperCaseAlphabets: false,
+        specialChars: false,
+      });
+      // create and save a password reset model
+      const passwordReset = new PasswordReset({
+        user: userId,
+        currentCode: code,
+        expiresAt: Date.now() + 1800000, // 30 minutes
+      });
+
+      await passwordReset.save();
+
+      // send OTP to user's phone number
+      const message = `Your Easeup password reset code is ${code}. If you did not request for this code, please ignore this message. Also, do not share this code with anyone!`;
+
+      const response = await axios.get(
+        `https://api.smsonlinegh.com/v4/message/sms/send?key=${process.env.EASEUP_SMS_API_KEY}&text=${message}&type=0&sender=${process.env.EASEUP_SMS_SENDER}&to=${phone}`
+      ); // wait for the sms to be sent
+
+      if (response.data.handshake.label !== "HSHK_OK")
+        return {
+          msg: "Handshake error. Access Denied",
+          status: 500,
+          success: false,
+        }; // Internal Server Error
+
+      return { msg: "Code sent successfully", status: 200, success: true };
+    }
+    catch (e) {
+      log.warn(e.message);
+      console.log(e);
+      return { status: 500, msg: e.message, success: false };
+    }
+  }
+
+  async resetPasswordOutside(req, res) {
+    try {
+      const { email, password, confirmPassword, code } = req.body;
+      const user = await userModel.findOne({ email });
+      if (!user) return {
+        msg: "User not found",
+        status: 404,
+        success: false
+      }
+      const userId = user._id
+
+      if (!email || !password || !confirmPassword || !code)
+        return { msg: "Bad Request. Required data not present. Please try again", status: 400, success: false };
+
+      // check if the code submitted matches the code in the database
+      const passwordReset = await PasswordReset.findOne({ user: userId, currentCode: code, used: false });
+
+      if (!passwordReset) return { msg: "Invalid code", status: 400, success: false };
+
+      // check if the code has expired
+      if (passwordReset.expiresAt < Date.now()) return { msg: "Code has expired", status: 400, success: false };
+
+      // check if password and confirm password match
+
+      if (password !== confirmPassword) return { msg: "Passwords do not match", status: 400, success: false };
+
+      // hash and salt password
+      const saltHash = generatePassword(password);
+      const passwordSalt = saltHash.salt;
+      const hashedPassword = saltHash.hash;
+
+      // update user's password
+      await userModel.findOneAndUpdate({ _id: userId }, { passwordSalt, hashedPassword })
+
+      // expire the code and mark it as used
+      await PasswordReset.findOneAndUpdate({ _id: passwordReset._id }, { used: true })
+
+      // send notification to user
+      await this.createUserNotification(
+        userId,
+        "Password reset successful",
+        "Your password has been reset successfully. If you did not request for this, please change your password immediately.",
+        "password_reset",
+        "");
+      return { msg: "Password reset successful", status: 200, success: true };
+    }
+    catch (e) {
+      log.warn(e.message);
+      console.log(e);
+      return { status: 500, msg: e.message, success: false };
+    }
+  }
+
 }
 
 module.exports = new UserService();

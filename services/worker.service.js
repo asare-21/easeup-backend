@@ -1,6 +1,6 @@
 const log = require("npmlog");
 const { workerModel } = require("../models/worker_models");
-const { notificationModel } = require("../models/nofications");
+const { notificationWorkerModel } = require("../models/nofications");
 const admin = require("firebase-admin");
 const { commonError, returnUnAuthUserError } = require("../utils");
 const { workerProfileModel } = require("../models/worker_profile_model");
@@ -9,7 +9,6 @@ const {
 } = require("../models/worker_profile_verification_model");
 const { locationModel } = require("../models/workerLocationModel");
 const { cache } = require("../cache/user_cache");
-const { userModel } = require("../models/user_model");
 const {
   createWorkerValidator,
   updateWorkerLocationValidator,
@@ -25,6 +24,7 @@ const {
 } = require("../utils");
 const { isValidPassword } = require("../utils");
 const { generateToken } = require("../passport/common");
+const { WorkerPasswordReset } = require("../models/password_reset_model");
 
 class WorkerService {
   async createNotification(worker, title, body, type, token) {
@@ -38,11 +38,11 @@ class WorkerService {
         if (err) return log.error("Internal Server Error"); // Internal Server Error
         if (!user) return log.warn("User Not Found"); // User Not Found
         // Create the notification
-        const notification = new notificationModel({
-          user: worker,
-          title: title,
+        const notification = new notificationWorkerModel({
+          worker,
+          title,
           message: body,
-          type: type,
+          type
         });
 
         const message = {
@@ -173,8 +173,7 @@ class WorkerService {
       const { email, username, password, name } = req.body;
 
       // check if email exist
-      const existingEmail = await userModel.findOne({ email });
-      console.log(existingEmail)
+      const existingEmail = await workerModel.findOne({ email });
 
       if (existingEmail) {
         return {
@@ -471,7 +470,7 @@ class WorkerService {
       if (!workerId) return { msg: "Bad Request", status: 400, success: false }; // User ID is required
       //check firebase if uid exists
       await // Find the user
-        notificationModel.find({ user: userId }, (err, notifications) => {
+        notificationWorkerModel.find({ worker: userId }, (err, notifications) => {
           if (err) return { msg: err.message, status: 500, success: false }; // Internal Server Error
           return {
             msg: "Notifications Found",
@@ -509,8 +508,8 @@ class WorkerService {
       if (!userId) return { msg: "Bad Request", status: 400, success: false }; // User ID is required
       //check firebase if uid exists
       await // Find the user
-        notificationModel.findOneAndUpdate(
-          { user: workerId, _id: id },
+        notificationWorkerModel.findOneAndUpdate(
+          { worker: workerId, _id: id },
           {
             read: true,
           },
@@ -525,6 +524,296 @@ class WorkerService {
           }
         );
     } catch (e) {
+      log.warn(e.message);
+      console.log(e);
+      return { status: 500, msg: e.message, success: false };
+    }
+  }
+  // Password reset within app
+  // password reset OTP
+  async sendResetCode(req, res) {
+    try {
+      const { email, phone } = req.body;
+      const userId = req.user.id;
+
+      const validationResults = await passwordResetValidator(req.body);
+      if (validationResults.status !== 200) {
+        return {
+          msg: "Bad Request. Missing fields",
+          status: 400,
+          success: false,
+          validationResults: validationResults.msg,
+        };
+      }
+
+      // check if email and phone match
+      const user = await workerModel.findById(userId)
+      if (!user) return { msg: "Worker not found", status: 404, success: false };
+
+      // check if phone number matches the phone number on record
+      if (user.phone !== phone) return { msg: "Phone number does not match", status: 400, success: false };
+
+      // check if email matches the email on record
+      if (user.email !== email) return { msg: "Email does not match", status: 400, success: false };
+
+      // check password reset model if there is an existing code that has not been used and is not expired
+      const exisitingCode = await WorkerPasswordReset.findOne({ user: userId, used: false, expiresAt: { $gt: Date.now() } })
+
+      if (exisitingCode) {
+        const message = `Your Easeup password reset code is ${exisitingCode.currentCode}. If you did not request for this code, please ignore this message. Also, do not share this code with anyone!`;
+
+        const response = await axios.get(
+          `https://api.smsonlinegh.com/v4/message/sms/send?key=${process.env.EASEUP_SMS_API_KEY}&text=${message}&type=0&sender=${process.env.EASEUP_SMS_SENDER}&to=${phone}`
+        ); // wait for the sms to be sent
+
+        if (response.data.handshake.label !== "HSHK_OK")
+          return {
+            msg: "Handshake error. Access Denied",
+            status: 500,
+            success: false,
+          };
+        else {
+          log.info("Code sent successfully. Code was reused", exisitingCode.currentCode);
+          return { msg: "Code sent successfully. Code was reused ", status: 200, success: true };
+        }
+      }
+
+      // generate OTP
+      const code = otpGenerator.generate(6, {
+        digits: true,
+        alphabets: false,
+        lowerCaseAlphabets: false,
+        upperCaseAlphabets: false,
+        specialChars: false,
+      });
+      // create and save a password reset model
+      const passwordReset = new WorkerPasswordReset({
+        user: userId,
+        currentCode: code,
+        expiresAt: Date.now() + 1800000, // 30 minutes
+      });
+
+      await passwordReset.save();
+
+      // send OTP to user's phone number
+      const message = `Your Easeup password reset code is ${code}. If you did not request for this code, please ignore this message. Also, do not share this code with anyone!`;
+
+      const response = await axios.get(
+        `https://api.smsonlinegh.com/v4/message/sms/send?key=${process.env.EASEUP_SMS_API_KEY}&text=${message}&type=0&sender=${process.env.EASEUP_SMS_SENDER}&to=${phone}`
+      ); // wait for the sms to be sent
+
+      if (response.data.handshake.label !== "HSHK_OK")
+        return {
+          msg: "Handshake error. Access Denied",
+          status: 500,
+          success: false,
+        }; // Internal Server Error
+
+      return { msg: "Code sent successfully", status: 200, success: true };
+    }
+    catch (e) {
+      log.warn(e.message);
+      console.log(e);
+      return { status: 500, msg: e.message, success: false };
+    }
+
+  }
+  // password reset route
+  async resetPassword(req, res) {
+    // data needed
+    // email
+    // password
+    // confirm password
+    // token
+
+    try {
+      const { email, password, confirmPassword, code } = req.body;
+      const userId = req.user.id;
+
+      if (!userId || !email || !password || !confirmPassword || !code)
+        return { msg: "Bad Request. Required data not present. Please try again", status: 400, success: false };
+
+      // check if the code submitted matches the code in the database
+      const passwordReset = await WorkerPasswordReset.findOne({ user: userId, currentCode: code, used: false });
+
+      if (!passwordReset) return { msg: "Invalid code", status: 400, success: false };
+
+      // check if the code has expired
+      if (passwordReset.expiresAt < Date.now()) return { msg: "Code has expired", status: 400, success: false };
+
+      // check if password and confirm password match
+
+      if (password !== confirmPassword) return { msg: "Passwords do not match", status: 400, success: false };
+
+      // hash and salt password
+      const saltHash = generatePassword(password);
+      const passwordSalt = saltHash.salt;
+      const hashedPassword = saltHash.hash;
+
+      // update user's password
+      await workerModel.findOneAndUpdate({ _id: userId }, { passwordSalt, hashedPassword })
+
+      // expire the code and mark it as used
+      await WorkerPasswordReset.findOneAndUpdate({ _id: passwordReset._id }, { used: true })
+
+      // send notification to user
+      await this.createNotification(
+        userId,
+        "Password reset successful",
+        "Your password has been reset successfully. If you did not request for this, please change your password immediately.",
+        "password_reset",
+        "");
+      return { msg: "Password reset successful", status: 200, success: true };
+    }
+    catch (e) {
+      log.warn(e.message);
+      console.log(e);
+      return { status: 500, msg: e.message, success: false };
+    }
+
+  }
+
+  // Password reset outside app
+  async sendResetCodeOutside(req, res) {
+    try {
+      const { email, phone } = req.body;
+      const user = await workerModel.findOne({ email });
+      if (!user) return {
+        msg: "Worker not found",
+        status: 404,
+        success: false
+      }
+
+      const validationResults = await passwordResetValidator(req.body);
+      if (validationResults.status !== 200) {
+        return {
+          msg: "Bad Request. Missing fields",
+          status: 400,
+          success: false,
+          validationResults: validationResults.msg,
+        };
+      }
+
+
+      if (!user) return { msg: "Worker not found", status: 404, success: false };
+      const userId = user._id
+
+
+      // check if phone number matches the phone number on record
+      if (user.phone !== phone) return { msg: "Phone number does not match", status: 400, success: false };
+
+      // check if email matches the email on record
+      if (user.email !== email) return { msg: "Email does not match", status: 400, success: false };
+
+      // check password reset model if there is an existing code that has not been used and is not expired
+      const exisitingCode = await WorkerPasswordReset.findOne({ user: userId, used: false, expiresAt: { $gt: Date.now() } })
+
+      if (exisitingCode) {
+        const message = `Your Easeup password reset code is ${exisitingCode.currentCode}. If you did not request for this code, please ignore this message. Also, do not share this code with anyone!`;
+
+        const response = await axios.get(
+          `https://api.smsonlinegh.com/v4/message/sms/send?key=${process.env.EASEUP_SMS_API_KEY}&text=${message}&type=0&sender=${process.env.EASEUP_SMS_SENDER}&to=${phone}`
+        ); // wait for the sms to be sent
+
+        if (response.data.handshake.label !== "HSHK_OK")
+          return {
+            msg: "Handshake error. Access Denied",
+            status: 500,
+            success: false,
+          };
+        else {
+          log.info("Code sent successfully. Code was reused", exisitingCode.currentCode);
+          return { msg: "Code sent successfully. Code was reused ", status: 200, success: true };
+        }
+      }
+
+      // generate OTP
+      const code = otpGenerator.generate(6, {
+        digits: true,
+        alphabets: false,
+        lowerCaseAlphabets: false,
+        upperCaseAlphabets: false,
+        specialChars: false,
+      });
+      // create and save a password reset model
+      const passwordReset = new WorkerPasswordReset({
+        user: userId,
+        currentCode: code,
+        expiresAt: Date.now() + 1800000, // 30 minutes
+      });
+
+      await passwordReset.save();
+
+      // send OTP to user's phone number
+      const message = `Your Easeup password reset code is ${code}. If you did not request for this code, please ignore this message. Also, do not share this code with anyone!`;
+
+      const response = await axios.get(
+        `https://api.smsonlinegh.com/v4/message/sms/send?key=${process.env.EASEUP_SMS_API_KEY}&text=${message}&type=0&sender=${process.env.EASEUP_SMS_SENDER}&to=${phone}`
+      ); // wait for the sms to be sent
+
+      if (response.data.handshake.label !== "HSHK_OK")
+        return {
+          msg: "Handshake error. Access Denied",
+          status: 500,
+          success: false,
+        }; // Internal Server Error
+
+      return { msg: "Code sent successfully", status: 200, success: true };
+    }
+    catch (e) {
+      log.warn(e.message);
+      console.log(e);
+      return { status: 500, msg: e.message, success: false };
+    }
+  }
+
+  async resetPasswordOutside(req, res) {
+    try {
+      const { email, password, confirmPassword, code } = req.body;
+      const user = await workerModel.findOne({ email });
+      if (!user) return {
+        msg: "Worker not found",
+        status: 404,
+        success: false
+      }
+      const userId = user._id
+
+      if (!email || !password || !confirmPassword || !code)
+        return { msg: "Bad Request. Required data not present. Please try again", status: 400, success: false };
+
+      // check if the code submitted matches the code in the database
+      const passwordReset = await WorkerPasswordReset.findOne({ user: userId, currentCode: code, used: false });
+
+      if (!passwordReset) return { msg: "Invalid code", status: 400, success: false };
+
+      // check if the code has expired
+      if (passwordReset.expiresAt < Date.now()) return { msg: "Code has expired", status: 400, success: false };
+
+      // check if password and confirm password match
+
+      if (password !== confirmPassword) return { msg: "Passwords do not match", status: 400, success: false };
+
+      // hash and salt password
+      const saltHash = generatePassword(password);
+      const passwordSalt = saltHash.salt;
+      const hashedPassword = saltHash.hash;
+
+      // update user's password
+      await workerModel.findOneAndUpdate({ _id: userId }, { passwordSalt, hashedPassword })
+
+      // expire the code and mark it as used
+      await WorkerPasswordReset.findOneAndUpdate({ _id: passwordReset._id }, { used: true })
+
+      // send notification to user
+      await this.createNotification(
+        userId,
+        "Password reset successful",
+        "Your password has been reset successfully. If you did not request for this, please change your password immediately.",
+        "password_reset",
+        "");
+      return { msg: "Password reset successful", status: 200, success: true };
+    }
+    catch (e) {
       log.warn(e.message);
       console.log(e);
       return { status: 500, msg: e.message, success: false };

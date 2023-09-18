@@ -44,4 +44,27 @@ router.post(
   workerController.updateNotification
 );
 
+// password reset routes
+router.post(
+  "/request-password-reset",
+  workerVerifyJWT,
+  workerController.sendResetPasswordCode
+);
+
+router.post(
+  "/verify-password-reset",
+  workerVerifyJWT,
+  workerController.resetPassword
+);
+// password reset routes outside app
+router.post(
+  "/request-password-reset-outside",
+  workerController.sendResetPasswordCodeOutside
+);
+
+router.post(
+  "/verify-password-reset-outside",
+  workerController.resetPasswordOutside
+);
+
 module.exports.workerRoute = router;
