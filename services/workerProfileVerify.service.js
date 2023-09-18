@@ -17,6 +17,8 @@ const {
   updateWorkerPhoneValidator,
   updateWorkerPhoneVerifyCodeValidator,
 } = require("../validators/workerProfileVerify.validator");
+const { workerModel } = require("../models/worker_models");
+const cron = require('node-cron');
 
 class WorkerProfileVerificationService {
   // worker profile verification data
@@ -477,11 +479,20 @@ class WorkerProfileVerificationService {
           status: 400,
           success: false,
         }; // Verification code is incorrect
+
       // Update the user if code matched
-      await workerProfileVerificationModel.findOneAndUpdate(
-        { worker },
-        { code: "", phone }
-      );
+      await Promise.all([
+        cache.del(`worker-profile/${worker}`),
+        cache.del(`worker/${worker}`),
+        workerModel.findOneAndUpdate({ _id: worker }, {
+          phone
+        }),
+        workerProfileVerificationModel.findOneAndUpdate(
+          { worker },
+          { code: "", phone }
+        )
+
+      ])
 
       return {
         msg: "Code has been verified successfully.",
@@ -495,5 +506,25 @@ class WorkerProfileVerificationService {
     }
   }
 }
+
+// wrtie a cron job to update workerModel with data from workerverificationmodel
+// cron job runs every 15 minutes
+cron.schedule('*/1 * * * *', async () => {
+  try {
+    // Fetch data from workerProfileVerificationModel
+    const verificationData = await workerProfileVerificationModel.find({});
+
+    // Update workerModel with the fetched data
+    verificationData.forEach(async (verification) => {
+      const { worker, ...updateData } = verification._doc;
+      delete updateData._id
+      await workerModel.updateOne({ _id: worker }, { $set: updateData });
+    });
+
+    log.info("Cron job completed succcessfully.")
+  } catch (error) {
+    console.error('Error executing cron job:', error);
+  }
+});
 
 module.exports = new WorkerProfileVerificationService();

@@ -46,10 +46,11 @@ const passwordResetWorkerSchema = new Schema({
         type: Boolean,
         default: false,
     },
+
 }, { timestamps: true });
 
 const PasswordReset = model('PasswordReset', passwordResetSchema);
 const WorkerPasswordReset = model('WorkerPasswordReset', passwordResetWorkerSchema);
 
 module.exports.PasswordReset = PasswordReset;
-module.exports.WorkerPasswordReset = PasswordReset;
+module.exports.WorkerPasswordReset = WorkerPasswordReset;
