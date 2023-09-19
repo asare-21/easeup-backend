@@ -668,19 +668,26 @@ class WorkerProfileService {
       const { worker, client, ref } = req.body;
       const { started, completed } = req.query;
       if (!completed) {
-        // check if any bookng has been started but not completed
+        // check if any bookng has been started but not completed,
+        // check to see if booking was started but cancelled
+        // check to see if booking was started but completed
+
         const bookingStarted = await bookingModel.findOne({
           worker,
           client,
-          ref,
           started: true,
-          completed: false,
-        }).populate("jobId").populate("slot").exec();
-        if (bookingStarted)
-          return commonError(
-            res,
-            "Sorry, you have a booking in progress. Please complete it before starting another booking."
-          );
+          $or: [
+            { completed: false },
+            { cancelled: true }
+          ]
+        });
+        // if found booking has the same ref as the one being updated, then update it otherwise, return error
+        if (bookingStarted && bookingStarted.ref !== ref)
+          return {
+            msg: "Booking already started",
+            status: 400,
+            success: false,
+          };
       }
       const booking = await bookingModel.findOneAndUpdate(
         {
@@ -694,7 +701,7 @@ class WorkerProfileService {
           pending: false,
           endTime: Date.now(),
         }
-      ).populate("jobId").populate("slot").exec();
+      );
 
       console.log(booking);
       if (!booking) return commonError(res, "Booking not found");
