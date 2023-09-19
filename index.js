@@ -53,7 +53,6 @@ const limiter = rateLimit({
       });
   },
 });
-
 const session = require("express-session");
 const swaggerUI = require('swagger-ui-express')
 const swaggerJdDoc = require("swagger-jsdoc")
@@ -68,6 +67,7 @@ const { jobRequestRoute } = require("./routes/api/job_requests_route");
 const { advertRoute } = require("./routes/api/advert_route");
 const { advertModel } = require("./models/advert_model");
 const { workerProfileRoute } = require("./routes/api/workerProfile.router");
+
 
 //options object for swaggerjs
 const options = {
