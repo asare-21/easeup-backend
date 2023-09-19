@@ -137,7 +137,7 @@ app.use("/keys", keysRoute)
 // add a route for testing to know if API is live
 app.get("/", (req, res) => {
   res.status(200).json({
-    msg: "Welcome to Easeup API",
+    msg: "Welcome to Easeup API. Testing",
     status: 200,
     success: true,
   });
