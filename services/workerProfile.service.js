@@ -653,18 +653,18 @@ class WorkerProfileService {
   // update booking status
   async updateBookingStatus(req, res) {
     try {
-      const validationResults = await profileWorkRadiusUpdateValidator(
-        req.body
-      );
+      // const validationResults = await profileWorkRadiusUpdateValidator(
+      //   req.body
+      // );
 
-      if (validationResults.status !== 200) {
-        return {
-          msg: "Bad Request. Missing fields",
-          status: 400,
-          success: false,
-          validationResults: validationResults.msg,
-        };
-      }
+      // if (validationResults.status !== 200) {
+      //   return {
+      //     msg: "Bad Request. Missing fields",
+      //     status: 400,
+      //     success: false,
+      //     validationResults: validationResults.msg,
+      //   };
+      // }
       const { worker, client, ref } = req.body;
       const { started, completed } = req.query;
       if (!completed) {
