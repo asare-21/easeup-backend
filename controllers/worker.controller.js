@@ -80,7 +80,7 @@ class WorkerController {
   };
   resetPassword = async (req, res, next) => {
     // Password reset when user is logged in
-    const { status, ...responseData } = await UserService.resetPassword(
+    const { status, ...responseData } = await WorkerService.resetPassword(
       req,
       res
     );
@@ -89,7 +89,7 @@ class WorkerController {
 
   sendResetPasswordCode = async (req, res, next) => {
     // Password reset when user is logged in
-    const { status, ...responseData } = await UserService.sendResetCode(
+    const { status, ...responseData } = await WorkerService.sendResetCode(
       req,
       res
     );
@@ -97,7 +97,7 @@ class WorkerController {
   };
   resetPasswordOutside = async (req, res, next) => {
     // Password reset when user is logged in
-    const { status, ...responseData } = await UserService.resetPasswordOutside(
+    const { status, ...responseData } = await WorkerService.resetPasswordOutside(
       req,
       res
     );
@@ -106,7 +106,7 @@ class WorkerController {
 
   sendResetPasswordCodeOutside = async (req, res, next) => {
     // Password reset when user is logged in
-    const { status, ...responseData } = await UserService.sendResetCodeOutside(
+    const { status, ...responseData } = await WorkerService.sendResetCodeOutside(
       req,
       res
     );
