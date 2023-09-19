@@ -7,6 +7,7 @@ const { workerProfileModel } = require("../models/worker_profile_model");
 const {
   workerProfileVerificationModel,
 } = require("../models/worker_profile_verification_model");
+const otpGenerator = require("otp-generator");
 const { locationModel } = require("../models/workerLocationModel");
 const { cache } = require("../cache/user_cache");
 const {
