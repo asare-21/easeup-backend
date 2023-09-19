@@ -1554,6 +1554,30 @@ class WorkerProfileService {
       return { status: 500, msg: e.message, success: false };
     }
   }
+
+  async deletePost(req, res) {
+    try {
+      const { id } = req.params;
+
+      const post = await mediaModel.findByIdAndDelete(id);
+      if (!post) return {
+        status: 404,
+        msg: "Post not found",
+        success: false,
+      };
+
+      return {
+        status: 200,
+        msg: "Post deleted successfully",
+        success: true,
+      };
+    }
+    catch (e) {
+      log.warn(e.message);
+      console.log(e);
+      return { status: 500, msg: e.message, success: false }
+    }
+  }
 }
 
 module.exports = new WorkerProfileService();

@@ -185,6 +185,14 @@ class WorkerController {
     );
     res.status(status).send(responseData);
   };
+
+  deletePost = async (req, res, next) => {
+    const { status, ...responseData } = await WorkerProfileService.deletePost(
+      req,
+      res
+    );
+    res.status(status).send(responseData);
+  }
 }
 
 module.exports = new WorkerController();

@@ -47,6 +47,7 @@ router.post("/skills", workerVerifyJWT, workerProfileController.addWorkerSkills)
 router.post("/bio", workerVerifyJWT, workerProfileController.addWorkerBio);
 router.post("/instagram", workerVerifyJWT, workerProfileController.addWorkerInstagram);
 router.post("/portfolio", workerVerifyJWT, workerProfileController.addWorkerPortfolio);
+router.delete("/portfolio/delete/:id", workerVerifyJWT, workerProfileController.deletePost);
 router.get(
   "/portfolio/:worker/:page",
   workerVerifyJWT,
