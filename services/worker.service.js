@@ -25,6 +25,7 @@ const {
 const { isValidPassword } = require("../utils");
 const { generateToken } = require("../passport/common");
 const { WorkerPasswordReset } = require("../models/password_reset_model");
+const { passwordResetValidator } = require("../validators/user.validator");
 
 class WorkerService {
   async createNotification(worker, title, body, type, token) {
