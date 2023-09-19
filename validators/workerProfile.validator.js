@@ -115,7 +115,7 @@ const profilePortfolioUpdateValidator = (params) => {
 const profileWorkRadiusUpdateValidator = (params) => {
   const schema = Joi.object({
     worker: Joi.string().required().label("Worker"),
-    radius: Joi.number().required().label("Raduis"),
+
   }).strict();
 
   const joiValidationResult = JoiValidator.validate(schema, params);
