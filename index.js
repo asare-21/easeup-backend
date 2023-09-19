@@ -134,6 +134,14 @@ app.use("/adverts", advertRoute)
 app.use("/intro", introRoute)
 app.use("/timeslot", timeslotRoute)
 app.use("/keys", keysRoute)
+// add a route for testing to know if API is live
+app.get("/", (req, res) => {
+  res.status(200).json({
+    msg: "Welcome to Easeup API",
+    status: 200,
+    success: true,
+  });
+});
 
 // only available in development
 if (process.env.NODE_ENV === "development") {
