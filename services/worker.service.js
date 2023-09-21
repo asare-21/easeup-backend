@@ -386,29 +386,24 @@ class WorkerService {
       }
 
       // Find the user
-      workerModel.findByIdAndUpdate(
+      const worker = await workerModel.findByIdAndUpdate(
         workerId,
         {
           deviceToken: req.body.token,
         },
-        (err, user) => {
-          if (err) {
-            log.warn(err.message);
-            return { msg: err.message, status: 500, success: false }; // Internal Server Error
-          }
-          if (!user)
-            return { msg: "Worker Not Found", status: 404, success: false }; // User Not Found
-          workerCache.del(`worker/${workerId}`);
-
-          return {
-            msg: "Profile token updated",
-            status: 200,
-            success: true,
-          }; // User Found and returned
-        }
       );
+
+      if (!worker)
+        return { msg: "Worker Not Found", status: 404, success: false }; // worker Not Found
+      workerCache.del(`worker/${workerId}`);
+
+      // worker Found and returned
+      return {
+        msg: "Profile token updated",
+        status: 200,
+        success: true,
+      }
     } catch (e) {
-      log.warn(e.message);
       console.log(e);
       return { status: 500, msg: e.message, success: false };
     }
