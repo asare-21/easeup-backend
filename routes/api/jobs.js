@@ -17,11 +17,11 @@ router.post('/notifications', async (req, res) => {
         const client = await userModel.findById(booking.client)
         // run aysnc in parallel
         await Promise.all([
-            // admin.messaging().sendToDevice(client.deviceToken, {
-            //     data: {
-            //         message
-            //     }
-            // }),
+            admin.messaging().sendToDevice(client.deviceToken, {
+                data: {
+                    message
+                }
+            }),
             // update record to show that customer has been contacted
             bookingModel.findOneAndUpdate({ worker, ref }, { contactedCustomer: true })
         ])

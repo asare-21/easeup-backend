@@ -70,7 +70,7 @@ class UserService {
         };
 
         await Promise.all([
-          // admin.messaging().send(message),
+          admin.messaging().send(message),
           notification.save(),
         ]);
       });
