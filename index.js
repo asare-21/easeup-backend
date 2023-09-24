@@ -92,6 +92,7 @@ const specs = swaggerJdDoc(options)
 const { timeslotRoute } = require("./routes/api/timeslot");
 const { keyModel } = require("./models/key_model");
 const { keysRoute } = require("./routes/api/keys_route");
+const { azureAIRouter } = require("./routes/api/azure_ai_route");
 
 //Auth
 app.use(
@@ -134,6 +135,7 @@ app.use("/adverts", advertRoute)
 app.use("/intro", introRoute)
 app.use("/timeslot", timeslotRoute)
 app.use("/keys", keysRoute)
+app.use("/azure-ai", azureAIRouter)
 // add a route for testing to know if API is live
 app.get("/", (req, res) => {
   res.status(200).json({
@@ -148,7 +150,6 @@ if (process.env.NODE_ENV === "development") {
   // setting up swagger doc
   app.use('/docs', swaggerUI.serve, swaggerUI.setup(specs))
 }
-
 
 // handle 404
 app.use((req, res, next) => {
