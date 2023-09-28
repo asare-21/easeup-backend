@@ -13,12 +13,12 @@ const { log } = require('npmlog');
 const { notificationUserModel, notificationWorkerModel } = require('./nofications');
 const bookingSchema = new Schema({
     worker: {
-        type: Schema.Types.ObjectId,
+        type: String,
         ref: 'Worker',
         required: true
     },
     client: {
-        type: Schema.Types.ObjectId,
+        type: String,
         ref: 'User',
         required: true
     },

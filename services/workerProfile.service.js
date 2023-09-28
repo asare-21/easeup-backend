@@ -578,9 +578,8 @@ class WorkerProfileService {
       const worker = req.user.id;
       const { user } = req.query;
       // check if worker is valid
-      // console.log("User variable ", user)
       const bookings = await bookingModel.find({
-        [user === "true" ? "client" : "worker"]: req.user.id,
+        [user === "true" ? "client" : "worker"]: worker,
         isPaid: true,
         completed: false,
         started: true,
@@ -588,7 +587,7 @@ class WorkerProfileService {
       }).populate("jobId").populate("slot").exec();
       console.log("Fetched bookings ", bookings);
       // set cahce
-
+      workerCache.set(`in-progress-bookings/${worker}`, JSON.stringify(bookings));
       return {
         msg: "Worker Profile Fetched Successfully",
         status: 200,
