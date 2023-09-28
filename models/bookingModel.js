@@ -163,76 +163,76 @@ cron.schedule('*/15 * * * *', async () => {
 });
 
 //cron job to cancel bookings that past but still have an upcoming status
-// cron job should run every 24 hours
-cron.schedule('0 0 * * *', async () => {
-    try {
-        // Find all bookings that are not cancelled and have a date that is less than today
-        const bookings = await this.bookingModel.find({ cancelled: false, isPaid: true, completed: false, date: { $lt: new Date() } }).populate('worker').populate('client').populate("slot").exec();
+// // cron job should run every 24 hours
+// cron.schedule('0 0 * * *', async () => {
+//     try {
+//         // Find all bookings that are not cancelled and have a date that is less than today
+//         const bookings = await this.bookingModel.find({ cancelled: false, isPaid: true, completed: false, date: { $lt: new Date() } }).populate('worker').populate('client').populate("slot").exec();
 
-        // Cancel all the bookings
-        for (const booking of bookings) {
-            const updatedBooking = await this.bookingModel.updateOne({ _id: booking._id }, { $set: { cancelled: true, cancelledReason: 'Booking has been cancelled automatically.' } }, { new: true });
-            // send notifications to the client and worker with the reason for cancellation using firebase admin
-            const messageToClient = {
-                notification: {
-                    title: 'Booking Cancelled',
-                    body: `Your booking with ${booking.worker.name} has been cancelled automatically. This is because the booking date has passed.`
-                },
-                data: {
-                    booking: booking._id.toString(),
-                    workerName: booking.worker.name,
-                    type: 'booking_cancelled'
-                },
-                token: booking.client.deviceToken
-            };
-            const messageToWorker = {
-                notification: {
-                    title: 'Booking Cancelled',
-                    body: `Your booking with ${booking.clientName} has been cancelled automatically. This is because the booking date has passed.`
-                },
-                data: {
-                    booking: booking._id.toString(),
-                    clientName: booking.clientName,
+//         // Cancel all the bookings
+//         for (const booking of bookings) {
+//             const updatedBooking = await this.bookingModel.updateOne({ _id: booking._id }, { $set: { cancelled: true, cancelledReason: 'Booking has been cancelled automatically.' } }, { new: true });
+//             // send notifications to the client and worker with the reason for cancellation using firebase admin
+//             const messageToClient = {
+//                 notification: {
+//                     title: 'Booking Cancelled',
+//                     body: `Your booking with ${booking.worker.name} has been cancelled automatically. This is because the booking date has passed.`
+//                 },
+//                 data: {
+//                     booking: booking._id.toString(),
+//                     workerName: booking.worker.name,
+//                     type: 'booking_cancelled'
+//                 },
+//                 token: booking.client.deviceToken
+//             };
+//             const messageToWorker = {
+//                 notification: {
+//                     title: 'Booking Cancelled',
+//                     body: `Your booking with ${booking.clientName} has been cancelled automatically. This is because the booking date has passed.`
+//                 },
+//                 data: {
+//                     booking: booking._id.toString(),
+//                     clientName: booking.clientName,
 
-                    type: 'booking_cancelled'
-                },
-                token: booking.worker.deviceToken
-            };
+//                     type: 'booking_cancelled'
+//                 },
+//                 token: booking.worker.deviceToken
+//             };
 
-            // Send the notifications
-            const userFBNotificationPromise = admin.messaging().send(
-                messageToClient
-            )
-            const workerFBNotificationPromise = admin.messaging().send(
-                messageToWorker
-            )
-            // Save to in-app notifications
-            const userNotificationPromise = notificationUserModel.create({
-                user: booking.client._id,
-                title: messageToClient.notification.title,
-                body: messageToClient.notification.body,
-                type: "booking_cancelled",
-                booking: booking._id
-            });
-            const workerNotificationPromise = notificationWorkerModel.create({
-                worker: booking.worker._id,
-                title: messageToWorker.notification.title,
-                body: messageToWorker.notification.body,
-                type: "booking_cancelled",
-                booking: booking._id
-            });
+//             // Send the notifications
+//             const userFBNotificationPromise = admin.messaging().send(
+//                 messageToClient
+//             )
+//             const workerFBNotificationPromise = admin.messaging().send(
+//                 messageToWorker
+//             )
+//             // Save to in-app notifications
+//             const userNotificationPromise = notificationUserModel.create({
+//                 user: booking.client._id,
+//                 title: messageToClient.notification.title,
+//                 body: messageToClient.notification.body,
+//                 type: "booking_cancelled",
+//                 booking: booking._id
+//             });
+//             const workerNotificationPromise = notificationWorkerModel.create({
+//                 worker: booking.worker._id,
+//                 title: messageToWorker.notification.title,
+//                 body: messageToWorker.notification.body,
+//                 type: "booking_cancelled",
+//                 booking: booking._id
+//             });
 
-            await Promise.all([
-                workerNotificationPromise,
-                userNotificationPromise,
-                userFBNotificationPromise,
-                workerFBNotificationPromise
-            ])
+//             await Promise.all([
+//                 workerNotificationPromise,
+//                 userNotificationPromise,
+//                 userFBNotificationPromise,
+//                 workerFBNotificationPromise
+//             ])
 
-        }
+//         }
 
-        console.log('Cron job completed successfully.');
-    } catch (error) {
-        console.error('Error executing cron job:', error);
-    }
-});
+//         console.log('Cron job completed successfully.');
+//     } catch (error) {
+//         console.error('Error executing cron job:', error);
+//     }
+// });
