@@ -87,7 +87,7 @@ class UserService {
   // get worker
   async deleteUser(req, res) {
     try {
-      const { user } = req.params;
+      const user = req.user.id;
 
       await Promise.all([userModel.findByIdAndDelete(user)]);
       return {

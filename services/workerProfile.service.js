@@ -45,7 +45,7 @@ class WorkerProfileService {
   // get worker
   async findWorker(req, res) {
     try {
-      const { worker } = req.params;
+      const worker = req.user.id;
       // check if uid is valid
       const workerPromise = workerProfileModel.findOne({ worker });
       const rating = reviewModel
@@ -68,10 +68,11 @@ class WorkerProfileService {
       if (response[1].length > 0) avgRating = response[1].avgRating ?? 0;
 
       const totalReviews = response[2]
-
-      response[0].rating = avgRating;
-      response[0].totalReviews = totalReviews;
-      response[0].jobs = totalReviews;
+      if (response[0] !== null) {
+        response[0].rating = avgRating;
+        response[0].totalReviews = totalReviews;
+        response[0].jobs = totalReviews;
+      }
       return {
         msg: "Worker Profile",
         status: 200,
@@ -89,7 +90,7 @@ class WorkerProfileService {
   // get worker reviews
   async findWorkerReviews(req, res) {
     try {
-      const { worker } = req.params;
+      const worker = req.user.id;
       // check if uid is valid
       const foundWorker = await reviewModel.find({ worker });
 
@@ -142,7 +143,7 @@ class WorkerProfileService {
         };
       }
 
-      const { worker } = req.params;
+      const worker = req.user.id;
       const { comment, image, from, post, name } = req.body;
 
       // check if uid is valid
@@ -474,8 +475,9 @@ class WorkerProfileService {
   //get worker booking
   async findBooking(req, res) {
     try {
-      const { worker } = req.params;
+      const worker = req.user.id;
       // check if worker is valid
+      console.log(worker)
       const bookings = await bookingModel.find({ worker }).populate("jobId").populate("slot").exec();
       // set cache
       workerCache.set(`booking/${worker}`, JSON.stringify(bookings));
@@ -515,7 +517,7 @@ class WorkerProfileService {
   // get upcoming booking
   async findUpcomingBooking(req, res) {
     try {
-      const { worker } = req.params;
+      const worker = req.user.id;
       const { user } = req.query;
       // check if worker is valid
       // console.log("User variable ", user)
@@ -544,7 +546,7 @@ class WorkerProfileService {
   // get pending booking
   async findPendingBooking(req, res) {
     try {
-      const { worker } = req.params;
+      const worker = req.user.id;
       const { user } = req.query;
       // check if worker is valid
       console.log("User variable ", Boolean("false"));
@@ -573,7 +575,7 @@ class WorkerProfileService {
   // get upcommming
   async findBookingInProgress(req, res) {
     try {
-      const { worker } = req.params;
+      const worker = req.user.id;
       const { user } = req.query;
       // check if worker is valid
       // console.log("User variable ", user)
@@ -602,7 +604,7 @@ class WorkerProfileService {
   // get completed booking
   async findCompletedBooking(req, res) {
     try {
-      const { worker } = req.params;
+      const worker = req.user.id;
       const { user } = req.query;
       // check if worker is valid
       const bookings = await bookingModel.find({
@@ -629,7 +631,7 @@ class WorkerProfileService {
   // get worker
   async findCancelledBooking(req, res) {
     try {
-      const { worker } = req.params;
+      const worker = req.user.id;
       const { user } = req.query;
       // check if worker is valid
       // const bookings = await bookingModel.find({ [user == true || 'true' ? 'client' : 'worker']: worker, isPaid: true, completed: false, cancelled: true })
