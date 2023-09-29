@@ -75,7 +75,6 @@ const { timeslotRoute } = require("./routes/api/timeslot");
 const { keyModel } = require("./models/key_model");
 const { keysRoute } = require("./routes/api/keys_route");
 const { azureAIRouter } = require("./routes/api/azure_ai_route");
-const { RequestLogger } = require("./controllers/request_logger");
 
 //Auth
 app.use(
@@ -92,7 +91,6 @@ app.use(passport.session());
 // Static files
 app.enable("trust proxy");
 app.use(cors());
-app.use(RequestLogger.requestLogger)
 app.use(compression());
 app.use(helmet());
 app.disable("x-powered-by");
