@@ -10,19 +10,14 @@ const { workerProfileModel } = require("../models/worker_profile_model");
 const { cache } = require("../cache/user_cache");
 const workerCache = cache;
 const { bookingModel } = require("../models/bookingModel");
-const { commonError, returnUnAuthUserError } = require("../utils");
 const { isValidDate } = require("../utils");
 const { userModel } = require("../models/user_model");
 const secret = process.env.PAYSTACK_SECRET;
 const https = require("https");
-const { query } = require("express");
 const {
   workerProfileVerificationModel,
 } = require("../models/worker_profile_verification_model");
-const {
-  findEarliestAvailableTimeSlot,
-  getMissingField,
-} = require("../routes/api/booking_helper");
+
 const { notificationModel } = require("../models/nofications");
 const {
   profileCommentsValidator,
@@ -82,8 +77,8 @@ class WorkerProfileService {
         totalReviews,
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(err)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -104,8 +99,8 @@ class WorkerProfileService {
         worker: foundWorker,
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(err)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -124,8 +119,8 @@ class WorkerProfileService {
         posts,
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(err)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -178,8 +173,8 @@ class WorkerProfileService {
         comment,
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(err)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -212,8 +207,8 @@ class WorkerProfileService {
         worker: foundWorker,
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(err)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -248,8 +243,8 @@ class WorkerProfileService {
         worker: foundWorker,
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(err)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -284,8 +279,8 @@ class WorkerProfileService {
         worker: foundWorker,
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(err)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -321,8 +316,8 @@ class WorkerProfileService {
         worker: foundWorker,
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(err)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -358,8 +353,8 @@ class WorkerProfileService {
         worker: foundWorker,
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(err)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -388,7 +383,11 @@ class WorkerProfileService {
       newMedia.save((err, worker) => {
         if (err) {
           console.log(err);
-          return commonError(res, err.message);
+          return {
+            msg: "Something went wrong",
+            status: 400,
+            success: false,
+          };
         }
         return {
           msg: "Worker Profile Updated",
@@ -398,8 +397,8 @@ class WorkerProfileService {
         };
       });
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(err)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -414,7 +413,11 @@ class WorkerProfileService {
         .find({ worker })
         .limit(pageSize)
         .skip((page - 1) * pageSize); // get 5 posts per page
-      if (!posts) return commonError(res, "No portfolio found");
+      if (!posts) return {
+        msg: "Portfolio not found",
+        status: 400,
+        success: false,
+      };
       workerCache.set(`portfolio/${page}/${worker}`, JSON.stringify(posts));
       return {
         msg: "Worker Profile Media Fetched Successfully",
@@ -423,8 +426,8 @@ class WorkerProfileService {
         worker: posts,
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(err)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -446,16 +449,24 @@ class WorkerProfileService {
       }
       // check if worker is valid
       if (radius.radius > 50 || radius.radius < 5)
-        return commonError(res, "Radius must be between 5 and 50");
+        return {
+          msg: "Insufficient radius",
+          status: 400,
+          success: false,
+        };
       workerProfileModel.findOneAndUpdate(
         { worker },
         {
           work_radius: radius,
         },
         (err, worker) => {
-          if (err) {
-            return commonError(res, err.message);
-          }
+          if (err)
+            return {
+              msg: err.message,
+              status: 400,
+              success: false,
+
+            }
 
           return {
             msg: "Worker Profile Updated",
@@ -466,8 +477,8 @@ class WorkerProfileService {
         }
       );
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(err)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -488,8 +499,8 @@ class WorkerProfileService {
         bookings,
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(err)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -508,8 +519,8 @@ class WorkerProfileService {
         bookings,
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(err)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -538,8 +549,8 @@ class WorkerProfileService {
         bookings,
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(err)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -567,8 +578,8 @@ class WorkerProfileService {
         bookings,
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(err)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -595,8 +606,8 @@ class WorkerProfileService {
         bookings,
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(err)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -622,8 +633,8 @@ class WorkerProfileService {
         bookings,
       }
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(err)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -649,8 +660,8 @@ class WorkerProfileService {
         bookings,
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(err)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -708,7 +719,11 @@ class WorkerProfileService {
       );
 
       console.log(booking);
-      if (!booking) return commonError(res, "Booking not found");
+      if (!booking) return {
+        msg: "Booking not available",
+        status: 400,
+        success: false,
+      };
       workerCache.del(`in-progress-bookings/${worker}`);
       workerCache.del(`upcoming-bookings/${worker}`);
 
@@ -719,8 +734,8 @@ class WorkerProfileService {
         booking,
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(err)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -734,7 +749,7 @@ class WorkerProfileService {
       if (validationResults.status !== 200) {
         return {
           msg: "Bad Request. Missing fields",
-          status: 400,
+          status: 500,
           success: false,
           validationResults: validationResults.msg,
         };
@@ -747,8 +762,13 @@ class WorkerProfileService {
         started: true,
         completed: false,
       }).populate("jobId").populate("slot").exec();
+
       if (!bookingStarted)
-        return commonError(res, "Sorry, something went wrong.");
+        return {
+          msg: "Something went wrong",
+          status: 500,
+          success: false,
+        };
 
       // update
       bookingStarted.pending = true;
@@ -790,8 +810,8 @@ class WorkerProfileService {
         // booking: bookingStarted,
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(err)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -827,8 +847,8 @@ class WorkerProfileService {
         success: true,
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(err)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -880,8 +900,8 @@ class WorkerProfileService {
         total: totalReviews,
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(err)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -969,8 +989,8 @@ class WorkerProfileService {
         timeslots: availableSlots,
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(err)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -1026,7 +1046,11 @@ class WorkerProfileService {
       const workerToken = await workerModel.findById(worker);
       // check if the phone numbers are available
       if (!clientPhone.phone || !workerPhone.phone) {
-        return commonError(res, "Phone number not found.");
+        return {
+          msg: "Phone number required",
+          status: 400,
+          success: false,
+        };
       }
       // before saving booing, check to see if the timeslot has a booking id.
       // if it has a booking id, request for that booking and check if it has been cancelled.
@@ -1035,10 +1059,11 @@ class WorkerProfileService {
       if (timeslot.bookingId) {
         const booking = await bookingModel.findById(timeslot.bookingId);
         if (!booking.cancelled) {
-          return commonError(
-            res,
-            "Sorry, this slot has been booked. Please choose another slot."
-          );
+          return {
+            msg: "Booking not available",
+            status: 400,
+            success: false,
+          };
         }
       }
       // save booking
@@ -1098,8 +1123,8 @@ class WorkerProfileService {
         result,
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(err)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -1131,7 +1156,11 @@ class WorkerProfileService {
             { new: true }
           );
           console.log("Found booking ", booking);
-          if (!booking) return commonError(res, "Booking not found");
+          if (!booking) return {
+            msg: "Booking not found",
+            status: 400,
+            success: false,
+          };
           // update time slot for worker
           await timeslotModel.findOneAndUpdate({
             _id: booking.slot,
@@ -1182,8 +1211,8 @@ class WorkerProfileService {
         status: 200,
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(err)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -1267,8 +1296,8 @@ class WorkerProfileService {
       refundRequest.write(refundDetails);
       refundRequest.end();
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(err)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -1338,8 +1367,8 @@ class WorkerProfileService {
       refundRequest.write(refundDetails);
       refundRequest.end();
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(err)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -1371,7 +1400,11 @@ class WorkerProfileService {
           { new: true }
         )
         .exec();
-      if (!bookings) return commonError(res, "Booking not found");
+      if (!bookings) return {
+        msg: "Booking not found",
+        status: 400,
+        success: false,
+      };
 
       console.log(bookings, typeof location[0], typeof location[1]);
       // send notification to device of worker and client
@@ -1399,8 +1432,8 @@ class WorkerProfileService {
         bookings,
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(err)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -1431,7 +1464,11 @@ class WorkerProfileService {
         },
         { new: true }
       );
-      if (!bookings) return commonError(res, "Booking not found");
+      if (!bookings) return {
+        msg: "Booking not available",
+        status: 400,
+        success: false,
+      };
 
       console.log(bookings);
       // send notification to device of worker and client
@@ -1459,15 +1496,19 @@ class WorkerProfileService {
         bookings,
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(err)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
   // get worker
   async notifyWorker(req, res) {
     try {
-      if (!req.params.worker) return commonError(res, "Worker ID not provided");
+      if (!req.params.worker) return {
+        msg: "Booking not available",
+        status: 400,
+        success: false,
+      };
       const workerToken = await workerModel.findById(req.params.worker);
       admin.messaging().sendToDevice(workerToken.deviceToken, {
         notification: {
@@ -1483,8 +1524,8 @@ class WorkerProfileService {
         success: true,
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(err)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -1569,8 +1610,8 @@ class WorkerProfileService {
         success: true,
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(err)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -1593,8 +1634,8 @@ class WorkerProfileService {
       };
     }
     catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(err)
+
       return { status: 500, msg: e.message, success: false }
     }
   }

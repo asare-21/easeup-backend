@@ -32,7 +32,7 @@ const { jobs } = require("./routes/api/jobs");
 const { introRoute } = require("./routes/api/intro_route");
 const limiter = rateLimit({
   windowMs: 600000, //
-  max: 10000,
+  max: 1000,
   standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
   legacyHeaders: true, // Disable the `X-RateLimit-*` headers
   message: {
@@ -93,6 +93,7 @@ const { timeslotRoute } = require("./routes/api/timeslot");
 const { keyModel } = require("./models/key_model");
 const { keysRoute } = require("./routes/api/keys_route");
 const { azureAIRouter } = require("./routes/api/azure_ai_route");
+const { RequestLogger } = require("./controllers/request_logger");
 
 //Auth
 app.use(
@@ -109,6 +110,7 @@ app.use(passport.session());
 // Static files
 app.enable("trust proxy");
 app.use(cors());
+app.use(RequestLogger.requestLogger)
 app.use(compression());
 app.use(helmet());
 app.disable("x-powered-by");
