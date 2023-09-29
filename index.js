@@ -31,27 +31,9 @@ const authRoutes = require("./routes/api/auth");
 const { jobs } = require("./routes/api/jobs");
 const { introRoute } = require("./routes/api/intro_route");
 const limiter = rateLimit({
-  windowMs: 600000, //
-  max: 1000,
-  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-  legacyHeaders: true, // Disable the `X-RateLimit-*` headers
-  message: {
-    msg: "Too many requests from this IP, please try again later",
-    status: 429,
-    success: false,
-    limit: true,
-  },
-  onLimitReached: (req, res, options) => {
-    log.warn(`Rate limit reached for IP: ${req.ip}`);
-    return res
-      .status(429)
-      .json({
-        msg: "Too many requests from this IP, please try again later",
-        status: 429,
-        success: false,
-        limit: true,
-      });
-  },
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 1000, // Max requests per windowMs
+  message: 'Too many requests, please try again later.',
 });
 const session = require("express-session");
 const swaggerUI = require('swagger-ui-express')
