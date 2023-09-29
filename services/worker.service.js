@@ -64,7 +64,7 @@ class WorkerService {
     } catch (e) {
       if (e.errorInfo) {
         // User Not Found
-        log.warn(e.message);
+        console.error(e)
 
         return returnUnAuthUserError(res, e.message);
       }
@@ -88,8 +88,8 @@ class WorkerService {
         data: result,
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(e)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -119,8 +119,8 @@ class WorkerService {
         success: true,
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(e)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -152,8 +152,8 @@ class WorkerService {
         // token: result.token
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(e)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -238,8 +238,8 @@ class WorkerService {
         success: true,
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(e)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -296,8 +296,8 @@ class WorkerService {
         token,
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(e)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -363,8 +363,8 @@ class WorkerService {
         success: true,
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(e)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -404,7 +404,7 @@ class WorkerService {
         success: true,
       }
     } catch (e) {
-      console.log(e);
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -454,8 +454,8 @@ class WorkerService {
         }
       );
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(e)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -478,8 +478,8 @@ class WorkerService {
           }; // Notifications Found and returned
         });
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(e)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -522,8 +522,8 @@ class WorkerService {
           }
         );
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(e)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -610,8 +610,8 @@ class WorkerService {
       return { msg: "Code sent successfully", status: 200, success: true };
     }
     catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(e)
+
       return { status: 500, msg: e.message, success: false };
     }
 
@@ -664,8 +664,8 @@ class WorkerService {
       return { msg: "Password reset successful", status: 200, success: true };
     }
     catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(e)
+
       return { status: 500, msg: e.message, success: false };
     }
 
@@ -759,8 +759,8 @@ class WorkerService {
       return { msg: "Code sent successfully", status: 200, success: true };
     }
     catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(e)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -812,8 +812,8 @@ class WorkerService {
       return { msg: "Password reset successful", status: 200, success: true };
     }
     catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(e)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
