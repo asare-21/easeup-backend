@@ -7,8 +7,8 @@ const { commentModel } = require("../models/comments_model");
 const { mediaModel } = require("../models/mediaModel");
 const { reviewModel } = require("../models/reviews_model");
 const { workerProfileModel } = require("../models/worker_profile_model");
-const { cache } = require("../cache/user_cache");
-const workerCache = cache;
+const { redisClient, DEFAULT_EXPIRATION } = require("../cache/user_cache");
+const workerCache = redisClient;
 const { bookingModel } = require("../models/bookingModel");
 const { isValidDate } = require("../utils");
 const { userModel } = require("../models/user_model");
@@ -90,7 +90,7 @@ class WorkerProfileService {
       const foundWorker = await reviewModel.find({ worker });
 
       if (foundWorker)
-        workerCache.set(`reviews/${worker}`, JSON.stringify(foundWorker));
+        await workerCache.setEx(`reviews/${worker}`, DEFAULT_EXPIRATION, JSON.stringify(foundWorker));
 
       return {
         msg: "Worker Profile",
@@ -111,7 +111,7 @@ class WorkerProfileService {
       // check if uid is valid
       const posts = await commentModel.find({ post });
       // set cache
-      workerCache.set(`comments/${post}`, JSON.stringify(posts));
+      await workerCache.setEx(`comments/${post}`, DEFAULT_EXPIRATION, JSON.stringify(posts));
       return {
         msg: "Comments fetched",
         status: 200,
@@ -199,7 +199,7 @@ class WorkerProfileService {
           base_price: charge,
         }
       );
-      workerCache.del(`worker-profile/${worker}`);
+      await workerCache.del(`worker-profile/${worker}`);
       return {
         msg: "Worker Profile Updated",
         status: 200,
@@ -235,7 +235,7 @@ class WorkerProfileService {
           },
         }
       );
-      workerCache.del(`worker-profile/${worker}`);
+      await workerCache.del(`worker-profile/${worker}`);
       return {
         msg: "Worker Profile Updated",
         status: 200,
@@ -271,7 +271,7 @@ class WorkerProfileService {
           },
         }
       );
-      workerCache.del(`worker-profile/${worker}`);
+      await workerCache.del(`worker-profile/${worker}`);
       return {
         msg: "Worker Profile Updated",
         status: 200,
@@ -307,7 +307,7 @@ class WorkerProfileService {
           },
         }
       );
-      workerCache.del(`worker-profile/${worker}`);
+      await workerCache.del(`worker-profile/${worker}`);
 
       return {
         msg: "Worker Profile Updated",
@@ -344,7 +344,7 @@ class WorkerProfileService {
           },
         }
       );
-      workerCache.del(`worker-profile/${worker}`);
+      await workerCache.del(`worker-profile/${worker}`);
 
       return {
         msg: "Worker Profile Updated",
@@ -418,7 +418,7 @@ class WorkerProfileService {
         status: 400,
         success: false,
       };
-      workerCache.set(`portfolio/${page}/${worker}`, JSON.stringify(posts));
+      await workerCache.setEx(`portfolio/${page}/${worker}`, DEFAULT_EXPIRATION, JSON.stringify(posts));
       return {
         msg: "Worker Profile Media Fetched Successfully",
         status: 200,
@@ -491,7 +491,7 @@ class WorkerProfileService {
       console.log(worker)
       const bookings = await bookingModel.find({ worker }).populate("jobId").populate("slot").exec();
       // set cache
-      workerCache.set(`booking/${worker}`, JSON.stringify(bookings));
+      await workerCache.setEx(`booking/${worker}`, DEFAULT_EXPIRATION, JSON.stringify(bookings));
       return {
         msg: "Worker Profile Fetched Successfully",
         status: 200,
@@ -511,7 +511,7 @@ class WorkerProfileService {
       const { user } = req.params;
       const bookings = await bookingModel.find({ client: user, isPaid: true }).populate("jobId").populate("slot").exec();
       // set cache
-      workerCache.set(`paid-bookings/${user}`, JSON.stringify(bookings));
+      await workerCache.setEx(`paid-bookings/${user}`, DEFAULT_EXPIRATION, JSON.stringify(bookings));
       return {
         msg: "Worker Profile Fetched Successfully",
         status: 200,
@@ -540,7 +540,7 @@ class WorkerProfileService {
       }).populate("jobId").populate("slot").exec();
       console.log("Fetched bookings ", bookings);
       // set cahce
-      workerCache.set(`upcoming-bookings/${worker}`, JSON.stringify(bookings));
+      await workerCache.setEx(`upcoming-bookings/${worker}`, DEFAULT_EXPIRATION, JSON.stringify(bookings));
 
       return {
         msg: "Worker Profile Fetched Successfully",
@@ -570,6 +570,7 @@ class WorkerProfileService {
       }).populate("jobId").populate("slot").exec();
       console.log("Fetched bookings ", bookings);
       // set cahce
+      await workerCache.setEx(`pending-bookings/${worker}`, DEFAULT_EXPIRATION, JSON.stringify(bookings));
 
       return {
         msg: "Worker Profile Fetched Successfully",
@@ -598,7 +599,7 @@ class WorkerProfileService {
       }).populate("jobId").populate("slot").exec();
       console.log("Fetched bookings ", bookings);
       // set cahce
-      workerCache.set(`in-progress-bookings/${worker}`, JSON.stringify(bookings));
+      await workerCache.set(`in-progress-bookings/${worker}`, DEFAULT_EXPIRATION, JSON.stringify(bookings));
       return {
         msg: "Worker Profile Fetched Successfully",
         status: 200,
@@ -625,7 +626,7 @@ class WorkerProfileService {
       }).populate("jobId").populate("slot").exec();
 
       // set cache
-      workerCache.set(`completed-bookings/${worker}`, JSON.stringify(bookings));
+      await workerCache.setEx(`completed-bookings/${worker}`, DEFAULT_EXPIRATION, JSON.stringify(bookings));
       return {
         msg: "Worker Profile Fetched Successfully",
         status: 200,
@@ -652,7 +653,7 @@ class WorkerProfileService {
         cancelled: true,
       }).populate("jobId").populate("slot").exec();
       // set cache
-      workerCache.set(`cancelled-bookings/${worker}`, JSON.stringify(bookings));
+      await workerCache.set(`cancelled-bookings/${worker}`, DEFAULT_EXPIRATION, JSON.stringify(bookings));
       return {
         msg: "Worker Profile Fetched Successfully",
         status: 200,
@@ -724,8 +725,8 @@ class WorkerProfileService {
         status: 400,
         success: false,
       };
-      workerCache.del(`in-progress-bookings/${worker}`);
-      workerCache.del(`upcoming-bookings/${worker}`);
+      await workerCache.del(`in-progress-bookings/${worker}`);
+      await workerCache.del(`upcoming-bookings/${worker}`);
 
       return {
         msg: "Booking Updated Successfully",
@@ -772,11 +773,8 @@ class WorkerProfileService {
 
       // update
       bookingStarted.pending = true;
-      bookingStarted.save();
+      await bookingStarted.save();
 
-      workerCache.del(`in-progress-bookings/${worker}`);
-      workerCache.del(`upcoming-bookings/${worker}`);
-      workerCache.del(`pending-bookings/${worker}`);
 
       // send notifcation to worker
       const workerfuture = await workerModel.findById(worker);
@@ -793,7 +791,9 @@ class WorkerProfileService {
         await Promise.all([
           notification.save(),
           // send notification to client using Firebase Cloud Messaging
-
+          workerCache.del(`in-progress-bookings/${worker}`),
+          workerCache.del(`upcoming-bookings/${worker}`),
+          workerCache.del(`pending-bookings/${worker}`),
           admin.messaging().send(workerfuture.deviceToken, {
             notification: {
               title: "Booking Pending",
@@ -889,7 +889,7 @@ class WorkerProfileService {
       reviews.total = totalReviews;
 
       // set cache
-      workerCache.set(`worker-review/${worker}`, JSON.stringify(reviews));
+      await workerCache.setEx(`worker-review/${worker}`, DEFAULT_EXPIRATION, JSON.stringify(reviews));
 
       return {
         msg: "Review saved",
@@ -1091,10 +1091,7 @@ class WorkerProfileService {
       });
 
       const result = await newBooking.save(); // save booking
-      // clear cache
-      workerCache.del(`booking/${worker}`);
-      workerCache.del(`upcoming-bookings/${client}`);
-      workerCache.del(`upcoming-bookings/${worker}`);
+
 
       // Send notifications to the worker and client    
 
@@ -1114,6 +1111,10 @@ class WorkerProfileService {
             },
             // token: clientPhone.deviceToken
           }),
+          // clear cache
+          workerCache.del(`booking/${worker}`),
+          workerCache.del(`upcoming-bookings/${client}`),
+          workerCache.del(`upcoming-bookings/${worker}`)
         ]);
 
       return {
@@ -1267,9 +1268,7 @@ class WorkerProfileService {
             }
           );
 
-          workerCache.del(`in-progress-bookings/${worker}`);
-          workerCache.del(`upcoming-bookings/${worker}`);
-          workerCache.del(`cancelled-bookings/${worker}`);
+
           await Promise.all([
             admin.messaging().sendToDevice(userToken.deviceToken, {
               notification: {
@@ -1282,7 +1281,10 @@ class WorkerProfileService {
                 title: "Sorry, Booking Cancelled",
                 body: "The customer has cancelled the booking. Please check your dashboard for more details",
               },
-            })
+            }),
+            workerCache.del(`in-progress-bookings/${worker}`),
+            workerCache.del(`upcoming-bookings/${worker}`),
+            workerCache.del(`cancelled-bookings/${worker}`)
           ])
           // send notification to device of worker and client
 
@@ -1510,7 +1512,7 @@ class WorkerProfileService {
         success: false,
       };
       const workerToken = await workerModel.findById(req.params.worker);
-      admin.messaging().sendToDevice(workerToken.deviceToken, {
+      await admin.messaging().sendToDevice(workerToken.deviceToken, {
         notification: {
           title: "Booking request",
           body: "You have a new booking request. Please check your dashboard to accept/reject the booking.",
@@ -1597,7 +1599,7 @@ class WorkerProfileService {
         }
       }
       // set cache
-      workerCache.set(
+      await workerCache.setEx(
         `popular-workers`,
         JSON.stringify({ profiles, popularServices, highest: sortedWorkers })
       );
