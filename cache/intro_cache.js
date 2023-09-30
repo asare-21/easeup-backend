@@ -1,3 +1,4 @@
+const { redisClient } = require("..");
 const { cache } = require("./user_cache")
 
 module.exports.getintroCache = async function getintroCache(req, res, next) {
