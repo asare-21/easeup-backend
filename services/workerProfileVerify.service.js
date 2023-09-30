@@ -24,7 +24,7 @@ class WorkerProfileVerificationService {
   // worker profile verification data
   async findWorkerProfileVerification(req, res) {
     try {
-      const { worker } = req.params;
+      const worker = req.user.id;
       // check if worker is valid
       const retrievedWorker = await workerProfileVerificationModel.findOne({
         worker,
@@ -61,8 +61,8 @@ class WorkerProfileVerificationService {
         };
       }
 
-      const { worker, selfie } = req.body;
-
+      const { selfie } = req.body;
+      const worker = req.user.id;
 
       // Update the worker
       const response = await Promise.all([
@@ -114,7 +114,7 @@ class WorkerProfileVerificationService {
 
       // destruct the request body
       const {
-        worker,
+
         gh_card_image_back,
         gh_card_image_front,
         gh_card_to_face,
@@ -122,7 +122,7 @@ class WorkerProfileVerificationService {
         ghc_number
       } = req.body;
 
-
+      const worker = req.user.id;
 
       // update worker
       const updatedWorker =
@@ -165,9 +165,9 @@ class WorkerProfileVerificationService {
           validationResults: validationResults.msg,
         };
       }
-      const { worker, age_doc } = req.body;
+      const { age_doc } = req.body;
 
-
+      const worker = req.user.id;
 
       // Find the user
       const updatedWorkerAge =
@@ -207,9 +207,9 @@ class WorkerProfileVerificationService {
           validationResults: validationResults.msg,
         };
       }
-      const { worker, proof_skill } = req.body;
+      const { proof_skill } = req.body;
 
-
+      const worker = req.user.id;
 
       // Update worker proof of skill
       const updatedWorkerPos =
@@ -247,9 +247,9 @@ class WorkerProfileVerificationService {
           validationResults: validationResults.msg,
         };
       }
-      const { worker, insurance_doc } = req.body;
+      const { insurance_doc } = req.body;
 
-
+      const worker = req.user.id;
 
 
       // Update worker insurance
@@ -350,9 +350,9 @@ class WorkerProfileVerificationService {
           validationResults: validationResults.msg,
         };
       }
-      const { worker, gender } = req.body;
+      const { gender } = req.body;
 
-
+      const worker = req.user.id;
 
 
 
@@ -392,7 +392,8 @@ class WorkerProfileVerificationService {
           validationResults: validationResults.msg,
         };
       }
-      const { worker, phone } = req.body;
+      const { phone } = req.body;
+      const worker = req.user.id;
       // check if the phone number is equal to the one in the database
       const user = await workerProfileVerificationModel.findOne({ worker });
 
@@ -462,7 +463,8 @@ class WorkerProfileVerificationService {
           validationResults: validationResults.msg,
         };
       }
-      const { worker, phone, code } = req.body;
+      const { phone, code } = req.body;
+      const worker = req.user.id;
       // Find the user
 
       // check if the phone number is equal to the one in the database

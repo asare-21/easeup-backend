@@ -10,19 +10,14 @@ const { workerProfileModel } = require("../models/worker_profile_model");
 const { cache } = require("../cache/user_cache");
 const workerCache = cache;
 const { bookingModel } = require("../models/bookingModel");
-const { commonError, returnUnAuthUserError } = require("../utils");
 const { isValidDate } = require("../utils");
 const { userModel } = require("../models/user_model");
 const secret = process.env.PAYSTACK_SECRET;
 const https = require("https");
-const { query } = require("express");
 const {
   workerProfileVerificationModel,
 } = require("../models/worker_profile_verification_model");
-const {
-  findEarliestAvailableTimeSlot,
-  getMissingField,
-} = require("../routes/api/booking_helper");
+
 const { notificationModel } = require("../models/nofications");
 const {
   profileCommentsValidator,
@@ -45,7 +40,7 @@ class WorkerProfileService {
   // get worker
   async findWorker(req, res) {
     try {
-      const { worker } = req.params;
+      const worker = req.user.id;
       // check if uid is valid
       const workerPromise = workerProfileModel.findOne({ worker });
       const rating = reviewModel
@@ -68,10 +63,11 @@ class WorkerProfileService {
       if (response[1].length > 0) avgRating = response[1].avgRating ?? 0;
 
       const totalReviews = response[2]
-
-      response[0].rating = avgRating;
-      response[0].totalReviews = totalReviews;
-      response[0].jobs = totalReviews;
+      if (response[0] !== null) {
+        response[0].rating = avgRating;
+        response[0].totalReviews = totalReviews;
+        response[0].jobs = totalReviews;
+      }
       return {
         msg: "Worker Profile",
         status: 200,
@@ -81,15 +77,15 @@ class WorkerProfileService {
         totalReviews,
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(err)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
   // get worker reviews
   async findWorkerReviews(req, res) {
     try {
-      const { worker } = req.params;
+      const worker = req.user.id;
       // check if uid is valid
       const foundWorker = await reviewModel.find({ worker });
 
@@ -103,8 +99,8 @@ class WorkerProfileService {
         worker: foundWorker,
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(err)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -123,8 +119,8 @@ class WorkerProfileService {
         posts,
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(err)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -142,7 +138,7 @@ class WorkerProfileService {
         };
       }
 
-      const { worker } = req.params;
+      const worker = req.user.id;
       const { comment, image, from, post, name } = req.body;
 
       // check if uid is valid
@@ -156,17 +152,20 @@ class WorkerProfileService {
       // get worker
       const workerData = await workerModel.findById(worker);
       // send notification to worker
-      // await admin.messaging().sendToDevice(workerData.deviceToken, {
-      //   notification: {
-      //     title: "New comment",
-      //     body: `${name} commented on your post`,
-      //   },
-      //   data: {
-      //     type: "comment",
-      //     post,
-      //   },
-      // });
-      await newComment.save();
+
+      await Promise.all([
+        admin.messaging().sendToDevice(workerData.deviceToken, {
+          notification: {
+            title: "New comment",
+            body: `${name} commented on your post`,
+          },
+          data: {
+            type: "comment",
+            post,
+          },
+        }),
+        newComment.save()
+      ])
       return {
         msg: "Comment Added",
         status: 200,
@@ -174,8 +173,8 @@ class WorkerProfileService {
         comment,
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(err)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -208,8 +207,8 @@ class WorkerProfileService {
         worker: foundWorker,
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(err)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -244,8 +243,8 @@ class WorkerProfileService {
         worker: foundWorker,
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(err)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -280,8 +279,8 @@ class WorkerProfileService {
         worker: foundWorker,
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(err)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -317,8 +316,8 @@ class WorkerProfileService {
         worker: foundWorker,
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(err)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -354,8 +353,8 @@ class WorkerProfileService {
         worker: foundWorker,
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(err)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -384,7 +383,11 @@ class WorkerProfileService {
       newMedia.save((err, worker) => {
         if (err) {
           console.log(err);
-          return commonError(res, err.message);
+          return {
+            msg: "Something went wrong",
+            status: 400,
+            success: false,
+          };
         }
         return {
           msg: "Worker Profile Updated",
@@ -394,8 +397,8 @@ class WorkerProfileService {
         };
       });
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(err)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -410,7 +413,11 @@ class WorkerProfileService {
         .find({ worker })
         .limit(pageSize)
         .skip((page - 1) * pageSize); // get 5 posts per page
-      if (!posts) return commonError(res, "No portfolio found");
+      if (!posts) return {
+        msg: "Portfolio not found",
+        status: 400,
+        success: false,
+      };
       workerCache.set(`portfolio/${page}/${worker}`, JSON.stringify(posts));
       return {
         msg: "Worker Profile Media Fetched Successfully",
@@ -419,8 +426,8 @@ class WorkerProfileService {
         worker: posts,
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(err)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -442,16 +449,24 @@ class WorkerProfileService {
       }
       // check if worker is valid
       if (radius.radius > 50 || radius.radius < 5)
-        return commonError(res, "Radius must be between 5 and 50");
+        return {
+          msg: "Insufficient radius",
+          status: 400,
+          success: false,
+        };
       workerProfileModel.findOneAndUpdate(
         { worker },
         {
           work_radius: radius,
         },
         (err, worker) => {
-          if (err) {
-            return commonError(res, err.message);
-          }
+          if (err)
+            return {
+              msg: err.message,
+              status: 400,
+              success: false,
+
+            }
 
           return {
             msg: "Worker Profile Updated",
@@ -462,8 +477,8 @@ class WorkerProfileService {
         }
       );
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(err)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -471,8 +486,9 @@ class WorkerProfileService {
   //get worker booking
   async findBooking(req, res) {
     try {
-      const { worker } = req.params;
+      const worker = req.user.id;
       // check if worker is valid
+      console.log(worker)
       const bookings = await bookingModel.find({ worker }).populate("jobId").populate("slot").exec();
       // set cache
       workerCache.set(`booking/${worker}`, JSON.stringify(bookings));
@@ -483,8 +499,8 @@ class WorkerProfileService {
         bookings,
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(err)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -503,8 +519,8 @@ class WorkerProfileService {
         bookings,
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(err)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -512,7 +528,7 @@ class WorkerProfileService {
   // get upcoming booking
   async findUpcomingBooking(req, res) {
     try {
-      const { worker } = req.params;
+      const worker = req.user.id;
       const { user } = req.query;
       // check if worker is valid
       // console.log("User variable ", user)
@@ -533,15 +549,15 @@ class WorkerProfileService {
         bookings,
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(err)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
   // get pending booking
   async findPendingBooking(req, res) {
     try {
-      const { worker } = req.params;
+      const worker = req.user.id;
       const { user } = req.query;
       // check if worker is valid
       console.log("User variable ", Boolean("false"));
@@ -562,20 +578,19 @@ class WorkerProfileService {
         bookings,
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(err)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
   // get upcommming
   async findBookingInProgress(req, res) {
     try {
-      const { worker } = req.params;
+      const worker = req.user.id;
       const { user } = req.query;
       // check if worker is valid
-      // console.log("User variable ", user)
       const bookings = await bookingModel.find({
-        [user === "true" ? "client" : "worker"]: req.user.id,
+        [user === "true" ? "client" : "worker"]: worker,
         isPaid: true,
         completed: false,
         started: true,
@@ -583,7 +598,7 @@ class WorkerProfileService {
       }).populate("jobId").populate("slot").exec();
       console.log("Fetched bookings ", bookings);
       // set cahce
-
+      workerCache.set(`in-progress-bookings/${worker}`, JSON.stringify(bookings));
       return {
         msg: "Worker Profile Fetched Successfully",
         status: 200,
@@ -591,15 +606,15 @@ class WorkerProfileService {
         bookings,
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(err)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
   // get completed booking
   async findCompletedBooking(req, res) {
     try {
-      const { worker } = req.params;
+      const worker = req.user.id;
       const { user } = req.query;
       // check if worker is valid
       const bookings = await bookingModel.find({
@@ -618,15 +633,15 @@ class WorkerProfileService {
         bookings,
       }
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(err)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
   // get worker
   async findCancelledBooking(req, res) {
     try {
-      const { worker } = req.params;
+      const worker = req.user.id;
       const { user } = req.query;
       // check if worker is valid
       // const bookings = await bookingModel.find({ [user == true || 'true' ? 'client' : 'worker']: worker, isPaid: true, completed: false, cancelled: true })
@@ -645,42 +660,49 @@ class WorkerProfileService {
         bookings,
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(err)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
   // update booking status
   async updateBookingStatus(req, res) {
     try {
-      const validationResults = await profileWorkRadiusUpdateValidator(
-        req.body
-      );
+      // const validationResults = await profileWorkRadiusUpdateValidator(
+      //   req.body
+      // );
 
-      if (validationResults.status !== 200) {
-        return {
-          msg: "Bad Request. Missing fields",
-          status: 400,
-          success: false,
-          validationResults: validationResults.msg,
-        };
-      }
+      // if (validationResults.status !== 200) {
+      //   return {
+      //     msg: "Bad Request. Missing fields",
+      //     status: 400,
+      //     success: false,
+      //     validationResults: validationResults.msg,
+      //   };
+      // }
       const { worker, client, ref } = req.body;
       const { started, completed } = req.query;
       if (!completed) {
-        // check if any bookng has been started but not completed
+        // check if any bookng has been started but not completed,
+        // check to see if booking was started but cancelled
+        // check to see if booking was started but completed
+
         const bookingStarted = await bookingModel.findOne({
           worker,
           client,
-          ref,
           started: true,
-          completed: false,
-        }).populate("jobId").populate("slot").exec();
-        if (bookingStarted)
-          return commonError(
-            res,
-            "Sorry, you have a booking in progress. Please complete it before starting another booking."
-          );
+          $or: [
+            { completed: false },
+            { cancelled: true }
+          ]
+        });
+        // if found booking has the same ref as the one being updated, then update it otherwise, return error
+        if (bookingStarted && bookingStarted.ref !== ref)
+          return {
+            msg: "Booking already started",
+            status: 400,
+            success: false,
+          };
       }
       const booking = await bookingModel.findOneAndUpdate(
         {
@@ -694,10 +716,14 @@ class WorkerProfileService {
           pending: false,
           endTime: Date.now(),
         }
-      ).populate("jobId").populate("slot").exec();
+      );
 
       console.log(booking);
-      if (!booking) return commonError(res, "Booking not found");
+      if (!booking) return {
+        msg: "Booking not available",
+        status: 400,
+        success: false,
+      };
       workerCache.del(`in-progress-bookings/${worker}`);
       workerCache.del(`upcoming-bookings/${worker}`);
 
@@ -708,8 +734,8 @@ class WorkerProfileService {
         booking,
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(err)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -723,7 +749,7 @@ class WorkerProfileService {
       if (validationResults.status !== 200) {
         return {
           msg: "Bad Request. Missing fields",
-          status: 400,
+          status: 500,
           success: false,
           validationResults: validationResults.msg,
         };
@@ -736,8 +762,13 @@ class WorkerProfileService {
         started: true,
         completed: false,
       }).populate("jobId").populate("slot").exec();
+
       if (!bookingStarted)
-        return commonError(res, "Sorry, something went wrong.");
+        return {
+          msg: "Something went wrong",
+          status: 500,
+          success: false,
+        };
 
       // update
       bookingStarted.pending = true;
@@ -757,15 +788,19 @@ class WorkerProfileService {
           title: "Booking Pending",
           body: `Your booking with ${bookingStarted.clientName} has been marked as pending. Please contact the client to resolve the issue.`,
         });
-        await notification.save();
-        // send notification to client using Firebase Cloud Messaging
 
-        // await admin.messaging().send(workerfuture.deviceToken, {
-        //   notification: {
-        //     title: "Booking Pending",
-        //     body: `Your booking with ${bookingStarted.clientName} has been marked as pending. Please contact the client to resolve the issue.`,
-        //   },
-        // });
+
+        await Promise.all([
+          notification.save(),
+          // send notification to client using Firebase Cloud Messaging
+
+          admin.messaging().send(workerfuture.deviceToken, {
+            notification: {
+              title: "Booking Pending",
+              body: `Your booking with ${bookingStarted.clientName} has been marked as pending. Please contact the client to resolve the issue.`,
+            },
+          })
+        ])
       }
 
       return {
@@ -775,8 +810,8 @@ class WorkerProfileService {
         // booking: bookingStarted,
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(err)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -812,8 +847,8 @@ class WorkerProfileService {
         success: true,
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(err)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -865,8 +900,8 @@ class WorkerProfileService {
         total: totalReviews,
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(err)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -954,8 +989,8 @@ class WorkerProfileService {
         timeslots: availableSlots,
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(err)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -1011,7 +1046,11 @@ class WorkerProfileService {
       const workerToken = await workerModel.findById(worker);
       // check if the phone numbers are available
       if (!clientPhone.phone || !workerPhone.phone) {
-        return commonError(res, "Phone number not found.");
+        return {
+          msg: "Phone number required",
+          status: 400,
+          success: false,
+        };
       }
       // before saving booing, check to see if the timeslot has a booking id.
       // if it has a booking id, request for that booking and check if it has been cancelled.
@@ -1020,10 +1059,11 @@ class WorkerProfileService {
       if (timeslot.bookingId) {
         const booking = await bookingModel.findById(timeslot.bookingId);
         if (!booking.cancelled) {
-          return commonError(
-            res,
-            "Sorry, this slot has been booked. Please choose another slot."
-          );
+          return {
+            msg: "Booking not available",
+            status: 400,
+            success: false,
+          };
         }
       }
       // save booking
@@ -1058,23 +1098,23 @@ class WorkerProfileService {
 
       // Send notifications to the worker and client    
 
-      // if (workerPhone && clientPhone)
-      //   await Promise.all([
-      //     admin.messaging().sendToDevice(workerToken.deviceToken, {
-      //       notification: {
-      //         title: "New Booking",
-      //         body: "You have a new booking. Please check your dashboard for more details.",
-      //       },
-      //       // token: workerToken.deviceToken
-      //     }),
-      //     admin.messaging().sendToDevice(clientPhone.deviceToken, {
-      //       notification: {
-      //         title: "New Booking",
-      //         body: "Your booking was successful. Awaiting payment.",
-      //       },
-      //       // token: clientPhone.deviceToken
-      //     }),
-      //   ]);
+      if (workerPhone && clientPhone)
+        await Promise.all([
+          admin.messaging().sendToDevice(workerToken.deviceToken, {
+            notification: {
+              title: "New Booking",
+              body: "You have a new booking. Please check your dashboard for more details.",
+            },
+            // token: workerToken.deviceToken
+          }),
+          admin.messaging().sendToDevice(clientPhone.deviceToken, {
+            notification: {
+              title: "New Booking",
+              body: "Your booking was successful. Awaiting payment.",
+            },
+            // token: clientPhone.deviceToken
+          }),
+        ]);
 
       return {
         msg: "Booking Successful",
@@ -1083,8 +1123,8 @@ class WorkerProfileService {
         result,
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(err)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -1116,7 +1156,11 @@ class WorkerProfileService {
             { new: true }
           );
           console.log("Found booking ", booking);
-          if (!booking) return commonError(res, "Booking not found");
+          if (!booking) return {
+            msg: "Booking not found",
+            status: 400,
+            success: false,
+          };
           // update time slot for worker
           await timeslotModel.findOneAndUpdate({
             _id: booking.slot,
@@ -1128,24 +1172,29 @@ class WorkerProfileService {
           // send notification to device of worker and client
           const workerToken = await workerModel.findById(booking.worker);
           const userToken = await userModel.findById(booking.client);
-          // await admin.messaging().sendToDevice(userToken.deviceToken, {
-          //   notification: {
-          //     title: "Payment Verified",
-          //     body: "Payment for your booking has been verified",
-          //   },
-          // });
+
           const date = new Date(workerToken.date);
           const parseDate = date.toDateString();
-          // await admin.messaging().sendToDevice(workerToken.deviceToken, {
-          //   notification: {
-          //     title: "Booking Confirmed",
-          //     body:
-          //       workerToken.name +
-          //       "has just booked you for " +
-          //       parseDate +
-          //       " Payment for your booking has been verified. Please check your dashboard for more details",
-          //   },
-          // });
+
+          await Promise.all([
+            admin.messaging().sendToDevice(workerToken.deviceToken, {
+              notification: {
+                title: "Booking Confirmed",
+                body:
+                  workerToken.name +
+                  "has just booked you for " +
+                  parseDate +
+                  " Payment for your booking has been verified. Please check your dashboard for more details",
+              },
+            }),
+            admin.messaging().sendToDevice(userToken.deviceToken, {
+              notification: {
+                title: "Payment Verified",
+                body: "Payment for your booking has been verified",
+              },
+            })
+          ]
+          )
           return {
             msg: "Payment Verified",
             status: 200,
@@ -1162,8 +1211,8 @@ class WorkerProfileService {
         status: 200,
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(err)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -1221,20 +1270,20 @@ class WorkerProfileService {
           workerCache.del(`in-progress-bookings/${worker}`);
           workerCache.del(`upcoming-bookings/${worker}`);
           workerCache.del(`cancelled-bookings/${worker}`);
-          // await Promise.all([
-          //   admin.messaging().sendToDevice(userToken.deviceToken, {
-          //     notification: {
-          //       title: "Refund Processed",
-          //       body: "Your booking has been cancelled and refund processed",
-          //     },
-          //   }),
-          //   admin.messaging().sendToDevice(workerToken.deviceToken, {
-          //     notification: {
-          //       title: "Sorry, Booking Cancelled",
-          //       body: "The customer has cancelled the booking. Please check your dashboard for more details",
-          //     },
-          //   })
-          // ])
+          await Promise.all([
+            admin.messaging().sendToDevice(userToken.deviceToken, {
+              notification: {
+                title: "Refund Processed",
+                body: "Your booking has been cancelled and refund processed",
+              },
+            }),
+            admin.messaging().sendToDevice(workerToken.deviceToken, {
+              notification: {
+                title: "Sorry, Booking Cancelled",
+                body: "The customer has cancelled the booking. Please check your dashboard for more details",
+              },
+            })
+          ])
           // send notification to device of worker and client
 
           return {
@@ -1247,8 +1296,8 @@ class WorkerProfileService {
       refundRequest.write(refundDetails);
       refundRequest.end();
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(err)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -1294,20 +1343,20 @@ class WorkerProfileService {
               endTime: Date.now(),
             }
           );
-          // await Promise.all([
-          //   admin.messaging().sendToDevice(userToken.deviceToken, {
-          //     notification: {
-          //       title: "Booking Cancelled.",
-          //       body: "Your booking has been cancelled successfully. You will a 70% refund within 3-5 working days",
-          //     },
-          //   }),
-          //   admin.messaging().sendToDevice(workerToken.deviceToken, {
-          //     notification: {
-          //       title: "Sorry, Booking Cancelled",
-          //       body: "The customer has cancelled the booking. Please check your dashboard for more details",
-          //     },
-          //   }),
-          // ]); // parallel async
+          await Promise.all([
+            admin.messaging().sendToDevice(userToken.deviceToken, {
+              notification: {
+                title: "Booking Cancelled.",
+                body: "Your booking has been cancelled successfully. You will a 70% refund within 3-5 working days",
+              },
+            }),
+            admin.messaging().sendToDevice(workerToken.deviceToken, {
+              notification: {
+                title: "Sorry, Booking Cancelled",
+                body: "The customer has cancelled the booking. Please check your dashboard for more details",
+              },
+            }),
+          ]); // parallel async
           return {
             msg: "Refund Processed",
             status: 200,
@@ -1318,8 +1367,8 @@ class WorkerProfileService {
       refundRequest.write(refundDetails);
       refundRequest.end();
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(err)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -1351,26 +1400,30 @@ class WorkerProfileService {
           { new: true }
         )
         .exec();
-      if (!bookings) return commonError(res, "Booking not found");
+      if (!bookings) return {
+        msg: "Booking not found",
+        status: 400,
+        success: false,
+      };
 
       console.log(bookings, typeof location[0], typeof location[1]);
       // send notification to device of worker and client
       const workerToken = await workerModel.findById(worker);
       const userToken = await userModel.findById(client);
-      // await Promise.all([
-      //   admin.messaging().sendToDevice(userToken.deviceToken, {
-      //     notification: {
-      //       title: "Location update successfull",
-      //       body: "Your location has been updated. We will notify the worker.",
-      //     },
-      //   }),
-      //   admin.messaging().sendToDevice(workerToken.deviceToken, {
-      //     notification: {
-      //       title: "Job location update.",
-      //       body: "The client has updated their location. Please check your dashboard for more details",
-      //     },
-      //   }),
-      // ]);
+      await Promise.all([
+        admin.messaging().sendToDevice(userToken.deviceToken, {
+          notification: {
+            title: "Location update successfull",
+            body: "Your location has been updated. We will notify the worker.",
+          },
+        }),
+        admin.messaging().sendToDevice(workerToken.deviceToken, {
+          notification: {
+            title: "Job location update.",
+            body: "The client has updated their location. Please check your dashboard for more details",
+          },
+        }),
+      ]);
 
       return {
         msg: "Address Update Successfull",
@@ -1379,8 +1432,8 @@ class WorkerProfileService {
         bookings,
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(err)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -1411,26 +1464,30 @@ class WorkerProfileService {
         },
         { new: true }
       );
-      if (!bookings) return commonError(res, "Booking not found");
+      if (!bookings) return {
+        msg: "Booking not available",
+        status: 400,
+        success: false,
+      };
 
       console.log(bookings);
       // send notification to device of worker and client
       const workerToken = await workerModel.findById(worker);
       const userToken = await userModel.findById(client);
-      // await Promise.all([
-      //   admin.messaging().sendToDevice(userToken.deviceToken, {
-      //     notification: {
-      //       title: "Date update successfull",
-      //       body: "New date has been updated. We will notify the worker.",
-      //     },
-      //   }),
-      //   admin.messaging().sendToDevice(workerToken.deviceToken, {
-      //     notification: {
-      //       title: "Job date update.",
-      //       body: "The client has updated the date and time for the job. Please check your dashboard for more details",
-      //     },
-      //   }),
-      // ]);
+      await Promise.all([
+        admin.messaging().sendToDevice(userToken.deviceToken, {
+          notification: {
+            title: "Date update successfull",
+            body: "New date has been updated. We will notify the worker.",
+          },
+        }),
+        admin.messaging().sendToDevice(workerToken.deviceToken, {
+          notification: {
+            title: "Job date update.",
+            body: "The client has updated the date and time for the job. Please check your dashboard for more details",
+          },
+        }),
+      ]);
 
       return {
         msg: "Update Successfull",
@@ -1439,23 +1496,27 @@ class WorkerProfileService {
         bookings,
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(err)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
   // get worker
   async notifyWorker(req, res) {
     try {
-      if (!req.params.worker) return commonError(res, "Worker ID not provided");
+      if (!req.params.worker) return {
+        msg: "Booking not available",
+        status: 400,
+        success: false,
+      };
       const workerToken = await workerModel.findById(req.params.worker);
-      // admin.messaging().sendToDevice(workerToken.deviceToken, {
-      //   notification: {
-      //     title: "Booking request",
-      //     body: "You have a new booking request. Please check your dashboard to accept/reject the booking.",
-      //   },
-      //   // token: workerToken.deviceToken
-      // });
+      admin.messaging().sendToDevice(workerToken.deviceToken, {
+        notification: {
+          title: "Booking request",
+          body: "You have a new booking request. Please check your dashboard to accept/reject the booking.",
+        },
+        // token: workerToken.deviceToken
+      });
       // set cache
       return {
         msg: "Notification sent",
@@ -1463,8 +1524,8 @@ class WorkerProfileService {
         success: true,
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(err)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -1549,9 +1610,33 @@ class WorkerProfileService {
         success: true,
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(err)
+
       return { status: 500, msg: e.message, success: false };
+    }
+  }
+
+  async deletePost(req, res) {
+    try {
+      const { id } = req.params;
+
+      const post = await mediaModel.findByIdAndDelete(id);
+      if (!post) return {
+        status: 404,
+        msg: "Post not found",
+        success: false,
+      };
+
+      return {
+        status: 200,
+        msg: "Post deleted successfully",
+        success: true,
+      };
+    }
+    catch (e) {
+      console.error(err)
+
+      return { status: 500, msg: e.message, success: false }
     }
   }
 }

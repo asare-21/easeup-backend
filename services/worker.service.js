@@ -4,9 +4,11 @@ const { notificationWorkerModel } = require("../models/nofications");
 const admin = require("firebase-admin");
 const { commonError, returnUnAuthUserError } = require("../utils");
 const { workerProfileModel } = require("../models/worker_profile_model");
+const axios = require("axios");
 const {
   workerProfileVerificationModel,
 } = require("../models/worker_profile_verification_model");
+const otpGenerator = require("otp-generator");
 const { locationModel } = require("../models/workerLocationModel");
 const { cache } = require("../cache/user_cache");
 const {
@@ -55,14 +57,14 @@ class WorkerService {
         };
 
         await Promise.all([
-          // admin.messaging().send(message),
+          admin.messaging().send(message),
           notification.save(),
         ]);
       });
     } catch (e) {
       if (e.errorInfo) {
         // User Not Found
-        log.warn(e.message);
+        console.error(e)
 
         return returnUnAuthUserError(res, e.message);
       }
@@ -86,8 +88,8 @@ class WorkerService {
         data: result,
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(e)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -117,8 +119,8 @@ class WorkerService {
         success: true,
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(e)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -136,12 +138,12 @@ class WorkerService {
 
       workerCache.set(`worker-token/${result._id}`, result.token); //cache results
 
-      // await admin.messaging().sendToDevice(result.deviceToken, {
-      //   notification: {
-      //     title: "New job request",
-      //     body: "You have a new job request from a user. Please check and accept or reject the request as soon as possible.",
-      //   },
-      // });
+      await admin.messaging().sendToDevice(result.deviceToken, {
+        notification: {
+          title: "New job request",
+          body: "You have a new job request from a user. Please check and accept or reject the request as soon as possible.",
+        },
+      });
 
       return {
         msg: "Worker Profile",
@@ -150,8 +152,8 @@ class WorkerService {
         // token: result.token
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(e)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -236,8 +238,8 @@ class WorkerService {
         success: true,
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(e)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -294,8 +296,8 @@ class WorkerService {
         token,
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(e)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -361,8 +363,8 @@ class WorkerService {
         success: true,
       };
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(e)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -384,30 +386,25 @@ class WorkerService {
       }
 
       // Find the user
-      workerModel.findByIdAndUpdate(
+      const worker = await workerModel.findByIdAndUpdate(
         workerId,
         {
           deviceToken: req.body.token,
         },
-        (err, user) => {
-          if (err) {
-            log.warn(err.message);
-            return { msg: err.message, status: 500, success: false }; // Internal Server Error
-          }
-          if (!user)
-            return { msg: "Worker Not Found", status: 404, success: false }; // User Not Found
-          workerCache.del(`worker/${workerId}`);
-
-          return {
-            msg: "Profile token updated",
-            status: 200,
-            success: true,
-          }; // User Found and returned
-        }
       );
+
+      if (!worker)
+        return { msg: "Worker Not Found", status: 404, success: false }; // worker Not Found
+      workerCache.del(`worker/${workerId}`);
+
+      // worker Found and returned
+      return {
+        msg: "Profile token updated",
+        status: 200,
+        success: true,
+      }
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -457,8 +454,8 @@ class WorkerService {
         }
       );
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(e)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -481,8 +478,8 @@ class WorkerService {
           }; // Notifications Found and returned
         });
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(e)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -525,8 +522,8 @@ class WorkerService {
           }
         );
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(e)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -613,8 +610,8 @@ class WorkerService {
       return { msg: "Code sent successfully", status: 200, success: true };
     }
     catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(e)
+
       return { status: 500, msg: e.message, success: false };
     }
 
@@ -667,8 +664,8 @@ class WorkerService {
       return { msg: "Password reset successful", status: 200, success: true };
     }
     catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(e)
+
       return { status: 500, msg: e.message, success: false };
     }
 
@@ -762,8 +759,8 @@ class WorkerService {
       return { msg: "Code sent successfully", status: 200, success: true };
     }
     catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(e)
+
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -815,8 +812,8 @@ class WorkerService {
       return { msg: "Password reset successful", status: 200, success: true };
     }
     catch (e) {
-      log.warn(e.message);
-      console.log(e);
+      console.error(e)
+
       return { status: 500, msg: e.message, success: false };
     }
   }

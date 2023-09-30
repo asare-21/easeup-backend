@@ -31,28 +31,11 @@ const authRoutes = require("./routes/api/auth");
 const { jobs } = require("./routes/api/jobs");
 const { introRoute } = require("./routes/api/intro_route");
 const limiter = rateLimit({
-  windowMs: 600000, //
-  max: 10000,
-  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-  legacyHeaders: true, // Disable the `X-RateLimit-*` headers
-  message: {
-    msg: "Too many requests from this IP, please try again later",
-    status: 429,
-    success: false,
-    limit: true,
-  },
-  onLimitReached: (req, res, options) => {
-    log.warn(`Rate limit reached for IP: ${req.ip}`);
-    return res
-      .status(429)
-      .json({
-        msg: "Too many requests from this IP, please try again later",
-        status: 429,
-        success: false,
-        limit: true,
-      });
-  },
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 1000, // Max requests per windowMs
+  message: 'Too many requests, please try again later.',
 });
+const redis = require('redis')
 const session = require("express-session");
 const swaggerUI = require('swagger-ui-express')
 const swaggerJdDoc = require("swagger-jsdoc")
@@ -67,7 +50,8 @@ const { jobRequestRoute } = require("./routes/api/job_requests_route");
 const { advertRoute } = require("./routes/api/advert_route");
 const { advertModel } = require("./models/advert_model");
 const { workerProfileRoute } = require("./routes/api/workerProfile.router");
-
+const cacheHostName = process.env.AZURE_CACHE_FOR_REDIS_HOST_NAME;
+const cachePassword = process.env.AZURE_CACHE_FOR_REDIS_ACCESS_KEY;
 
 //options object for swaggerjs
 const options = {
@@ -174,6 +158,9 @@ app.use(function (req, res, next) {
 http.listen(PORT, async () => {
   try {
     log.info(`Listening on port ${PORT}`);
+    // Environment variables for cache
+
+
     await connect(
       `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASS}@easeup-cluster.pfxvast.mongodb.net/?retryWrites=true&w=majority`,
       {
@@ -346,3 +333,8 @@ async function saveKeys() {
 
 
 module.exports.admin = FBadmin;
+// export redis client
+module.exports.redisClient = redis.createClient({
+  url: `rediss://${cacheHostName}:6380`,
+  password: cachePassword
+})

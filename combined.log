@@ -1,0 +1,3 @@
+{"level":"info","message":"Method: GET URL: / Hostname: ::1 Request-Body: undefined","service":"user-service"}
+{"level":"info","message":"Method: GET\nURL: /\nHostname: ::1\nRequest-Body: undefined","service":"user-service"}
+{"level":"info","message":"Method: GET\nURL: /\nHostname: ::1\nRequest-Body: undefined","service":"user-service"}

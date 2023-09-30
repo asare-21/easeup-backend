@@ -49,7 +49,7 @@ const reviewSchema = new Schema({
 module.exports.reviewModel = model('Review', reviewSchema);
 
 // cron job to udpate users rating
-cron.schedule('*/1 * * * *', async () => {
+cron.schedule('*/15 * * * *', async () => {
     try {
         // Fetch all reviews for workers
         const reviews = await this.reviewModel.find({});
