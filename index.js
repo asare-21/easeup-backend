@@ -35,7 +35,6 @@ const limiter = rateLimit({
   max: 1000, // Max requests per windowMs
   message: 'Too many requests, please try again later.',
 });
-const redis = require('redis')
 const session = require("express-session");
 const swaggerUI = require('swagger-ui-express')
 const swaggerJdDoc = require("swagger-jsdoc")
@@ -50,8 +49,7 @@ const { jobRequestRoute } = require("./routes/api/job_requests_route");
 const { advertRoute } = require("./routes/api/advert_route");
 const { advertModel } = require("./models/advert_model");
 const { workerProfileRoute } = require("./routes/api/workerProfile.router");
-const cacheHostName = process.env.AZURE_CACHE_FOR_REDIS_HOST_NAME;
-const cachePassword = process.env.AZURE_CACHE_FOR_REDIS_ACCESS_KEY;
+
 
 //options object for swaggerjs
 const options = {
@@ -77,6 +75,7 @@ const { timeslotRoute } = require("./routes/api/timeslot");
 const { keyModel } = require("./models/key_model");
 const { keysRoute } = require("./routes/api/keys_route");
 const { azureAIRouter } = require("./routes/api/azure_ai_route");
+const { redisClient } = require("./cache/user_cache");
 
 //Auth
 app.use(
@@ -160,7 +159,7 @@ http.listen(PORT, async () => {
     log.info(`Listening on port ${PORT}`);
     // Environment variables for cache
 
-
+    await redisClient.connect()
     await connect(
       `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASS}@easeup-cluster.pfxvast.mongodb.net/?retryWrites=true&w=majority`,
       {
@@ -333,8 +332,4 @@ async function saveKeys() {
 
 
 module.exports.admin = FBadmin;
-// export redis client
-module.exports.redisClient = redis.createClient({
-  url: `rediss://${cacheHostName}:6380`,
-  password: cachePassword
-})
+
