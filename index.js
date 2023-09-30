@@ -76,6 +76,7 @@ const { keyModel } = require("./models/key_model");
 const { keysRoute } = require("./routes/api/keys_route");
 const { azureAIRouter } = require("./routes/api/azure_ai_route");
 const { redisClient } = require("./cache/user_cache");
+const { save } = require("node-cron/src/storage");
 
 //Auth
 app.use(
@@ -156,22 +157,21 @@ app.use(function (req, res, next) {
 // Starting the server
 http.listen(PORT, async () => {
   try {
-    log.info(`Listening on port ${PORT}`);
-    // Environment variables for cache
-
-    await redisClient.connect()
-    await connect(
-      `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASS}@easeup-cluster.pfxvast.mongodb.net/?retryWrites=true&w=majority`,
-      {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-        dbName: "easeup",
-      }
-    );
-    await FBadmin.initializeApp({
-      credential: FBadmin.credential.cert(serviceAccount),
-    });
-    await saveKeys()
+    await Promise.all([
+      saveKeys(),
+      FBadmin.initializeApp({
+        credential: FBadmin.credential.cert(serviceAccount),
+      }),
+      connect(
+        `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASS}@easeup-cluster.pfxvast.mongodb.net/?retryWrites=true&w=majority`,
+        {
+          useNewUrlParser: true,
+          useUnifiedTopology: true,
+          dbName: "easeup",
+        }
+      ),
+      redisClient.connect()
+    ])
     log.info("Connected to MongoDB and running");
 
   } catch (err) {
