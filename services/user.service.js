@@ -19,9 +19,7 @@ const options = {
   hostname: "https://api.smsonlinegh.com/v4/message/sms/send",
 };
 const {
-  getUserCache,
-  cache,
-  getUserNotificationsCache,
+  redisClient, DEFAULT_EXPIRATION,
 } = require("../cache/user_cache");
 const {
   updateImageValidator,
@@ -41,7 +39,7 @@ const {
 const { isValidPassword, generatePassword } = require("../utils");
 const { generateToken } = require("../passport/common");
 const { PasswordReset } = require("../models/password_reset_model");
-const userCache = cache;
+const userCache = redisClient;
 class UserService {
   async createUserNotification(user, title, body, type, token) {
     try {
@@ -90,6 +88,7 @@ class UserService {
       const user = req.user.id;
 
       await Promise.all([userModel.findByIdAndDelete(user)]);
+      await redisClient.del(`user/${user}`)
       return {
         msg: "user Profile Deleted",
         status: 200,
@@ -110,7 +109,6 @@ class UserService {
       // Find the user
       const userData = await userModel.findById(userId);
       // cache data
-      console.log("User data ", userData)
       if (!userData)
         return {
           msg: "Something went wrong. User not found",
@@ -118,7 +116,7 @@ class UserService {
           success: false,
         }; // Internal Server Error
 
-      userCache.set(`user/${userId}`, userData);
+      await userCache.setEx(`user/${userId}`, DEFAULT_EXPIRATION, JSON.stringify(userData));
 
       // return user data
       return {
@@ -129,8 +127,6 @@ class UserService {
       };
 
     } catch (e) {
-      log.warn(e.message);
-      console.log(e);
       return { status: 500, msg: e.message, success: false };
     }
   }
@@ -154,7 +150,7 @@ class UserService {
         profile_picture: profile_picture,
       });
       // load user from cache and update
-      userCache.del(`user/${userId}`);
+      await userCache.del(`user/${userId}`);
       return {
         msg: "Profile updated",
         status: 200,
@@ -191,7 +187,7 @@ class UserService {
           latlng,
         },
       });
-      userCache.del(`user/${userId}`);
+      await userCache.del(`user/${userId}`);
 
       return {
         msg: "Profile updated",
@@ -225,7 +221,7 @@ class UserService {
       const updatedUser = await userModel.findByIdAndUpdate(userId, {
         gender: gender,
       });
-      userCache.del(`user/${userId}`);
+      await userCache.del(`user/${userId}`);
 
       return {
         msg: "Profile updated",
@@ -264,7 +260,7 @@ class UserService {
         status: 404,
         success: false
       }
-      userCache.del(`user/${userId}`);
+      await userCache.del(`user/${userId}`);
 
       return {
         msg: "Profile token updated",
@@ -304,7 +300,7 @@ class UserService {
           success: false,
         };
       }
-      userCache.del(`user/${userId}`);
+      await userCache.del(`user/${userId}`);
 
       return {
         msg: "Profile updated",
@@ -346,7 +342,7 @@ class UserService {
           success: false,
         };
       }
-      userCache.del(`user/${userId}`);
+      await userCache.del(`user/${userId}`);
 
       return {
         msg: "Profile updated",
@@ -391,6 +387,7 @@ class UserService {
           success: false,
         };
       }
+      await userCache.del(`user/${userId}`);
       // Update the user
       return { msg: "User Updated", status: 200, success: true };
     } catch (e) {
@@ -468,7 +465,7 @@ class UserService {
           success: false,
         };
       }
-      userCache.del(`user/${userId}`);
+      await userCache.del(`user/${userId}`);
 
       // Update the user
       return {
@@ -523,7 +520,7 @@ class UserService {
         };
       }
 
-      userCache.del(`user/${userId}`);
+      await userCache.del(`user/${userId}`);
 
       return {
         msg: `Code has been verified successfully.`,
@@ -536,6 +533,7 @@ class UserService {
       return { status: 500, msg: e.message, success: false };
     }
   }
+
   async userLogin(req, res) {
     try {
       // validating request body submitted
@@ -684,10 +682,12 @@ class UserService {
       }
 
       // cache data
-      userCache.set(
+      await userCache.setEx(
         `notifications/${userId}`,
+        DEFAULT_EXPIRATION,
         JSON.stringify(userNotifications)
       );
+
       return {
         msg: "Notifications Found",
         status: 200,
@@ -755,7 +755,7 @@ class UserService {
       //check firebase if uid exists
 
       // Find the user
-      const retrievedUser = userModel.findById(userId);
+      const retrievedUser = await userModel.findById(userId);
 
       if (!retrievedUser)
         return { msg: "User Not Found", status: 404, success: false }; // User Not Found
