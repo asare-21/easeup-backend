@@ -1,6 +1,5 @@
 const { redisClient } = require("./user_cache");
 
-const redisClient = cache
 
 module.exports.getWorkerProfileCache = async function getWorkerProfileCache(req, res, next) {
     // use user id to get user cache
