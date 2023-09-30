@@ -10,7 +10,7 @@ const {
 } = require("../models/worker_profile_verification_model");
 const otpGenerator = require("otp-generator");
 const { locationModel } = require("../models/workerLocationModel");
-const { cache } = require("../cache/user_cache");
+const { redisClient, DEFAULT_EXPIRATION } = require("../cache/user_cache");
 const {
   createWorkerValidator,
   updateWorkerLocationValidator,
@@ -19,7 +19,7 @@ const {
   updateUserNotificationsValidator,
   loginWorkerValidator,
 } = require("../validators/worker.validator");
-const workerCache = cache;
+const workerCache = redisClient;
 const {
   createWorkerProfileAndVerification,
   generatePassword,
@@ -79,7 +79,7 @@ class WorkerService {
       // check if worker is valid
       const result = await workerModel.findById(workerId);
 
-      workerCache.set(`worker/${workerId}`, result); //cache results
+      await workerCache.setEx(`worker/${workerId}`, DEFAULT_EXPIRATION, JSON.stringify(result)); //cache results
 
       return {
         msg: "Worker Profile",
@@ -136,7 +136,7 @@ class WorkerService {
         return { status: 404, msg: "worker not found", success: false };
       }
 
-      workerCache.set(`worker-token/${result._id}`, result.token); //cache results
+      await workerCache.setEx(`worker-token/${result._id}`, DEFAULT_EXPIRATION, JSON.stringify(result.token)); //cache results
 
       await admin.messaging().sendToDevice(result.deviceToken, {
         notification: {
@@ -395,7 +395,7 @@ class WorkerService {
 
       if (!worker)
         return { msg: "Worker Not Found", status: 404, success: false }; // worker Not Found
-      workerCache.del(`worker/${workerId}`);
+      await workerCache.del(`worker/${workerId}`);
 
       // worker Found and returned
       return {
@@ -436,14 +436,14 @@ class WorkerService {
           ghc_number: ghc_n,
           ghc_exp: ghc_exp,
         },
-        (err, user) => {
+        async (err, user) => {
           if (err) {
             log.warn(err.message);
             return { msg: err.message, status: 500, success: false }; // Internal Server Error
           }
           if (!user)
             return { msg: "User Not Found", status: 404, success: false }; // User Not Found
-          cache.del(`worker/${workerId}`);
+          await workerCache.del(`worker/${workerId}`);
 
           return {
             msg: "Profile updated",
