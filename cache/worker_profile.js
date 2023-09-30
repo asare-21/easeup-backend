@@ -1,10 +1,10 @@
-const { cache } = require("./user_cache");
+const { redisClient } = require("./user_cache");
 
-const myCache = cache
+const redisClient = cache
 
 module.exports.getWorkerProfileCache = async function getWorkerProfileCache(req, res, next) {
     // use user id to get user cache
-    const worker = myCache.get(`worker-profile/${req.params.worker}`);
+    const worker = await redisClient.get(`worker-profile/${req.params.worker}`);
 
     console.log('cached worker profile', worker);
 
@@ -22,7 +22,7 @@ module.exports.getWorkerProfileCache = async function getWorkerProfileCache(req,
 
 module.exports.getWorkerPortfolioCache = async function getWorkerPortfolioCache(req, res, next) {
     // use user id to get user cache
-    const worker = myCache.get(`portfolio/${req.params.worker}`);
+    const worker = await redisClient.get(`portfolio/${req.params.worker}`);
     console.log('cached worker portfolio ', worker);
 
     if (worker !== null && worker !== undefined) {

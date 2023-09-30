@@ -12,7 +12,6 @@ module.exports.getintroCache = async function getintroCache(req, res, next) {
     next();
 }
 module.exports.getintroUserCache = async function getintroUserCache(req, res, next) {
-    console.log(module.exports)
     // use intro id to get intro cache
     const intro = await redisClient.get(`intro/user`);
 
