@@ -1,6 +1,6 @@
 const log = require("npmlog");
 const otpGenerator = require("otp-generator");
-const { cache } = require("../cache/user_cache");
+const { redisClient } = require("../cache/user_cache");
 const axios = require("axios");
 const {
   workerProfileVerificationModel,
@@ -82,7 +82,7 @@ class WorkerProfileVerificationService {
       ])
       if (!response[0] || !response[1]) return { status: 404, msg: "worker not found", success: false };
 
-      cache.del(`worker-profile/${worker}`);
+      await redisClient.del(`worker-profile/${worker}`);
       return {
         msg: "Profile updated",
         status: 200,
@@ -484,8 +484,8 @@ class WorkerProfileVerificationService {
 
       // Update the user if code matched
       await Promise.all([
-        cache.del(`worker-profile/${worker}`),
-        cache.del(`worker/${worker}`),
+        redisClient.del(`worker-profile/${worker}`),
+        redisClient.del(`worker/${worker}`),
         workerModel.findOneAndUpdate({ _id: worker }, {
           phone
         }),
