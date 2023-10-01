@@ -172,10 +172,10 @@ http.listen(PORT, async () => {
       ),
       redisClient.connect()
     ])
-    log.info("Connected to MongoDB and running");
 
   } catch (err) {
     console.error(err);
+
   }
 });
 

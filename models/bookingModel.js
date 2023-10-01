@@ -11,6 +11,9 @@ const cron = require('node-cron');
 const admin = require('firebase-admin');
 const { log } = require('npmlog');
 const { notificationUserModel, notificationWorkerModel } = require('./nofications');
+const { redisClient } = require('../cache/user_cache');
+const https = require("https");
+const secret = process.env.PAYSTACK_SECRET;
 const bookingSchema = new Schema({
     worker: {
         type: String,
@@ -226,7 +229,9 @@ cron.schedule('0 0 * * *', async () => {
                 workerNotificationPromise,
                 userNotificationPromise,
                 userFBNotificationPromise,
-                workerFBNotificationPromise
+                workerFBNotificationPromise,
+                // issue refund
+                issueRefund(booking.ref)
             ])
 
         }
@@ -284,3 +289,49 @@ cron.schedule('*/15 * * * *', async () => {
         console.error('Error executing cron job:', error);
     }
 });
+
+// refund worker
+async function issueRefund(ref) {
+    try {
+        // refund payment and cancel booking.
+        const { worker, reason } = req.body;
+        const options = {
+            method: "POST",
+            hostname: "api.paystack.co",
+            path: "/refund",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${secret}`,
+            },
+        };
+        const { ref } = req.params;
+        const foundBooking = await bookingModel.findOne({ ref }); // find booking
+        // Set refund details
+        const refundDetails = JSON.stringify({
+            transaction: foundBooking.ref,
+            // 'amount': (foundBooking.commitmentFee * 100),
+        });
+
+        const refundRequest = https.request(options, (response) => {
+            let data = "";
+            response.on("data", (chunk) => {
+                data += chunk;
+            });
+            response.on("end", async () => {
+                console.log(JSON.parse(data));
+                await Promise.all([
+                    redisClient.del(`in-progress-bookings/${worker}`),
+                    redisClient.del(`upcoming-bookings/${worker}`),
+                    redisClient.del(`cancelled-bookings/${worker}`)
+                ])
+                // send notification to device of worker and client
+            });
+        });
+        refundRequest.write(refundDetails);
+        refundRequest.end();
+    } catch (e) {
+        console.error(err)
+
+        return { status: 500, msg: e.message, success: false };
+    }
+}
