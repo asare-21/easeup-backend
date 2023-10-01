@@ -236,3 +236,51 @@ cron.schedule('0 0 * * *', async () => {
         console.error('Error executing cron job:', error);
     }
 });
+
+//cron job to send reminders to both clients and workers when job is 60 minutes && 24 hours to time
+// cron job should run every 15 minutes
+cron.schedule('*/15 * * * *', async () => {
+    try {
+        // get all pending bookings.
+        const bookings = await this.bookingModel.find({ pending: true, completed: false, cancelled: false }).populate('worker').populate('client').populate("slot").populate("jobId").exec();
+        if (!bookings) return;
+        // group bookings into those that are 24 hours away to start and 60 minutes to starts
+        const bookings24Hours = [];
+        const bookings60Minutes = [];
+
+        for (const booking of bookings) {
+            const bookingDate = new Date(booking.date);
+            const currentDate = new Date();
+            const timeDifference = bookingDate.getTime() - currentDate.getTime();
+            const hoursDifference = timeDifference / (1000 * 3600);
+            if (hoursDifference <= 24) {
+                bookings24Hours.push(booking);
+            }
+            if (hoursDifference <= 1) {
+                bookings60Minutes.push(booking);
+            }
+        }
+
+        // send notifications 
+        const message24Hours = {
+            notification: {
+                title: 'Booking Reminder',
+                body: `Hi there, this is to remind you that your booking starts in the next 24 hours`
+            },
+            tokens: [...bookings24Hours.map((user) => user.client.deviceToken), ...bookings24Hours.map((user) => user.worker.deviceToken)]
+        };
+
+        const message60Minutes = {
+            notification: {
+                title: 'Booking Reminder',
+                body: `Hi there, this is to remind you that your booking starts in the next 60 minutes`
+            },
+            tokens: [...bookings60Minutes.map((user) => user.client.deviceToken), ...bookings60Minutes.map((user) => user.worker.deviceToken)]
+        }
+
+        if (message24Hours.tokens.length != 0) await admin.messaging().send(message24Hours)
+        if (message60Minutes.tokens.length != 0) await admin.messaging().send(message60Minutes)
+    } catch (error) {
+        console.error('Error executing cron job:', error);
+    }
+});

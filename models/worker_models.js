@@ -6,7 +6,6 @@ const workerSchema = new Schema({
     required: true,
     unique: true,
     immutable: true,
-
   },
   name: {
     type: String,
