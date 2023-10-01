@@ -4,7 +4,7 @@ const admin = require("firebase-admin");
 
 module.exports.getWorkerCache = async function getWorkerCache(req, res, next) {
     // use user id to get user cache
-    const worker = redisClient.get(`worker/${req.params.worker}`);
+    const worker = await redisClient.get(`worker/${req.params.worker}`);
     console.log('cached worker ', worker);
     if (worker !== null && worker !== undefined) {
         console.log('Worker found in cache');
@@ -18,7 +18,7 @@ module.exports.getWorkerCache = async function getWorkerCache(req, res, next) {
 
 module.exports.getWorkerTokenCache = async function getWorkerTokenCache(req, res, next) {
     // use user id to get user cache
-    const worker = redisClient.get(`worker-token/${req.params.worker}`);
+    const worker = await redisClient.get(`worker-token/${req.params.worker}`);
     console.log('cached worker token ', worker);
     if (worker !== null && worker !== undefined) {
         console.log('Worker found in cache');
@@ -41,7 +41,7 @@ module.exports.getWorkerTokenCache = async function getWorkerTokenCache(req, res
 
 // reviews cache
 module.exports.getReviewsCache = async function getReviewsCache(req, res, next) {
-    const reviews = redisClient.get(`reviews/${req.params.worker}`);
+    const reviews = await redisClient.get(`reviews/${req.params.worker}`);
     console.log('cached reviews ', reviews);
     if (reviews !== null && reviews !== undefined) {
         console.log('Reviews found in cache');
@@ -56,7 +56,7 @@ module.exports.getReviewsCache = async function getReviewsCache(req, res, next) 
 
 // comments cache
 module.exports.getCommentsCache = async function getCommentsCache(req, res, next) {
-    const comments = redisClient.get(`comments/${req.params.post}`);
+    const comments = await redisClient.get(`comments/${req.params.post}`);
     console.log('cached comments ', comments);
     if (comments !== null && comments !== undefined) {
         console.log('Comments found in cache');
@@ -70,7 +70,7 @@ module.exports.getCommentsCache = async function getCommentsCache(req, res, next
 
 // booking cache
 module.exports.getBookingCache = async function getBookingCache(req, res, next) {
-    const booking = redisClient.get(`booking/${req.params.worker}`);
+    const booking = await redisClient.get(`booking/${req.params.worker}`);
     console.log('cached booking ', booking);
     if (booking !== null && booking !== undefined) {
         console.log('Booking found in cache');
@@ -84,7 +84,7 @@ module.exports.getBookingCache = async function getBookingCache(req, res, next) 
 
 // get upcoming booking cache
 module.exports.getUpcomingBookingCache = async function getUpcomingBookingCache(req, res, next) {
-    const booking = redisClient.get(`upcoming-bookings/${req.params.worker}`);
+    const booking = await redisClient.get(`upcoming-bookings/${req.params.worker}`);
     console.log('cached upcoming booking ', booking);
     if (booking !== null && booking !== undefined) {
         console.log('Upcoming Booking found in cache');
@@ -97,7 +97,7 @@ module.exports.getUpcomingBookingCache = async function getUpcomingBookingCache(
 }
 // get Pending booking cache
 module.exports.getPendingBookingCache = async function getPendingBookingCache(req, res, next) {
-    const booking = redisClient.get(`pending-bookings/${req.params.worker}`);
+    const booking = await redisClient.get(`pending-bookings/${req.params.worker}`);
     console.log('cached upcoming booking ', booking);
     if (booking !== null && booking !== undefined) {
         console.log('Pending Booking found in cache');
@@ -111,7 +111,7 @@ module.exports.getPendingBookingCache = async function getPendingBookingCache(re
 
 // get in progress booking cache
 module.exports.getInProgressBookingCache = async function getInProgressBookingCache(req, res, next) {
-    const booking = redisClient.get(`in-progress-bookings/${req.params.worker}`);
+    const booking = await redisClient.get(`in-progress-bookings/${req.params.worker}`);
     console.log('cached in progress booking ', booking);
     if (booking !== null && booking !== undefined) {
         console.log('In Progress Booking found in cache');
@@ -125,7 +125,7 @@ module.exports.getInProgressBookingCache = async function getInProgressBookingCa
 
 // get completed booking cache
 module.exports.getCompletedBookingCache = async function getCompletedBookingCache(req, res, next) {
-    const booking = redisClient.get(`completed-bookings/${req.params.worker}`);
+    const booking = await redisClient.get(`completed-bookings/${req.params.worker}`);
     console.log('cached completed booking ', booking);
     if (booking !== null && booking !== undefined) {
         console.log('Completed Booking found in cache');
@@ -139,7 +139,7 @@ module.exports.getCompletedBookingCache = async function getCompletedBookingCach
 
 // get cancelled cache
 module.exports.getCancelledBookingCache = async function getCancelledBookingCache(req, res, next) {
-    const booking = redisClient.get(`cancelled-bookings/${req.params.worker}`);
+    const booking = await redisClient.get(`cancelled-bookings/${req.params.worker}`);
     console.log('cached cancelled booking ', booking);
     if (booking !== null && booking !== undefined) {
         console.log('Cancelled Booking found in cache');
@@ -153,7 +153,7 @@ module.exports.getCancelledBookingCache = async function getCancelledBookingCach
 
 // get worker review
 module.exports.getWorkerReviewCache = async function getWorkerReviewCache(req, res, next) {
-    const reviews = redisClient.get(`worker-review/${req.params.worker}`);
+    const reviews = await redisClient.get(`worker-review/${req.params.worker}`);
 
     console.log('cached worker review ', reviews);
 
@@ -174,8 +174,8 @@ module.exports.getWorkerReviewCache = async function getWorkerReviewCache(req, r
 
 // get popoular workers
 module.exports.getPopularWorkersCache = async function getPopularWorkersCache(req, res, next) {
-    const workers = redisClient.get(`popular-workers`);
-    const highestRated = redisClient.get(`popular-workers-sorted`);
+    const workers = await redisClient.get(`popular-workers`);
+    const highestRated = await redisClient.get(`popular-workers-sorted`);
 
     console.log('cached popular workers ', workers);
 
@@ -198,7 +198,7 @@ module.exports.getPopularWorkersCache = async function getPopularWorkersCache(re
 
 // paid bookings cache
 module.exports.getPaidBookingsCache = async function getPaidBookingsCache(req, res, next) {
-    const bookings = redisClient.get(`paid-bookings/${req.params.user}`);
+    const bookings = await redisClient.get(`paid-bookings/${req.params.user}`);
     console.log('cached paid bookings ', bookings);
     if (bookings !== null && bookings !== undefined) {
         console.log('Paid Bookings found in cache');

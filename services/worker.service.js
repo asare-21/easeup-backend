@@ -136,15 +136,18 @@ class WorkerService {
         return { status: 404, msg: "worker not found", success: false };
       }
 
-      await workerCache.setEx(`worker-token/${result._id}`, DEFAULT_EXPIRATION, JSON.stringify(result.token)); //cache results
+      const workerCachePromise = workerCache.setEx(`worker-token/${result._id}`, DEFAULT_EXPIRATION, JSON.stringify(result.token)); //cache results
 
-      await admin.messaging().sendToDevice(result.deviceToken, {
+      const firebaseMessagePromise = admin.messaging().sendToDevice(result.deviceToken, {
         notification: {
           title: "New job request",
           body: "You have a new job request from a user. Please check and accept or reject the request as soon as possible.",
         },
       });
-
+      await Promise.all([
+        firebaseMessagePromise,
+        workerCachePromise
+      ])
       return {
         msg: "Worker Profile",
         status: 200,

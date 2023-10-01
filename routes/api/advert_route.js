@@ -1,17 +1,21 @@
+const { advertCache } = require('../../cache/advert_cache');
+const { redisClient, DEFAULT_EXPIRATION } = require('../../cache/user_cache');
 const { advertModel } = require('../../models/advert_model');
 const { verifyJWT } = require('../../passport/common');
 
 const router = require('express').Router();
 
-router.get('/', verifyJWT, async (req, res) => {
+router.get('/', verifyJWT, advertCache, async (req, res) => {
     try {
         const adverts = await advertModel.find()
+
 
         if (!adverts) return res.json({
             success: false,
             adverts: []
         })
-
+        // set cache
+        await redisClient.setEx(`worker-token/${result._id}`, DEFAULT_EXPIRATION, JSON.stringify(adverts)); //cache results
         return res.json({
             success: true,
             adverts: adverts

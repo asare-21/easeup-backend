@@ -1,10 +1,10 @@
-const { cache } = require("./user_cache");
+const { redisClient } = require("./user_cache");
 
-const myCache = cache
+
 
 
 module.exports.jobPlanCache = async function jobPlanCache(req, res, next) {
-    const jobPlans = myCache.get(`plans/${req.params.client}`); // get the worker portfolio from cache based on page
+    const jobPlans = await redisClient.get(`plans/${req.params.client}`); // get the worker portfolio from cache based on page
     if (jobPlans !== null && jobPlans !== undefined) {
         return res.status(200).json({
             msg: 'job plans found', status: 200, success: true, jobPlans: JSON.parse(jobPlans)
@@ -14,7 +14,7 @@ module.exports.jobPlanCache = async function jobPlanCache(req, res, next) {
     next();
 }
 module.exports.singleJobPlanCache = async function singleJobPlanCache(req, res, next) {
-    const jobPlan = myCache.get(`plans/${req.params.client}/${req.params.job_id}`); // get the worker portfolio from cache based on page
+    const jobPlan = await redisClient.get(`plans/${req.params.client}/${req.params.job_id}`); // get the worker portfolio from cache based on page
 
     if (jobPlans !== null && jobPlans !== undefined) {
         return res.status(200).json({
