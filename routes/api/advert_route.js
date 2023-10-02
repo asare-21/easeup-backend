@@ -15,7 +15,7 @@ router.get('/', verifyJWT, advertCache, async (req, res) => {
             adverts: []
         })
         // set cache
-        await redisClient.setEx(`worker-token/${result._id}`, DEFAULT_EXPIRATION, JSON.stringify(adverts)); //cache results
+        await redisClient.setEx(`adverts`, DEFAULT_EXPIRATION, JSON.stringify(adverts)); //cache results
         return res.json({
             success: true,
             adverts: adverts

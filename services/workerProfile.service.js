@@ -1566,18 +1566,15 @@ class WorkerProfileService {
         return workerCounts[b] - workerCounts[a];
       });
 
-      console.log("worker: ", sortedWorkers);
-
       // get the profiles of the sorted workers
       for (const foundWorker of sortedWorkers) {
         const foundProfile = await workerProfileModel.findOne({
           worker: foundWorker,
         });
-        console.log("Found profile", foundProfile);
+        // console.log("Found profile", foundProfile);
 
         if (foundProfile) {
           // get avg rating of worker
-          console.log("Found Worker", foundWorker);
           const rating = await reviewModel
             .aggregate([
               {
@@ -1591,7 +1588,7 @@ class WorkerProfileService {
               },
             ])
             .exec();
-          console.log("Rating", rating);
+
           if (rating.length > 0) {
             foundProfile.rating = rating[0].avgRating ?? 0;
           }
@@ -1601,6 +1598,7 @@ class WorkerProfileService {
       // set cache
       await workerCache.setEx(
         `popular-workers`,
+        DEFAULT_EXPIRATION,
         JSON.stringify({ profiles, popularServices, highest: sortedWorkers })
       );
 
@@ -1612,7 +1610,7 @@ class WorkerProfileService {
         success: true,
       };
     } catch (e) {
-      console.error(err)
+      console.error(e)
 
       return { status: 500, msg: e.message, success: false };
     }
