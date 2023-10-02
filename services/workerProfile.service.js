@@ -42,6 +42,7 @@ class WorkerProfileService {
     try {
       const worker = req.user.id;
       const { from, id } = req.query
+      console.log(req.query)
       // check if uid is valid
       const workerPromise = (from === "user" && id) ? workerProfileModel.findOne({ worker: id }) : workerProfileModel.findOne({ worker });
 
@@ -61,7 +62,12 @@ class WorkerProfileService {
 
       let avgRating = 0;
       let response = await Promise.all([workerPromise, rating, reviewModel.countDocuments({ worker: (from === "user" && id) ? id : worker })])
+      if (!response[0]) return {
+        msg: "Worker not found",
+        success: false,
+        status: 500,
 
+      }
       if (response[1].length > 0) avgRating = response[1].avgRating ?? 0;
 
       const totalReviews = response[2]
@@ -82,7 +88,7 @@ class WorkerProfileService {
       };
 
     } catch (e) {
-      console.error(err)
+      console.error(e)
 
       return { status: 500, msg: e.message, success: false };
     }
@@ -104,7 +110,7 @@ class WorkerProfileService {
         worker: foundWorker,
       };
     } catch (e) {
-      console.error(err)
+      console.error(e)
 
       return { status: 500, msg: e.message, success: false };
     }
@@ -124,7 +130,7 @@ class WorkerProfileService {
         posts,
       };
     } catch (e) {
-      console.error(err)
+      console.error(e)
 
       return { status: 500, msg: e.message, success: false };
     }
@@ -178,7 +184,7 @@ class WorkerProfileService {
         comment,
       };
     } catch (e) {
-      console.error(err)
+      console.error(e)
 
       return { status: 500, msg: e.message, success: false };
     }
@@ -212,7 +218,7 @@ class WorkerProfileService {
         worker: foundWorker,
       };
     } catch (e) {
-      console.error(err)
+      console.error(e)
 
       return { status: 500, msg: e.message, success: false };
     }
@@ -248,7 +254,7 @@ class WorkerProfileService {
         worker: foundWorker,
       };
     } catch (e) {
-      console.error(err)
+      console.error(e)
 
       return { status: 500, msg: e.message, success: false };
     }
@@ -284,7 +290,7 @@ class WorkerProfileService {
         worker: foundWorker,
       };
     } catch (e) {
-      console.error(err)
+      console.error(e)
 
       return { status: 500, msg: e.message, success: false };
     }
@@ -321,7 +327,7 @@ class WorkerProfileService {
         worker: foundWorker,
       };
     } catch (e) {
-      console.error(err)
+      console.error(e)
 
       return { status: 500, msg: e.message, success: false };
     }
@@ -358,7 +364,7 @@ class WorkerProfileService {
         worker: foundWorker,
       };
     } catch (e) {
-      console.error(err)
+      console.error(e)
 
       return { status: 500, msg: e.message, success: false };
     }
@@ -402,7 +408,7 @@ class WorkerProfileService {
         };
       });
     } catch (e) {
-      console.error(err)
+      console.error(e)
 
       return { status: 500, msg: e.message, success: false };
     }
@@ -431,7 +437,7 @@ class WorkerProfileService {
         worker: posts,
       };
     } catch (e) {
-      console.error(err)
+      console.error(e)
 
       return { status: 500, msg: e.message, success: false };
     }
@@ -482,7 +488,7 @@ class WorkerProfileService {
         }
       );
     } catch (e) {
-      console.error(err)
+      console.error(e)
 
       return { status: 500, msg: e.message, success: false };
     }
@@ -504,7 +510,7 @@ class WorkerProfileService {
         bookings,
       };
     } catch (e) {
-      console.error(err)
+      console.error(e)
 
       return { status: 500, msg: e.message, success: false };
     }
@@ -524,7 +530,7 @@ class WorkerProfileService {
         bookings,
       };
     } catch (e) {
-      console.error(err)
+      console.error(e)
 
       return { status: 500, msg: e.message, success: false };
     }
@@ -554,7 +560,7 @@ class WorkerProfileService {
         bookings,
       };
     } catch (e) {
-      console.error(err)
+      console.error(e)
 
       return { status: 500, msg: e.message, success: false };
     }
@@ -584,7 +590,7 @@ class WorkerProfileService {
         bookings,
       };
     } catch (e) {
-      console.error(err)
+      console.error(e)
 
       return { status: 500, msg: e.message, success: false };
     }
@@ -612,7 +618,7 @@ class WorkerProfileService {
         bookings,
       };
     } catch (e) {
-      console.error(err)
+      console.error(e)
 
       return { status: 500, msg: e.message, success: false };
     }
@@ -639,7 +645,7 @@ class WorkerProfileService {
         bookings,
       }
     } catch (e) {
-      console.error(err)
+      console.error(e)
 
       return { status: 500, msg: e.message, success: false };
     }
@@ -666,7 +672,7 @@ class WorkerProfileService {
         bookings,
       };
     } catch (e) {
-      console.error(err)
+      console.error(e)
 
       return { status: 500, msg: e.message, success: false };
     }
@@ -740,7 +746,7 @@ class WorkerProfileService {
         booking,
       };
     } catch (e) {
-      console.error(err)
+      console.error(e)
 
       return { status: 500, msg: e.message, success: false };
     }
@@ -815,7 +821,7 @@ class WorkerProfileService {
         // booking: bookingStarted,
       };
     } catch (e) {
-      console.error(err)
+      console.error(e)
 
       return { status: 500, msg: e.message, success: false };
     }
@@ -852,7 +858,7 @@ class WorkerProfileService {
         success: true,
       };
     } catch (e) {
-      console.error(err)
+      console.error(e)
 
       return { status: 500, msg: e.message, success: false };
     }
@@ -905,7 +911,7 @@ class WorkerProfileService {
         total: totalReviews,
       };
     } catch (e) {
-      console.error(err)
+      console.error(e)
 
       return { status: 500, msg: e.message, success: false };
     }
@@ -994,7 +1000,7 @@ class WorkerProfileService {
         timeslots: availableSlots,
       };
     } catch (e) {
-      console.error(err)
+      console.error(e)
 
       return { status: 500, msg: e.message, success: false };
     }
@@ -1129,7 +1135,7 @@ class WorkerProfileService {
         result,
       };
     } catch (e) {
-      console.error(err)
+      console.error(e)
 
       return { status: 500, msg: e.message, success: false };
     }
@@ -1217,7 +1223,7 @@ class WorkerProfileService {
         status: 200,
       };
     } catch (e) {
-      console.error(err)
+      console.error(e)
 
       return { status: 500, msg: e.message, success: false };
     }
@@ -1303,7 +1309,7 @@ class WorkerProfileService {
       refundRequest.write(refundDetails);
       refundRequest.end();
     } catch (e) {
-      console.error(err)
+      console.error(e)
 
       return { status: 500, msg: e.message, success: false };
     }
@@ -1374,7 +1380,7 @@ class WorkerProfileService {
       refundRequest.write(refundDetails);
       refundRequest.end();
     } catch (e) {
-      console.error(err)
+      console.error(e)
 
       return { status: 500, msg: e.message, success: false };
     }
@@ -1439,7 +1445,7 @@ class WorkerProfileService {
         bookings,
       };
     } catch (e) {
-      console.error(err)
+      console.error(e)
 
       return { status: 500, msg: e.message, success: false };
     }
@@ -1503,7 +1509,7 @@ class WorkerProfileService {
         bookings,
       };
     } catch (e) {
-      console.error(err)
+      console.error(e)
 
       return { status: 500, msg: e.message, success: false };
     }
@@ -1531,7 +1537,7 @@ class WorkerProfileService {
         success: true,
       };
     } catch (e) {
-      console.error(err)
+      console.error(e)
 
       return { status: 500, msg: e.message, success: false };
     }
@@ -1639,7 +1645,7 @@ class WorkerProfileService {
       };
     }
     catch (e) {
-      console.error(err)
+      console.error(e)
 
       return { status: 500, msg: e.message, success: false }
     }
