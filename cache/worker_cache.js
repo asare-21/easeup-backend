@@ -9,7 +9,7 @@ module.exports.getWorkerCache = async function getWorkerCache(req, res, next) {
     if (worker !== null && worker !== undefined) {
         console.log('Worker found in cache');
         return res.status(200).json({
-            msg: 'worker Found', status: 200, success: true, worker
+            msg: 'worker Found', status: 200, success: true, worker: JSON.parse(worker)
         })
     }
     console.log('Worker not found in cache');
@@ -31,7 +31,7 @@ module.exports.getWorkerTokenCache = async function getWorkerTokenCache(req, res
         })
 
         return res.status(200).json({
-            msg: 'worker Found', status: 200, success: true, token: worker
+            msg: 'worker Found', status: 200, success: true, token: JSON.parse(worker)
         })
     }
 
