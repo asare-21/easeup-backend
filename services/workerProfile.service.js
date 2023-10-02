@@ -41,12 +41,14 @@ class WorkerProfileService {
   async findWorker(req, res) {
     try {
       const worker = req.user.id;
+      const { from, id } = req.query
       // check if uid is valid
-      const workerPromise = workerProfileModel.findOne({ worker });
+      const workerPromise = (from === "user" && id) ? workerProfileModel.findOne({ worker: id }) : workerProfileModel.findOne({ worker });
+
       const rating = reviewModel
         .aggregate([
           {
-            $match: { worker },
+            $match: { worker: (from === "user" && id) ? id : worker },
           },
           {
             $group: {
@@ -58,16 +60,18 @@ class WorkerProfileService {
         .exec();
 
       let avgRating = 0;
-      let response = await Promise.all([workerPromise, rating, reviewModel.countDocuments({ worker })])
+      let response = await Promise.all([workerPromise, rating, reviewModel.countDocuments({ worker: (from === "user" && id) ? id : worker })])
 
       if (response[1].length > 0) avgRating = response[1].avgRating ?? 0;
 
       const totalReviews = response[2]
+
       if (response[0] !== null) {
         response[0].rating = avgRating;
         response[0].totalReviews = totalReviews;
         response[0].jobs = totalReviews;
       }
+
       return {
         msg: "Worker Profile",
         status: 200,
@@ -76,6 +80,7 @@ class WorkerProfileService {
         avgRating: avgRating ?? 0,
         totalReviews,
       };
+
     } catch (e) {
       console.error(err)
 
