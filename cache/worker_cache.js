@@ -175,7 +175,7 @@ module.exports.getWorkerReviewCache = async function getWorkerReviewCache(req, r
 // get popoular workers
 module.exports.getPopularWorkersCache = async function getPopularWorkersCache(req, res, next) {
     const workers = await redisClient.get(`popular-workers`);
-    const highestRated = await redisClient.get(`popular-workers-sorted`);
+
 
     console.log('cached popular workers ', workers);
 
@@ -209,3 +209,4 @@ module.exports.getPaidBookingsCache = async function getPaidBookingsCache(req, r
     console.log('Paid Bookings not found in cache');
     next();
 }
+
