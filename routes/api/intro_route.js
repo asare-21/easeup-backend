@@ -10,7 +10,7 @@ router.get("/", getintroCache, async (req, res) => {
         const intro = await introModel.find();
 
         if (!intro) return res.status(404).json({ msg: "No intro found", success: false });
-        await redisClient.setEx(`intro`, DEFAULT_EXPIRATION, JSON.stringify(intro));
+        redisClient.setEx(`intro`, DEFAULT_EXPIRATION, JSON.stringify(intro));
         return res.status(200).json({ intro, success: true });
     }
     catch (e) {
