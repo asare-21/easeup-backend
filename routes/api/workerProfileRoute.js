@@ -11,7 +11,7 @@ const { mediaModel } = require("../../models/mediaModel");
 const { reviewModel } = require("../../models/reviews_model");
 const { workerProfileModel } = require("../../models/worker_profile_model");
 const { commonError, returnUnAuthUserError } = require("./user_route");
-const { cache } = require("../../cache/user_cache");
+const { cache, DEFAULT_EXPIRATION } = require("../../cache/user_cache");
 const { bookingModel } = require("../../models/bookingModel");
 const workerCache = cache;
 const { isValidDate } = require("../../utils");
@@ -96,7 +96,7 @@ router.get("/:worker", workerVerifyJWT, getWorkerProfileCache, async (req, res) 
     promiseWorker.totalReviews = totalReviews;
     promiseWorker.jobs = totalReviews;
     // console.log(foundWorker, avgRating, reviews)
-    workerCache.set(`worker-profile/${worker}`, JSON.stringify(promiseWorker));
+    workerCache.setEx(`worker-profile/${worker}`, DEFAULT_EXPIRATION, JSON.stringify(promiseWorker));
 
     return res.status(200).json({
       msg: "Worker Profile",
@@ -124,7 +124,7 @@ router.get("/reviews/:worker", workerVerifyJWT, getReviewsCache, async (req, res
     const foundWorker = await reviewModel.find({ worker });
 
     if (foundWorker)
-      workerCache.set(`reviews/${worker}`, JSON.stringify(foundWorker));
+      workerCache.setEx(`reviews/${worker}`, DEFAULT_EXPIRATION, JSON.stringify(foundWorker));
 
     return res.status(200).json({
       msg: "Worker Profile",
@@ -153,7 +153,7 @@ router.get(
       // check if uid is valid
       const posts = await commentModel.find({ post });
       // set cache
-      workerCache.set(`comments/${post}`, JSON.stringify(posts));
+      workerCache.setEx(`comments/${post}`, DEFAULT_EXPIRATION, JSON.stringify(posts));
       return res.status(200).json({
         msg: "Comments fetched",
         status: 200,
@@ -482,7 +482,7 @@ router.get(
         .limit(pageSize)
         .skip((page - 1) * pageSize); // get 5 posts per page
       if (!posts) return commonError(res, "No portfolio found");
-      workerCache.set(`portfolio/${page}/${worker}`, JSON.stringify(posts));
+      workerCache.setEx(`portfolio/${page}/${worker}`, DEFAULT_EXPIRATION, JSON.stringify(posts));
       return res.status(200).json({
         msg: "Worker Profile Media Fetched Successfully",
         status: 200,
@@ -551,7 +551,7 @@ router.get("/booking/:worker", workerVerifyJWT, getBookingCache, async (req, res
     // check if worker is valid
     const bookings = await bookingModel.find({ worker });
     // set cache
-    workerCache.set(`booking/${worker}`, JSON.stringify(bookings));
+    workerCache.setEx(`booking/${worker}`, DEFAULT_EXPIRATION, JSON.stringify(bookings));
     return res.status(200).json({
       msg: "Worker Profile Fetched Successfully",
       status: 200,
@@ -573,7 +573,7 @@ router.get("/paid/:user", workerVerifyJWT, getPaidBookingsCache, async (req, res
   try {
     const bookings = await bookingModel.find({ client: user, isPaid: true });
     // set cache
-    workerCache.set(`paid-bookings/${user}`, JSON.stringify(bookings));
+    workerCache.setEx(`paid-bookings/${user}`, DEFAULT_EXPIRATION, JSON.stringify(bookings));
     return res.status(200).json({
       msg: "Worker Profile Fetched Successfully",
       status: 200,
@@ -609,7 +609,7 @@ router.get(
       });
       console.log("Fetched bookings ", bookings);
       // set cahce
-      workerCache.set(`upcoming-bookings/${worker}`, JSON.stringify(bookings));
+      workerCache.setEx(`upcoming-bookings/${worker}`, DEFAULT_EXPIRATION, JSON.stringify(bookings));
 
       return res.status(200).json({
         msg: "Worker Profile Fetched Successfully",
@@ -711,7 +711,7 @@ router.get(
       });
 
       // set cache
-      workerCache.set(`completed-bookings/${worker}`, JSON.stringify(bookings));
+      workerCache.setEx(`completed-bookings/${worker}`, DEFAULT_EXPIRATION, JSON.stringify(bookings));
       return res.status(200).json({
         msg: "Worker Profile Fetched Successfully",
         status: 200,
@@ -748,7 +748,8 @@ router.get(
         cancelled: true,
       });
       // set cache
-      workerCache.set(`cancelled-bookings/${worker}`, JSON.stringify(bookings));
+      if (bookings)
+        await workerCache.setEx(`cancelled-bookings/${worker}`, DEFAULT_EXPIRATION, JSON.stringify(bookings));
       return res.status(200).json({
         msg: "Worker Profile Fetched Successfully",
         status: 200,
@@ -986,7 +987,7 @@ router.get(
       reviews.total = totalReviews;
 
       // set cache
-      workerCache.set(`worker-review/${worker}`, JSON.stringify(reviews));
+      workerCache.setEx(`worker-review/${worker}`, DEFAULT_EXPIRATION, JSON.stringify(reviews));
 
       return res.status(200).json({
         msg: "Review saved",
@@ -1665,8 +1666,9 @@ router.get(
         }
       }
       // set cache
-      workerCache.set(
+      workerCache.setEx(
         `popular-workers`,
+        DEFAULT_EXPIRATION,
         JSON.stringify({ profiles, popularServices, highest: sortedWorkers })
       );
 
