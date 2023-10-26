@@ -165,7 +165,6 @@ http.listen(PORT, async () => {
           useNewUrlParser: true,
           useUnifiedTopology: true,
           dbName: "easeup",
-
         }
       ),
       redisClient.connect()
@@ -174,7 +173,6 @@ http.listen(PORT, async () => {
 
   } catch (err) {
     console.error(err);
-
   }
 });
 
