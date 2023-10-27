@@ -1333,7 +1333,7 @@ class WorkerProfileService {
 
       // user and worker device tokens to send an alert that the refund has been process and booking cancelled
       const workerToken = await workerModel.findById(foundBooking.worker);
-      const userToken = await userModel.findById(client);
+      const userToken = await userModel.findById(req.user.id);
       // Set refund details
       const refundDetails = JSON.stringify({
         transaction: foundBooking.ref,
@@ -1347,6 +1347,8 @@ class WorkerProfileService {
         });
         response.on("end", async () => {
           console.log(JSON.parse(data));
+          const response = JSON.parse(data)
+
           // update booking to cancelled
           await bookingModel.findOneAndUpdate(
             { ref },
@@ -1370,15 +1372,17 @@ class WorkerProfileService {
               },
             }),
           ]); // parallel async
-          return {
-            msg: "Refund Processed",
-            status: 200,
-            success: true,
-          };
+
         });
       });
       refundRequest.write(refundDetails);
       refundRequest.end();
+
+      return {
+        msg: "request Processed",
+        status: 200,
+        success: true,
+      };
     } catch (e) {
       console.error(e)
 
