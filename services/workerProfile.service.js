@@ -895,8 +895,7 @@ class WorkerProfileService {
       const reviews = result[0];
       const avgRating = result[1];
       const totalReviews = result[2];
-
-      reviews.avgRating = avgRating[0].avgRating ?? 0;
+      reviews.avgRating = avgRating.length === 0 ? 0 : avgRating[0].avgRating ?? 0;
       reviews.total = totalReviews;
 
       // set cache
@@ -907,7 +906,7 @@ class WorkerProfileService {
         status: 200,
         success: true,
         reviews,
-        avgRating: avgRating[0].avgRating ?? 0,
+        avgRating: 0,
         total: totalReviews,
       };
     } catch (e) {
