@@ -163,20 +163,18 @@ class WorkerProfileService {
       // get worker
       const workerData = await workerModel.findById(worker);
       // send notification to worker
+      if (workerData.deviceToken) await admin.messaging().sendToDevice(workerData.deviceToken, {
+        notification: {
+          title: "New comment",
+          body: `${name} commented on your post`,
+        },
+        data: {
+          type: "comment",
+          post,
+        },
+      })
+      await newComment.save()
 
-      await Promise.all([
-        admin.messaging().sendToDevice(workerData.deviceToken, {
-          notification: {
-            title: "New comment",
-            body: `${name} commented on your post`,
-          },
-          data: {
-            type: "comment",
-            post,
-          },
-        }),
-        newComment.save()
-      ])
       return {
         msg: "Comment Added",
         status: 200,
