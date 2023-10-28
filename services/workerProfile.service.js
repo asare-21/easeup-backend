@@ -1350,14 +1350,20 @@ class WorkerProfileService {
           const response = JSON.parse(data)
 
           // update booking to cancelled
-          await bookingModel.findOneAndUpdate(
+          const foundBooking = await bookingModel.findOneAndUpdate(
             { ref },
             {
               cancelled: true,
               // cancelledReason: reason,
+              slot: "",
               endTime: Date.now(),
             }
           );
+          if (foundBooking) await timeslotModel.findOneAndUpdate({
+            ref: foundBooking._id
+          }, {
+            bookingId: ""
+          })
           await Promise.all([
             admin.messaging().sendToDevice(userToken.deviceToken, {
               notification: {
