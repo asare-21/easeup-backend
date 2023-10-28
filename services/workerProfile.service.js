@@ -149,7 +149,7 @@ class WorkerProfileService {
         };
       }
 
-      const worker = req.user.id;
+      const worker = req.params.worker;
       const { comment, image, from, post, name } = req.body;
 
       // check if uid is valid
@@ -162,6 +162,11 @@ class WorkerProfileService {
       });
       // get worker
       const workerData = await workerModel.findById(worker);
+      if(!workerData) return {
+        msg: "Worker not found. Comment not posted",
+        status: 400,
+        success:false
+      }
       // send notification to worker
       if (workerData.deviceToken) await admin.messaging().sendToDevice(workerData.deviceToken, {
         notification: {
@@ -173,6 +178,7 @@ class WorkerProfileService {
           post,
         },
       })
+
       await newComment.save()
 
       return {
