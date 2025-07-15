@@ -149,7 +149,7 @@ class WorkerProfileService {
         };
       }
 
-      const worker = req.user.id;
+      const worker = req.params.worker;
       const { comment, image, from, post, name } = req.body;
 
       // check if uid is valid
@@ -162,21 +162,25 @@ class WorkerProfileService {
       });
       // get worker
       const workerData = await workerModel.findById(worker);
+      if(!workerData) return {
+        msg: "Worker not found. Comment not posted",
+        status: 400,
+        success:false
+      }
       // send notification to worker
+      if (workerData.deviceToken) await admin.messaging().sendToDevice(workerData.deviceToken, {
+        notification: {
+          title: "New comment",
+          body: `${name} commented on your post`,
+        },
+        data: {
+          type: "comment",
+          post,
+        },
+      })
 
-      await Promise.all([
-        admin.messaging().sendToDevice(workerData.deviceToken, {
-          notification: {
-            title: "New comment",
-            body: `${name} commented on your post`,
-          },
-          data: {
-            type: "comment",
-            post,
-          },
-        }),
-        newComment.save()
-      ])
+      await newComment.save()
+
       return {
         msg: "Comment Added",
         status: 200,
@@ -895,8 +899,7 @@ class WorkerProfileService {
       const reviews = result[0];
       const avgRating = result[1];
       const totalReviews = result[2];
-
-      reviews.avgRating = avgRating[0].avgRating ?? 0;
+      reviews.avgRating = avgRating.length === 0 ? 0 : avgRating[0].avgRating ?? 0;
       reviews.total = totalReviews;
 
       // set cache
@@ -907,7 +910,7 @@ class WorkerProfileService {
         status: 200,
         success: true,
         reviews,
-        avgRating: avgRating[0].avgRating ?? 0,
+        avgRating: 0,
         total: totalReviews,
       };
     } catch (e) {
@@ -1333,7 +1336,7 @@ class WorkerProfileService {
 
       // user and worker device tokens to send an alert that the refund has been process and booking cancelled
       const workerToken = await workerModel.findById(foundBooking.worker);
-      const userToken = await userModel.findById(client);
+      const userToken = await userModel.findById(req.user.id);
       // Set refund details
       const refundDetails = JSON.stringify({
         transaction: foundBooking.ref,
@@ -1347,15 +1350,23 @@ class WorkerProfileService {
         });
         response.on("end", async () => {
           console.log(JSON.parse(data));
+          const response = JSON.parse(data)
+
           // update booking to cancelled
-          await bookingModel.findOneAndUpdate(
+          const foundBooking = await bookingModel.findOneAndUpdate(
             { ref },
             {
               cancelled: true,
               // cancelledReason: reason,
+              slot: "",
               endTime: Date.now(),
             }
           );
+          if (foundBooking) await timeslotModel.findOneAndUpdate({
+            ref: foundBooking._id
+          }, {
+            bookingId: ""
+          })
           await Promise.all([
             admin.messaging().sendToDevice(userToken.deviceToken, {
               notification: {
@@ -1370,15 +1381,17 @@ class WorkerProfileService {
               },
             }),
           ]); // parallel async
-          return {
-            msg: "Refund Processed",
-            status: 200,
-            success: true,
-          };
+
         });
       });
       refundRequest.write(refundDetails);
       refundRequest.end();
+
+      return {
+        msg: "request Processed",
+        status: 200,
+        success: true,
+      };
     } catch (e) {
       console.error(e)
 

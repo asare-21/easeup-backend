@@ -7,6 +7,11 @@ const servicesSchema = new Schema({
         type: String,
         required: true
     },
+    lottie: {
+        type: String,
+        required: false,
+        default: ""
+    },
     query: {
         type: String,
         required: true
@@ -14,7 +19,6 @@ const servicesSchema = new Schema({
     service: {
         type: String,
         required: true
-
     }
 }, {
     timestamps: true
