@@ -11,8 +11,12 @@ const cachePassword = process.env.AZURE_CACHE_FOR_REDIS_ACCESS_KEY;
 const redis = require('redis')
 
 const redisClient = redis.createClient({
-    url: `rediss://${cacheHostName}:6380`,
-    password: cachePassword,
+    username: cacheHostName,
+    socket: {
+        host: 'redis-19218.c261.us-east-1-4.ec2.redns.redis-cloud.com',
+        port: 19218
+    },
+        password: cachePassword,
 
 })
 // defaul expiration

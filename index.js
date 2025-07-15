@@ -160,7 +160,7 @@ http.listen(PORT, async () => {
         credential: FBadmin.credential.cert(serviceAccount),
       }),
       connect(
-        `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASS}@easeup-cluster.pfxvast.mongodb.net/?retryWrites=true&w=majority`,
+        `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASS}@beavercluster.xx2nucs.mongodb.net/?retryWrites=true&w=majority&appName=BeaverCluster`,
         {
           useNewUrlParser: true,
           useUnifiedTopology: true,
