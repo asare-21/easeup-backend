@@ -20,28 +20,27 @@ router.get('/get-chat-room/:id', async (req, res) => {
         // check if user is authenticated
         await admin.auth().getUser(id)
 
-
-        chatRoomModel.findOne({ room }, (err, doc) => {
-            if (err) {
-                return res.status(400).json({ msg: 'Error fetching chat room', status: 400, success: false })
-            }
-            return res.status(200).json({ msg: 'Chat room fetched', status: 200, success: true, exists: doc ? true : false, data: doc })
+        const doc = await chatRoomModel.findOne({ room }).exec();
+        return res.status(200).json({ 
+            msg: 'Chat room fetched', 
+            status: 200, 
+            success: true, 
+            exists: doc ? true : false, 
+            data: doc 
         })
 
     } catch (error) {
-        if (e.errorInfo) {
-            // User Not Found
-            log.warn(e.message)
-            return returnUnAuthUserError(res, e.message)
+        if (error.errorInfo) {
+            log.warn(error.message)
+            return res.status(401).json({ msg: error.message, status: 401, success: false })
         }
-        return commonError(res, e.message)
+        return res.status(500).json({ msg: error.message, status: 500, success: false })
     }
 })
 router.get('/rooms/:id', async (req, res) => {
     try {
         const { type } = req.query; // type = worker or user
         const { id } = req.params;
-        console.log(id, type)
         if (!id) {
             return res.status(400).json({ msg: 'No user id provided', status: 400, success: false })
         }
@@ -53,20 +52,15 @@ router.get('/rooms/:id', async (req, res) => {
 
         let userWorker = type === 'worker' ? 'worker' : 'user';
 
-        chatRoomModel.find({ [userWorker]: id }, (err, rooms) => {
-            if (err) {
-                return res.status(400).json({ msg: 'Error fetching chat rooms', status: 400, success: false })
-            }
-            return res.status(200).json({ msg: 'Chat rooms fetched', status: 200, success: true, rooms })
-        })
+        const rooms = await chatRoomModel.find({ [userWorker]: id }).exec();
+        return res.status(200).json({ msg: 'Chat rooms fetched', status: 200, success: true, rooms })
 
     } catch (error) {
-        if (e.errorInfo) {
-            // User Not Found
-            log.warn(e.message)
-            return returnUnAuthUserError(res, e.message)
+        if (error.errorInfo) {
+            log.warn(error.message)
+            return res.status(401).json({ msg: error.message, status: 401, success: false })
         }
-        return commonError(res, e.message)
+        return res.status(500).json({ msg: error.message, status: 500, success: false })
     }
 })
 
@@ -82,7 +76,8 @@ router.post('/update-message-status', async (req, res) => {
         }
         // check if user is authenticated
         await admin.auth().getUser(from === user ? user : worker)
-        chatModel.findAndUpdate({
+        
+        const doc = await chatModel.findOneAndUpdate({
             _id: id,
             from,
             user,
@@ -91,25 +86,20 @@ router.post('/update-message-status', async (req, res) => {
             worker
         }, {
             is_read: true
-        }, (err, doc) => {
-            if (err) {
-                return res.status(400).json({ msg: 'Error updating message status', status: 400, success: false })
-            }
-            return res.status(200).json({ msg: 'Message status updated', status: 200, success: true, doc })
-        })
+        }, { new: true }).exec();
+        
+        return res.status(200).json({ msg: 'Message status updated', status: 200, success: true, doc })
     } catch (error) {
-        if (e.errorInfo) {
-            // User Not Found
-            log.warn(e.message)
-            return returnUnAuthUserError(res, e.message)
+        if (error.errorInfo) {
+            log.warn(error.message)
+            return res.status(401).json({ msg: error.message, status: 401, success: false })
         }
-        return commonError(res, e.message)
+        return res.status(500).json({ msg: error.message, status: 500, success: false })
     }
 })
 
 // get messages
 router.get('/messages/:id', async (req, res) => {
-
     try {
         const { room } = req.query; // type = worker or user
         const { id, page } = req.params;
@@ -123,23 +113,21 @@ router.get('/messages/:id', async (req, res) => {
         }
         // check if user is authenticated
         await admin.auth().getUser(id)
-        chatModel.find({
-            room,
-        }).skip((page - 1) * pageSize).limit(pageSize).sort({ createdAt: -1 }).exec((err, messages) => {
-            if (err) {
-                return res.status(400).json({ msg: 'Error fetching messages', status: 400, success: false })
-            }
-            return res.status(200).json({ msg: 'Messages fetched', status: 200, success: true, messages })
-        }
-        )
+        
+        const messages = await chatModel.find({ room })
+            .skip((page - 1) * pageSize)
+            .limit(pageSize)
+            .sort({ createdAt: -1 })
+            .exec();
+        
+        return res.status(200).json({ msg: 'Messages fetched', status: 200, success: true, messages })
     }
     catch (error) {
-        if (e.errorInfo) {
-            // User Not Found
-            log.warn(e.message)
-            return returnUnAuthUserError(res, e.message)
+        if (error.errorInfo) {
+            log.warn(error.message)
+            return res.status(401).json({ msg: error.message, status: 401, success: false })
         }
-        return commonError(res, e.message)
+        return res.status(500).json({ msg: error.message, status: 500, success: false })
     }
 })
 
@@ -164,24 +152,24 @@ router.delete('/delete-room/:id', async (req, res) => {
         }
         // check if user is authenticated
         await admin.auth().getUser(id)
-        chatRoomModel.findOneAndDelete({ room }, async (err, doc) => {
-            if (err) {
-                return res.status(400).json({ msg: 'Error deleting chat room', status: 400, success: false })
-            }
-            if (!doc) {
-                return res.status(400).json({ msg: 'No chat room found', status: 400, success: false })
-            }
-            await userModel.findOneAndUpdate({ _id: user }, { $pull: { rooms: room } })
-            await workerModel.findOneAndUpdate({ _id: worker }, { $pull: { rooms: room } })
-            return res.status(200).json({ msg: 'Chat room deleted', status: 200, success: true })
-        })
-    } catch (error) {
-        if (e.errorInfo) {
-            // User Not Found
-            log.warn(e.message)
-            return returnUnAuthUserError(res, e.message)
+        
+        const doc = await chatRoomModel.findOneAndDelete({ room }).exec();
+        if (!doc) {
+            return res.status(400).json({ msg: 'No chat room found', status: 400, success: false })
         }
-        return commonError(res, e.message)
+        
+        await Promise.all([
+            userModel.findOneAndUpdate({ _id: user }, { $pull: { rooms: room } }),
+            workerModel.findOneAndUpdate({ _id: worker }, { $pull: { rooms: room } })
+        ]);
+        
+        return res.status(200).json({ msg: 'Chat room deleted', status: 200, success: true })
+    } catch (error) {
+        if (error.errorInfo) {
+            log.warn(error.message)
+            return res.status(401).json({ msg: error.message, status: 401, success: false })
+        }
+        return res.status(500).json({ msg: error.message, status: 500, success: false })
     }
 })
 
