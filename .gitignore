@@ -8,3 +8,6 @@ public/fonts
 !.elasticbeanstalk/*.global.yml
 error.log
 combined.log
+.DS_Store
+*.log
+.idea

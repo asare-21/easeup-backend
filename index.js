@@ -89,6 +89,16 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
+// enforce https in production
+if (process.env.NODE_ENV !== "development") {
+  app.use(function (req, res, next) {
+    if (!req.secure) {
+      return res.redirect("https://" + req.headers.host + req.url);
+    }
+    next();
+  });
+}
+
 // Static files
 app.use(cors());
 app.use(compression());
@@ -143,15 +153,6 @@ app.use((req, res, next) => {
   });
 });
 
-
-// enforce https
-app.use(function (req, res, next) {
-  if (process.env.NODE_ENV != "development" && !req.secure) {
-    return res.redirect("https://" + req.headers.host + req.url);
-  }
-  next();
-});
-
 // Starting the server
 http.listen(PORT, async () => {
   try {
@@ -167,12 +168,16 @@ http.listen(PORT, async () => {
           dbName: "easeup",
         }
       ),
-      redisClient.connect()
+      redisClient.connect().catch(err => {
+        console.error("Redis connection failed:", err);
+        console.log("Server will continue without Redis cache");
+      })
     ])
     console.log("Connected to MongoDB");
-
+    console.log(`Server running on port ${PORT}`);
   } catch (err) {
-    console.error(err);
+    console.error("Server startup error:", err);
+    process.exit(1);
   }
 });
 
