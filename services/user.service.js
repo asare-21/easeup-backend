@@ -44,42 +44,44 @@ class UserService {
   async createUserNotification(user, title, body, type, token) {
     try {
       // required field : user
-      if (!user) return { msg: "Bad Request", status: 400, success: false }; // User ID is required
-      //check firebase if uid exists
+      if (!user) return { msg: "Bad Request", status: 400, success: false };
 
       // Find the user
-      userModel.findById(user, async (err, user) => {
-        if (err) return log.error("Internal Server Error"); // Internal Server Error
-        if (!user) return log.warn("User Not Found"); // User Not Found
-        // Create the notification
-        const notification = new notificationUserModel({
-          user,
-          title,
-          message: body,
-          type,
-        });
+      const foundUser = await userModel.findById(user);
+      if (!foundUser) {
+        log.warn("User Not Found");
+        return { msg: "User Not Found", status: 404, success: false };
+      }
 
-        const message = {
-          notification: {
-            title: title,
-            body: body,
-          },
-          token: token,
-        };
-
-        await Promise.all([
-          admin.messaging().send(message),
-          notification.save(),
-        ]);
+      // Create the notification
+      const notification = new notificationUserModel({
+        user,
+        title,
+        message: body,
+        type,
       });
+
+      const message = {
+        notification: {
+          title: title,
+          body: body,
+        },
+        token: token,
+      };
+
+      await Promise.all([
+        admin.messaging().send(message),
+        notification.save(),
+      ]);
+
+      return { msg: "Notification created", status: 200, success: true };
     } catch (e) {
       if (e.errorInfo) {
-        // User Not Found
         log.warn(e.message);
-
-        return returnUnAuthUserError(res, e.message);
+        return { msg: e.message, status: 401, success: false };
       }
-      return commonError(res, e.message);
+      log.error("Error creating notification:", e.message);
+      return { msg: e.message, status: 500, success: false };
     }
   }
   // get worker

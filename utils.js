@@ -10,68 +10,59 @@ const admin = require("firebase-admin");
 const crypto = require("crypto");
 
 async function getAndCacheUsers() {
-  console.log("getting users");
-  userModel.find((err, docs) => {
-    if (err) {
-      console.log(err);
-    }
+  try {
+    const docs = await userModel.find();
     if (docs) {
       docs.forEach((doc) => {
-        console.log("user ", doc._id, doc.profile_name);
-
         cache.set(`user/${doc._id}`, doc);
       });
+      log.info(`Cached ${docs.length} users`);
     }
-  });
+  } catch (err) {
+    log.error("Error caching users:", err);
+  }
 }
 
 async function getAndCacheWorkers() {
-  console.log("getting workers");
-  workerModel.find((err, docs) => {
-    if (err) {
-      console.log(err);
-    }
+  try {
+    const docs = await workerModel.find();
     if (docs) {
       docs.forEach((doc) => {
-        console.log("worker ", doc._id, doc.worker);
-
         cache.set(`worker/${doc._id}`, doc);
       });
+      log.info(`Cached ${docs.length} workers`);
     }
-  });
+  } catch (err) {
+    log.error("Error caching workers:", err);
+  }
 }
 
 async function getAndCacheWorkerProfiles() {
-  console.log("getting worker profiles");
-
-  workerProfileModel.find((err, docs) => {
-    if (err) {
-      console.log(err);
-    }
+  try {
+    const docs = await workerProfileModel.find();
     if (docs) {
       docs.forEach((doc) => {
-        console.log("worker profile ", doc.name, doc.worker);
         cache.set(`worker-profile/${doc.worker}`, JSON.stringify(doc));
       });
+      log.info(`Cached ${docs.length} worker profiles`);
     }
-  });
+  } catch (err) {
+    log.error("Error caching worker profiles:", err);
+  }
 }
 
 async function getAndCacheWorkerMedia() {
-  console.log("getting worker media");
-
-  mediaModel.find((err, docs) => {
-    if (err) {
-      console.log(err);
-    }
+  try {
+    const docs = await mediaModel.find();
     if (docs) {
       docs.forEach((doc) => {
-        console.log("worker profile media", doc._id, doc.worker);
-
         cache.set(`portfolio/${doc.worker}`, JSON.stringify(doc));
       });
+      log.info(`Cached ${docs.length} worker media items`);
     }
-  });
+  } catch (err) {
+    log.error("Error caching worker media:", err);
+  }
 }
 
 async function returnUnAuthUserError(res, msg) {
@@ -85,13 +76,15 @@ async function commonError(res, msg) {
 async function createNotification(user_id, title, body, type, token) {
   try {
     // required field : user_id
-
-    if (!user_id) return { msg: "Bad Request", status: 400, success: false }; // User ID is required
-    //check firebase if uid exists
+    if (!user_id) return { msg: "Bad Request", status: 400, success: false };
 
     // Find the user
-    const user = userModel.findById(user_id);
-    if (!user) return log.warn("User Not Found"); // User Not Found
+    const user = await userModel.findById(user_id);
+    if (!user) {
+      log.warn("User Not Found");
+      return { msg: "User Not Found", status: 404, success: false };
+    }
+
     // Create the notification
     const notification = new notificationModel({
       user: user_id,
@@ -99,7 +92,7 @@ async function createNotification(user_id, title, body, type, token) {
       message: body,
       type: type,
     });
-    await notification.save();
+
     // Use token to send a notification to the user
     const message = {
       notification: {
@@ -108,17 +101,21 @@ async function createNotification(user_id, title, body, type, token) {
       },
       token: token,
     };
-    await admin.messaging().send(message);
-    log.info("Notification sent to the user");
-    return log.info("Notification created");
+
+    await Promise.all([
+      admin.messaging().send(message),
+      notification.save()
+    ]);
+
+    log.info("Notification created and sent to the user");
+    return { msg: "Notification created", status: 200, success: true };
   } catch (e) {
     if (e.errorInfo) {
-      // User Not Found
       log.warn(e.message);
-
-      return returnUnAuthUserError(res, e.message);
+      return { msg: e.message, status: 401, success: false };
     }
-    return commonError(res, e.message);
+    log.error("Error creating notification:", e.message);
+    return { msg: e.message, status: 500, success: false };
   }
 }
 

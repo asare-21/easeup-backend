@@ -18,12 +18,14 @@ const bookingSchema = new Schema({
     worker: {
         type: String,
         ref: 'Worker',
-        required: true
+        required: true,
+        index: true
     },
     client: {
         type: String,
         ref: 'User',
-        required: true
+        required: true,
+        index: true
     },
     clientName: {
         type: String,
@@ -36,7 +38,8 @@ const bookingSchema = new Schema({
     date: {
         // start time of the slot
         type: Date,
-        default: Date.now
+        default: Date.now,
+        index: true
     },
     endTime: {
         // end time of the slot
@@ -57,11 +60,13 @@ const bookingSchema = new Schema({
     },
     isPaid: {
         type: Boolean,
-        default: false
+        default: false,
+        index: true
     },
     cancelled: {
         type: Boolean,
-        default: false
+        default: false,
+        index: true
     },
     cancelledReason: {
         type: String,
@@ -73,7 +78,8 @@ const bookingSchema = new Schema({
     },
     completed: {
         type: Boolean,
-        default: false
+        default: false,
+        index: true
     },
     started: {
         type: Boolean,
@@ -159,9 +165,9 @@ cron.schedule('*/15 * * * *', async () => {
             await workerProfileModel.updateOne({ _id }, { $set: { amount_earned: totalAmount } });
         }
 
-        console.log('Cron job completed successfully.');
+        log.info('Earnings cron job completed successfully.');
     } catch (error) {
-        console.error('Error executing cron job:', error);
+        log.error('Error executing earnings cron job:', error);
     }
 });
 

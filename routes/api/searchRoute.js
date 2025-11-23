@@ -33,7 +33,7 @@ router.post('/', async (req, res) => {
     const missing_fields = required_fields.filter(field => !req.body[field])
 
     if (missing_fields.length > 0) {
-        // return error of a field is misising
+        // return error of a field is missing
         return res.status(400).json({
             msg: 'Missing fields',
             status: 400,
@@ -45,42 +45,43 @@ router.post('/', async (req, res) => {
     const { service, uid, page, radius, location } = req.body
     // check if user is authenticated
     try {
-
         // search for workers in the service
-        await workerProfileModel.find({
+        const workers = await workerProfileModel.find({
             // skills: {
             //     $in: [service]
             // }
-        }, (err, workers) => {
-            if (err) {
-                console.log(err)
-                return commonError(res, err.message)
-            }
-            // filter workers by distance
-            const filteredWorkers = workers.filter(worker => {
-                const distance = getDistance(worker.location, location)
-                return worker.bio.length > 0
-            })
-            // Filtered
-            return res.status(200).json({
-                msg: 'Workers found',
-                status: 200,
-                success: true,
-                workers: filteredWorkers
-            })
-        }).limit(pageLimit).skip((page - 1) * pageLimit) // paginate the results
+        })
+        .limit(pageLimit)
+        .skip((page - 1) * pageLimit)
+        .exec();
+
+        // filter workers by distance
+        const filteredWorkers = workers.filter(worker => {
+            const distance = getDistance(worker.location, location)
+            return worker.bio.length > 0
+        })
+        
+        return res.status(200).json({
+            msg: 'Workers found',
+            status: 200,
+            success: true,
+            workers: filteredWorkers
+        })
     }
     catch (e) {
-        log.warn(e.message)
-        console.log(e.message)
+        log.error('Search error:', e.message)
         if (e.errorInfo) {
-            // User Not Found
-
-            return returnUnAuthUserError(res, e.message)
-        } else {
-            // return commonError(res, e.message)
-
+            return res.status(401).json({
+                msg: e.message,
+                status: 401,
+                success: false
+            })
         }
+        return res.status(500).json({
+            msg: e.message,
+            status: 500,
+            success: false
+        })
     }
 })
 

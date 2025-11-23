@@ -11,29 +11,35 @@ router.post('/notifications', async (req, res) => {
     }
     // validate worker
     try {
-        // send notification
-        const booking = await
-            bookingModel.findOneAndUpdate({ worker, ref }, { contactedCustomer: true })
-        const client = await userModel.findById(booking.client)
-        // run aysnc in parallel
-        await Promise.all([
-            admin.messaging().sendToDevice(client.deviceToken, {
-                data: {
-                    message
-                }
-            }),
-            // update record to show that customer has been contacted
-            bookingModel.findOneAndUpdate({ worker, ref }, { contactedCustomer: true })
-        ])
+        // Update booking and get client data in parallel
+        const [booking, client] = await Promise.all([
+            bookingModel.findOneAndUpdate({ worker, ref }, { contactedCustomer: true }, { new: true }),
+            bookingModel.findOne({ worker, ref }).then(b => b ? userModel.findById(b.client) : null)
+        ]);
+
+        if (!booking) {
+            return res.status(404).json({ msg: 'Booking not found.', status: 404, success: false });
+        }
+
+        if (!client) {
+            return res.status(404).json({ msg: 'Client not found.', status: 404, success: false });
+        }
+
+        // Send notification to client
+        await admin.messaging().sendToDevice(client.deviceToken, {
+            data: {
+                message
+            }
+        });
 
         return res.status(200).json({ msg: 'Notification sent.', status: 200, success: true })
     } catch (e) {
         if (e.errorInfo) {
-            // User Not Found
+            // Firebase error
             console.log(e.message)
-            return returnUnAuthUserError(res, e.message)
+            return res.status(401).json({ msg: e.message, status: 401, success: false })
         }
-        return commonError(res, e.message)
+        return res.status(500).json({ msg: e.message, status: 500, success: false })
     }
 })
 // route to update call variable

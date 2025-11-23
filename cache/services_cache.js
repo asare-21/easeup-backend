@@ -1,13 +1,17 @@
 const { redisClient } = require("./user_cache");
 
-
 module.exports.serviceCache = async function serviceCache(req, res, next) {
-    const services = await redisClient.get(`services`); // get the worker portfolio from cache based on page
-    if (services !== null && services !== undefined) {
-        return res.status(200).json({
-            msg: ' services found', status: 200, success: true, services: JSON.parse(services)
-        })
+    try {
+        const services = await redisClient.get(`services`);
+        if (services !== null && services !== undefined) {
+            return res.status(200).json({
+                msg: 'services found', status: 200, success: true, services: JSON.parse(services)
+            })
+        }
+        next();
+    } catch (error) {
+        console.error('Redis cache error:', error);
+        next();
     }
-    next();
 }
 

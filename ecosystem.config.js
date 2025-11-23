@@ -1,8 +1,20 @@
 module.exports = {
   apps: [{
+    name: 'easeup-backend',
     script: 'index.js',
-    watch: '.',
-    instances: '1',
+    watch: false,
+    instances: 'max',
+    exec_mode: 'cluster',
+    max_memory_restart: '500M',
+    error_file: './error.log',
+    out_file: './combined.log',
+    merge_logs: true,
+    env: {
+      NODE_ENV: 'development'
+    },
+    env_production: {
+      NODE_ENV: 'production'
+    }
   }],
 
   deploy: {

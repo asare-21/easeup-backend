@@ -14,42 +14,65 @@ const redisClient = redis.createClient({
     username: cacheHostName,
     socket: {
         host: 'redis-19218.c261.us-east-1-4.ec2.redns.redis-cloud.com',
-        port: 19218
+        port: 19218,
+        reconnectStrategy: (retries) => {
+            if (retries > 10) {
+                console.error('Redis max reconnection attempts reached');
+                return new Error('Redis max reconnection attempts reached');
+            }
+            return Math.min(retries * 100, 3000);
+        }
     },
-        password: cachePassword,
+    password: cachePassword,
+});
 
-})
+// Add error event handler
+redisClient.on('error', (err) => {
+    console.error('Redis Client Error:', err);
+});
+
+redisClient.on('connect', () => {
+    console.log('Redis client connected');
+});
+
 // defaul expiration
 const DEFAULT_EXPIRATION = 3600
 
 module.exports.getUserCache = async function getUserCache(req, res, next) {
-    // use user id to get user cache
-    const user = await redisClient.get(`user/${req.params.user_id}`);
-    console.log('cached user ', user);
+    try {
+        // use user id to get user cache
+        const user = await redisClient.get(`user/${req.params.user_id}`);
 
-    if (user !== null && user !== undefined) {
-        console.log('User found in cache');
-        return res.status(200).json({
-            msg: 'User Found', status: 200, success: true, user: JSON.parse(user)
-        })
+        if (user !== null && user !== undefined) {
+            return res.status(200).json({
+                msg: 'User Found', status: 200, success: true, user: JSON.parse(user)
+            })
+        }
+        next();
+    } catch (error) {
+        console.error('Redis cache error:', error);
+        // Continue to next middleware on cache error
+        next();
     }
-    console.log('User not found in cache');
-    next();
 }
 
 // notifications cache
 module.exports.getUserNotificationsCache = async function getNotificationsCache(req, res, next) {
-    const notifications = await redisClient.get(`notifications/${req.params.user_id}`);
-    console.log('cached notifications ', notifications);
-    if (notifications !== null && notifications !== undefined) {
-        console.log('Notifications found in cache');
-        return res.status(200).json({
-            msg: 'Notifications Found', status: 200, success: true,
-            notifications: JSON.parse(notifications)
-        })
+    try {
+        const notifications = await redisClient.get(`notifications/${req.params.user_id}`);
+        
+        if (notifications !== null && notifications !== undefined) {
+            return res.status(200).json({
+                msg: 'Notifications Found', status: 200, success: true,
+                notifications: JSON.parse(notifications)
+            })
+        }
+        next();
+    } catch (error) {
+        console.error('Redis cache error:', error);
+        // Continue to next middleware on cache error
+        next();
     }
-    console.log('Notifications not found in cache');
-    next();
 }
 
 module.exports.cache = myCache;
