@@ -17,6 +17,7 @@ const userSchema = new Schema({
     type: String,
     unique: true,
     immutable: true,
+    index: true,
   },
   token: {
     type: String,
@@ -38,6 +39,7 @@ const userSchema = new Schema({
     type: String,
     required: true,
     unique: true,
+    index: true,
   },
   profile_name: {
     type: String,

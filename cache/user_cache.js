@@ -14,11 +14,27 @@ const redisClient = redis.createClient({
     username: cacheHostName,
     socket: {
         host: 'redis-19218.c261.us-east-1-4.ec2.redns.redis-cloud.com',
-        port: 19218
+        port: 19218,
+        reconnectStrategy: (retries) => {
+            if (retries > 10) {
+                console.error('Redis max reconnection attempts reached');
+                return new Error('Redis max reconnection attempts reached');
+            }
+            return Math.min(retries * 100, 3000);
+        }
     },
-        password: cachePassword,
+    password: cachePassword,
+});
 
-})
+// Add error event handler
+redisClient.on('error', (err) => {
+    console.error('Redis Client Error:', err);
+});
+
+redisClient.on('connect', () => {
+    console.log('Redis client connected');
+});
+
 // defaul expiration
 const DEFAULT_EXPIRATION = 3600
 

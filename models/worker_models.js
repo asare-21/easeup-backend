@@ -6,6 +6,7 @@ const workerSchema = new Schema({
     required: true,
     unique: true,
     immutable: true,
+    index: true,
   },
   name: {
     type: String,
@@ -23,7 +24,7 @@ const workerSchema = new Schema({
     type: String,
     default: "",
   },
-  addres: {
+  address: {
     type: String,
     default: "",
   },
@@ -42,6 +43,7 @@ const workerSchema = new Schema({
   profile_verified: {
     type: Boolean,
     default: false,
+    index: true,
   },
   profile_verified_date: {
     type: Date,
@@ -67,6 +69,7 @@ const workerSchema = new Schema({
     type: String,
     required: true,
     unique: true,
+    index: true,
   },
   profile_name: {
     type: String,
